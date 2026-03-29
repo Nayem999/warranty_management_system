@@ -16,7 +16,7 @@ trait ApiResponse
 
         if ($data instanceof LengthAwarePaginator) {
             $response['data'] = $data->items();
-            $response['meta'] = [
+            $response['pagination'] = [
                 'current_page' => $data->currentPage(),
                 'per_page' => $data->perPage(),
                 'total' => $data->total(),

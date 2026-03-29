@@ -49,9 +49,12 @@ class AuthController extends Controller
         $user->save();
 
         $token = $user->createToken('auth-token')->plainTextToken;
+        $expiresAt = now()->addMinutes(config('sanctum.expiration', 14400));
 
         return $this->success([
             'token' => $token,
+            'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
+            'expires_in' => config('sanctum.expiration', 4320) * 60,
             'user' => $user,
             'permissions' => $user->permissions,
         ], 'Login successful.');
@@ -83,10 +86,10 @@ class AuthController extends Controller
             return $this->error('Login is disabled for this user.', 403);
         }
 
-        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $otp = env("SMS_STATUS") ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
 
         DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $user->email],
+            ['email' => $login],
             [
                 'token' => $otp,
                 'created_at' => now(),
@@ -140,9 +143,12 @@ class AuthController extends Controller
         $user->save();
 
         $token = $user->createToken('auth-token')->plainTextToken;
+        $expiresAt = now()->addMinutes(config('sanctum.expiration', 14400));
 
         return $this->success([
             'token' => $token,
+            'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
+            'expires_in' => config('sanctum.expiration', 4320) * 60,
             'user' => $user,
             'permissions' => $user->permissions,
         ], 'Login successful.');
