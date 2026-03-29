@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+class Claim extends BaseModel
+{
+    protected $table = 'wms_claims';
+
+    protected $fillable = [
+        'claim_number',
+        'product_serial',
+        'problem_description',
+        'customer_firstname',
+        'customer_lastname',
+        'customer_email',
+        'customer_phone',
+        'customer_city',
+        'customer_address',
+        'service_center_id',
+        'claim_date',
+        'status',
+        'created_by',
+    ];
+
+    protected $casts = [
+        'claim_date' => 'date',
+        'status' => 'string',
+    ];
+
+    public function warranty(): BelongsTo
+    {
+        return $this->belongsTo(Warranty::class, 'product_serial');
+    }
+
+    public function serviceCenter(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCenter::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function workOrder(): HasOne
+    {
+        return $this->hasOne(WorkOrder::class);
+    }
+
+    public function scopeOpen($query)
+    {
+        return $query->where('status', 'Open');
+    }
+
+    public function scopeClosed($query)
+    {
+        return $query->where('status', 'Closed');
+    }
+
+    public function scopeConverted($query)
+    {
+        return $query->where('status', 'Converted');
+    }
+
+    public static function generateClaimNumber(): string
+    {
+        $year = now()->year;
+        $lastClaim = static::whereYear('created_at', $year)->latest()->first();
+        $seq = $lastClaim ? (intval(substr($lastClaim->claim_number, -5)) + 1) : 1;
+        return 'CLM-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+    }
+}

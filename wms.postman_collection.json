@@ -1,0 +1,818 @@
+{
+  "info": {
+    "name": "Warranty Management System API",
+    "description": "SNP Distribution - Warranty Management System RESTful API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://localhost/warranty-management-system/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"password\": \"Admin@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/logout"
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/forgot-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@snpdist.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/reset-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"current_password\": \"Admin@1234\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/auth/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+8801234567890\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users?per_page=15&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["users"],
+              "query": [
+                {"key": "per_page", "value": "15"},
+                {"key": "page", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@snpdist.com\",\n    \"password\": \"Password@123\",\n    \"user_type\": \"staff\",\n    \"role_id\": 1,\n    \"phone\": \"+8801234567890\",\n    \"job_title\": \"Manager\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/users/1"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/users/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe Updated\",\n    \"phone\": \"+8801234567891\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/users/1"
+          }
+        },
+        {
+          "name": "Restore User",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/users/1/restore"
+          }
+        },
+        {
+          "name": "Get User Brand Access",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/users/1/brand-access"
+          }
+        },
+        {
+          "name": "Assign Brand Access",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/users/1/brand-access",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"brand_ids\": [1, 2]\n}"
+            }
+          }
+        },
+        {
+          "name": "Revoke Brand Access",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/users/1/brand-access/1"
+          }
+        },
+        {
+          "name": "Toggle User Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/users/1/toggle-status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "List Roles",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/roles"
+          }
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/roles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\"],\n        \"claims\": [\"view\", \"create\", \"edit\"]\n    }\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Role",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/roles/1"
+          }
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/roles/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Senior Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\", \"delete\"],\n        \"claims\": [\"view\", \"create\", \"edit\", \"delete\"]\n    }\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/roles/1"
+          }
+        },
+        {
+          "name": "Permissions List",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/roles/permissions/list"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Brands",
+      "item": [
+        {
+          "name": "List Brands",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/brands"
+          }
+        },
+        {
+          "name": "Create Brand",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/brands",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Apple\",\n    \"short_name\": \"APL\",\n    \"description\": \"Apple Inc. products\",\n    \"status\": \"active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Brand",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/brands/1"
+          }
+        },
+        {
+          "name": "Update Brand",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/brands/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Samsung Electronics\",\n    \"short_name\": \"SMG\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Brand",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/brands/1"
+          }
+        },
+        {
+          "name": "Get Brand Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/brands/1/categories"
+          }
+        },
+        {
+          "name": "Get Brand Warranties",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/brands/1/warranties"
+          }
+        },
+        {
+          "name": "Get Brand Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/brands/1/stats"
+          }
+        },
+        {
+          "name": "Toggle Brand Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/brands/1/toggle-status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/categories"
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"brand_id\": 1,\n    \"name\": \"Laptop\",\n    \"short_name\": \"LAP\",\n    \"status\": \"active\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Category",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/categories/1"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/categories/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Smartphones\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/categories/1"
+          }
+        },
+        {
+          "name": "Toggle Category Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/categories/1/toggle-status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Warranties",
+      "item": [
+        {
+          "name": "List Warranties",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/warranties"
+          }
+        },
+        {
+          "name": "Create Warranty",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/warranties",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"product_serial\": \"SMG-12345\",\n    \"product_name\": \"Samsung Galaxy S21\",\n    \"product_info\": \"64GB, Black\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2025-01-01\",\n    \"is_void\": \"NO\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Warranty",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/warranties/1"
+          }
+        },
+        {
+          "name": "Update Warranty",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/warranties/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"product_name\": \"Samsung Galaxy S21 Ultra\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Warranty",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/warranties/1"
+          }
+        },
+        {
+          "name": "Check Warranty by Serial",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/warranties/check/SMG-12345"
+          }
+        },
+        {
+          "name": "Void Warranty",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/warranties/1/void",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"void_reason\": \"Customer requested cancellation\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Unvoid Warranty",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/warranties/1/unvoid"
+          }
+        },
+        {
+          "name": "Get Warranty Claims",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/warranties/1/claims"
+          }
+        },
+        {
+          "name": "Expiring Soon Warranties",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/warranties/expiring-soon?days=30"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Claims",
+      "item": [
+        {
+          "name": "List Claims",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/claims"
+          }
+        },
+        {
+          "name": "Create Claim",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/claims",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"product_serial\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\",\n    \"claim_date\": \"2024-06-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Claim",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/claims/1"
+          }
+        },
+        {
+          "name": "Update Claim",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/claims/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"problem_description\": \"Screen not responding - updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Claim",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/claims/1"
+          }
+        },
+        {
+          "name": "Convert to Work Order",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/claims/1/convert-to-work-order",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"additional_comment\": \"Urgent repair needed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Close Claim",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/claims/1/close"
+          }
+        },
+        {
+          "name": "Get Claim Work Order",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/claims/1/work-order"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Work Orders",
+      "item": [
+        {
+          "name": "List Work Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/work-orders"
+          }
+        },
+        {
+          "name": "Get Work Order",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/work-orders/1"
+          }
+        },
+        {
+          "name": "Update Work Order",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/work-orders/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"part1_used\": \"New Screen Display\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Work Order",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/work-orders/1"
+          }
+        },
+        {
+          "name": "Assign Service Center",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/work-orders/1/assign",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"service_center_id\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/work-orders/1/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"In Progress\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Feedback Link",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/work-orders/1/feedback-link"
+          }
+        },
+        {
+          "name": "Pending Work Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/work-orders/pending"
+          }
+        },
+        {
+          "name": "Overdue Work Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/work-orders/overdue"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Service Centers",
+      "item": [
+        {
+          "name": "List Service Centers",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/service-centers"
+          }
+        },
+        {
+          "name": "Create Service Center",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/service-centers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Mirpur Service Center\",\n    \"address\": \"Mirpur, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"mirpur@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Service Center",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/service-centers/1"
+          }
+        },
+        {
+          "name": "Update Service Center",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/service-centers/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Mirpur Service Center - Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Service Center",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/service-centers/1"
+          }
+        },
+        {
+          "name": "Toggle Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/service-centers/1/toggle-status"
+          }
+        },
+        {
+          "name": "Get Service Center Work Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/service-centers/1/work-orders"
+          }
+        },
+        {
+          "name": "Get Service Center Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/service-centers/1/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get All Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/settings"
+          }
+        },
+        {
+          "name": "Create/Update Setting",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/settings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"key\": \"company_name\",\n    \"value\": \"SNP Distribution Ltd.\",\n    \"type\": \"app\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Setting",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/settings/company_name"
+          }
+        },
+        {
+          "name": "Delete Setting",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/settings/company_name"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/stats"
+          }
+        },
+        {
+          "name": "Warranty Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/warranty-stats"
+          }
+        },
+        {
+          "name": "Claim Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/claim-stats"
+          }
+        },
+        {
+          "name": "Work Order Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/work-order-stats"
+          }
+        },
+        {
+          "name": "Recent Claims",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/recent-claims"
+          }
+        },
+        {
+          "name": "Recent Work Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/recent-work-orders"
+          }
+        },
+        {
+          "name": "Brand Wise Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/brand-wise-summary"
+          }
+        },
+        {
+          "name": "Service Center Performance",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/service-center-performance"
+          }
+        },
+        {
+          "name": "Monthly Claims",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/monthly-claims"
+          }
+        },
+        {
+          "name": "Expiring Warranties",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard/expiring-warranties"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activity Logs",
+      "item": [
+        {
+          "name": "List Activity Logs",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/activity-logs"
+          }
+        }
+      ]
+    }
+  ]
+}
