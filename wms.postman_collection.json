@@ -33,10 +33,21 @@
           "name": "Login",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/login",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"password\": \"Admin@1234\"\n}"
+              "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"password\": \"Admin@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -44,14 +55,25 @@
               "name": "Success",
               "originalRequest": {
                 "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"password\": \"Admin@1234\"\n}"
+                  "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"password\": \"Admin@1234\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
               "code": 200,
-              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-03-29T15:30:00+00:00\",\n        \"expires_in\": 8640000,\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-03-29 04:30 PM\",\n        \"expires_in\": 259200,\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
             }
           ]
         },
@@ -59,6 +81,12 @@
           "name": "Logout",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/logout"
           }
         },
@@ -66,10 +94,21 @@
           "name": "Send OTP",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/send-otp",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"login\": \"admin@snpdist.com\"\n}"
+              "raw": "{\n    \"login\": \"admin@snpdist.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -77,9 +116,20 @@
               "name": "Success",
               "originalRequest": {
                 "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"login\": \"admin@snpdist.com\"\n}"
+                  "raw": "{\n    \"login\": \"admin@snpdist.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
@@ -92,10 +142,21 @@
           "name": "Login with OTP",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/login-with-otp",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"otp\": \"123456\"\n}"
+              "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"otp\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -103,14 +164,25 @@
               "name": "Success",
               "originalRequest": {
                 "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"otp\": \"123456\"\n}"
+                  "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"otp\": \"123456\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
               "code": 200,
-              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-03-29T15:30:00+00:00\",\n        \"expires_in\": 8640000,\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-03-29 04:30 PM\",\n        \"expires_in\": 259200,\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
             }
           ]
         },
@@ -118,10 +190,21 @@
           "name": "Forgot Password",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/forgot-password",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"admin@snpdist.com\"\n}"
+              "raw": "{\n    \"email\": \"admin@snpdist.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -129,9 +212,20 @@
               "name": "Success",
               "originalRequest": {
                 "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"email\": \"admin@snpdist.com\"\n}"
+                  "raw": "{\n    \"email\": \"admin@snpdist.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
@@ -144,10 +238,21 @@
           "name": "Reset Password",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/reset-password",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}"
+              "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -155,9 +260,20 @@
               "name": "Success",
               "originalRequest": {
                 "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}"
+                  "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
@@ -170,10 +286,21 @@
           "name": "Change Password",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/change-password",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"current_password\": \"Admin@1234\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}"
+              "raw": "{\n    \"current_password\": \"Admin@1234\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -183,13 +310,22 @@
                 "method": "POST",
                 "header": [
                   {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
                     "key": "Authorization",
                     "value": "Bearer {{auth_token}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"current_password\": \"Admin@1234\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}"
+                  "raw": "{\n    \"current_password\": \"Admin@1234\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
@@ -202,6 +338,12 @@
           "name": "Get Profile",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/me"
           },
           "response": [
@@ -210,6 +352,10 @@
               "originalRequest": {
                 "method": "GET",
                 "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
                   {
                     "key": "Authorization",
                     "value": "Bearer {{auth_token}}"
@@ -226,10 +372,21 @@
           "name": "Update Profile",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/auth/profile",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+8801234567890\"\n}"
+              "raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+8801234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [
@@ -239,13 +396,22 @@
                 "method": "PUT",
                 "header": [
                   {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
                     "key": "Authorization",
                     "value": "Bearer {{auth_token}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+8801234567890\"\n}"
+                  "raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+8801234567890\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "status": "OK",
@@ -263,6 +429,12 @@
           "name": "List Users",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/users?per_page=15&page=1",
               "host": ["{{base_url}}"],
@@ -278,10 +450,21 @@
           "name": "Create User",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@snpdist.com\",\n    \"password\": \"Password@123\",\n    \"user_type\": \"staff\",\n    \"role_id\": 1,\n    \"phone\": \"+8801234567890\",\n    \"job_title\": \"Manager\"\n}"
+              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@snpdist.com\",\n    \"password\": \"Password@123\",\n    \"user_type\": \"staff\",\n    \"role_id\": 1,\n    \"phone\": \"+8801234567890\",\n    \"job_title\": \"Manager\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -289,6 +472,12 @@
           "name": "Get User",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1"
           }
         },
@@ -296,10 +485,21 @@
           "name": "Update User",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe Updated\",\n    \"phone\": \"+8801234567891\"\n}"
+              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe Updated\",\n    \"phone\": \"+8801234567891\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -307,6 +507,12 @@
           "name": "Delete User",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1"
           }
         },
@@ -314,6 +520,12 @@
           "name": "Restore User",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1/restore"
           }
         },
@@ -321,6 +533,12 @@
           "name": "Get User Brand Access",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1/brand-access"
           }
         },
@@ -328,10 +546,21 @@
           "name": "Assign Brand Access",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1/brand-access",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"brand_ids\": [1, 2]\n}"
+              "raw": "{\n    \"brand_ids\": [1, 2]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -339,6 +568,12 @@
           "name": "Revoke Brand Access",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1/brand-access/1"
           }
         },
@@ -346,6 +581,12 @@
           "name": "Toggle User Status",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/users/1/toggle-status"
           }
         }
@@ -358,6 +599,12 @@
           "name": "List Roles",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/roles"
           }
         },
@@ -365,10 +612,21 @@
           "name": "Create Role",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/roles",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\"],\n        \"claims\": [\"view\", \"create\", \"edit\"]\n    }\n}"
+              "raw": "{\n    \"title\": \"Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\"],\n        \"claims\": [\"view\", \"create\", \"edit\"]\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -376,6 +634,12 @@
           "name": "Get Role",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/roles/1"
           }
         },
@@ -383,10 +647,21 @@
           "name": "Update Role",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/roles/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Senior Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\", \"delete\"],\n        \"claims\": [\"view\", \"create\", \"edit\", \"delete\"]\n    }\n}"
+              "raw": "{\n    \"title\": \"Senior Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\", \"delete\"],\n        \"claims\": [\"view\", \"create\", \"edit\", \"delete\"]\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -394,6 +669,12 @@
           "name": "Delete Role",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/roles/1"
           }
         },
@@ -401,6 +682,12 @@
           "name": "Permissions List",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/roles/permissions/list"
           }
         }
@@ -413,6 +700,12 @@
           "name": "List Brands",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands"
           }
         },
@@ -420,10 +713,21 @@
           "name": "Create Brand",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Apple\",\n    \"short_name\": \"APL\",\n    \"description\": \"Apple Inc. products\",\n    \"status\": \"active\"\n}"
+              "raw": "{\n    \"name\": \"Apple\",\n    \"short_name\": \"APL\",\n    \"description\": \"Apple Inc. products\",\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -431,6 +735,12 @@
           "name": "Get Brand",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1"
           }
         },
@@ -438,10 +748,21 @@
           "name": "Update Brand",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Samsung Electronics\",\n    \"short_name\": \"SMG\"\n}"
+              "raw": "{\n    \"name\": \"Samsung Electronics\",\n    \"short_name\": \"SMG\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -449,6 +770,12 @@
           "name": "Delete Brand",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1"
           }
         },
@@ -456,6 +783,12 @@
           "name": "Get Brand Categories",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1/categories"
           }
         },
@@ -463,6 +796,12 @@
           "name": "Get Brand Warranties",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1/warranties"
           }
         },
@@ -470,6 +809,12 @@
           "name": "Get Brand Stats",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1/stats"
           }
         },
@@ -477,6 +822,12 @@
           "name": "Toggle Brand Status",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/brands/1/toggle-status"
           }
         }
@@ -489,6 +840,12 @@
           "name": "List Categories",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/categories"
           }
         },
@@ -496,10 +853,21 @@
           "name": "Create Category",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/categories",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"brand_id\": 1,\n    \"name\": \"Laptop\",\n    \"short_name\": \"LAP\",\n    \"status\": \"active\"\n}"
+              "raw": "{\n    \"brand_id\": 1,\n    \"name\": \"Laptop\",\n    \"short_name\": \"LAP\",\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -507,6 +875,12 @@
           "name": "Get Category",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/categories/1"
           }
         },
@@ -514,10 +888,21 @@
           "name": "Update Category",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/categories/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Smartphones\"\n}"
+              "raw": "{\n    \"name\": \"Smartphones\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -525,6 +910,12 @@
           "name": "Delete Category",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/categories/1"
           }
         },
@@ -532,6 +923,12 @@
           "name": "Toggle Category Status",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/categories/1/toggle-status"
           }
         }
@@ -544,6 +941,12 @@
           "name": "List Warranties",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties"
           }
         },
@@ -551,10 +954,21 @@
           "name": "Create Warranty",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_serial\": \"SMG-12345\",\n    \"product_name\": \"Samsung Galaxy S21\",\n    \"product_info\": \"64GB, Black\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2025-01-01\",\n    \"is_void\": \"NO\"\n}"
+              "raw": "{\n    \"product_serial\": \"SMG-12345\",\n    \"product_name\": \"Samsung Galaxy S21\",\n    \"product_info\": \"64GB, Black\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2025-01-01\",\n    \"is_void\": \"NO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -562,6 +976,12 @@
           "name": "Get Warranty",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/1"
           }
         },
@@ -569,10 +989,21 @@
           "name": "Update Warranty",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_name\": \"Samsung Galaxy S21 Ultra\"\n}"
+              "raw": "{\n    \"product_name\": \"Samsung Galaxy S21 Ultra\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -580,6 +1011,12 @@
           "name": "Delete Warranty",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/1"
           }
         },
@@ -587,6 +1024,12 @@
           "name": "Check Warranty by Serial",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/check/SMG-12345"
           }
         },
@@ -594,10 +1037,21 @@
           "name": "Void Warranty",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/1/void",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"void_reason\": \"Customer requested cancellation\"\n}"
+              "raw": "{\n    \"void_reason\": \"Customer requested cancellation\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -605,6 +1059,12 @@
           "name": "Unvoid Warranty",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/1/unvoid"
           }
         },
@@ -612,6 +1072,12 @@
           "name": "Get Warranty Claims",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/1/claims"
           }
         },
@@ -619,6 +1085,12 @@
           "name": "Expiring Soon Warranties",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/warranties/expiring-soon?days=30"
           }
         }
@@ -631,6 +1103,12 @@
           "name": "List Claims",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims"
           }
         },
@@ -638,10 +1116,21 @@
           "name": "Create Claim",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_serial\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\",\n    \"claim_date\": \"2024-06-01\"\n}"
+              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\",\n    \"claim_date\": \"2024-06-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -649,6 +1138,12 @@
           "name": "Get Claim",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims/1"
           }
         },
@@ -656,10 +1151,21 @@
           "name": "Update Claim",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"problem_description\": \"Screen not responding - updated\"\n}"
+              "raw": "{\n    \"problem_description\": \"Screen not responding - updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -667,6 +1173,12 @@
           "name": "Delete Claim",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims/1"
           }
         },
@@ -674,10 +1186,21 @@
           "name": "Convert to Work Order",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims/1/convert-to-work-order",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"additional_comment\": \"Urgent repair needed\"\n}"
+              "raw": "{\n    \"service_center_id\": 1,\n    \"additional_comment\": \"Urgent repair needed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -685,6 +1208,12 @@
           "name": "Close Claim",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims/1/close"
           }
         },
@@ -692,6 +1221,12 @@
           "name": "Get Claim Work Order",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/claims/1/work-order"
           }
         }
@@ -704,6 +1239,12 @@
           "name": "List Work Orders",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders"
           }
         },
@@ -711,6 +1252,12 @@
           "name": "Get Work Order",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/1"
           }
         },
@@ -718,10 +1265,21 @@
           "name": "Update Work Order",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"part1_used\": \"New Screen Display\"\n}"
+              "raw": "{\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"part1_used\": \"New Screen Display\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -729,6 +1287,12 @@
           "name": "Delete Work Order",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/1"
           }
         },
@@ -736,10 +1300,21 @@
           "name": "Assign Service Center",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/1/assign",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 2\n}"
+              "raw": "{\n    \"service_center_id\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -747,10 +1322,21 @@
           "name": "Update Status",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/1/status",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"status\": \"In Progress\"\n}"
+              "raw": "{\n    \"status\": \"In Progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -758,6 +1344,12 @@
           "name": "Get Feedback Link",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/1/feedback-link"
           }
         },
@@ -765,6 +1357,12 @@
           "name": "Pending Work Orders",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/pending"
           }
         },
@@ -772,6 +1370,12 @@
           "name": "Overdue Work Orders",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/work-orders/overdue"
           }
         }
@@ -784,6 +1388,12 @@
           "name": "List Service Centers",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers"
           }
         },
@@ -791,10 +1401,21 @@
           "name": "Create Service Center",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Mirpur Service Center\",\n    \"address\": \"Mirpur, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"mirpur@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}"
+              "raw": "{\n    \"title\": \"Mirpur Service Center\",\n    \"address\": \"Mirpur, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"mirpur@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -802,6 +1423,12 @@
           "name": "Get Service Center",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers/1"
           }
         },
@@ -809,10 +1436,21 @@
           "name": "Update Service Center",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Mirpur Service Center - Updated\"\n}"
+              "raw": "{\n    \"title\": \"Mirpur Service Center - Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -820,6 +1458,12 @@
           "name": "Delete Service Center",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers/1"
           }
         },
@@ -827,6 +1471,12 @@
           "name": "Toggle Status",
           "request": {
             "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers/1/toggle-status"
           }
         },
@@ -834,6 +1484,12 @@
           "name": "Get Service Center Work Orders",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers/1/work-orders"
           }
         },
@@ -841,6 +1497,12 @@
           "name": "Get Service Center Stats",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/service-centers/1/stats"
           }
         }
@@ -853,6 +1515,12 @@
           "name": "Get All Settings",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/settings"
           }
         },
@@ -860,10 +1528,21 @@
           "name": "Create/Update Setting",
           "request": {
             "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/settings",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"key\": \"company_name\",\n    \"value\": \"SNP Distribution Ltd.\",\n    \"type\": \"app\"\n}"
+              "raw": "{\n    \"key\": \"company_name\",\n    \"value\": \"SNP Distribution Ltd.\",\n    \"type\": \"app\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -871,6 +1550,12 @@
           "name": "Get Setting",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/settings/company_name"
           }
         },
@@ -878,6 +1563,12 @@
           "name": "Delete Setting",
           "request": {
             "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/settings/company_name"
           }
         }
@@ -890,6 +1581,12 @@
           "name": "Dashboard Stats",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/stats"
           }
         },
@@ -897,6 +1594,12 @@
           "name": "Warranty Stats",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/warranty-stats"
           }
         },
@@ -904,6 +1607,12 @@
           "name": "Claim Stats",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/claim-stats"
           }
         },
@@ -911,6 +1620,12 @@
           "name": "Work Order Stats",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/work-order-stats"
           }
         },
@@ -918,6 +1633,12 @@
           "name": "Recent Claims",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/recent-claims"
           }
         },
@@ -925,6 +1646,12 @@
           "name": "Recent Work Orders",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/recent-work-orders"
           }
         },
@@ -932,6 +1659,12 @@
           "name": "Brand Wise Summary",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/brand-wise-summary"
           }
         },
@@ -939,6 +1672,12 @@
           "name": "Service Center Performance",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/service-center-performance"
           }
         },
@@ -946,6 +1685,12 @@
           "name": "Monthly Claims",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/monthly-claims"
           }
         },
@@ -953,6 +1698,12 @@
           "name": "Expiring Warranties",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/dashboard/expiring-warranties"
           }
         }
@@ -965,6 +1716,12 @@
           "name": "List Activity Logs",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/activity-logs"
           }
         }
