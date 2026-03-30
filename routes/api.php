@@ -1,18 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\WarrantyController;
 use App\Http\Controllers\Api\ClaimController;
-use App\Http\Controllers\Api\WorkOrderController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
 use App\Http\Controllers\Api\SettingController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\ActivityLogController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WarrantyController;
+use App\Http\Controllers\Api\WorkOrderController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('')->group(function () {
 
@@ -61,12 +61,12 @@ Route::prefix('')->group(function () {
         Route::put('/claims/{id}/close', [ClaimController::class, 'close']);
         Route::get('/claims/{id}/work-order', [ClaimController::class, 'workOrder']);
 
+        Route::get('/work-orders/pending', [WorkOrderController::class, 'pending']);
+        Route::get('/work-orders/overdue', [WorkOrderController::class, 'overdue']);
         Route::apiResource('work-orders', WorkOrderController::class)->except(['store']);
         Route::post('/work-orders/{id}/assign', [WorkOrderController::class, 'assignServiceCenter']);
         Route::put('/work-orders/{id}/status', [WorkOrderController::class, 'updateStatus']);
         Route::get('/work-orders/{id}/feedback-link', [WorkOrderController::class, 'getFeedbackLink']);
-        Route::get('/work-orders/pending', [WorkOrderController::class, 'pending']);
-        Route::get('/work-orders/overdue', [WorkOrderController::class, 'overdue']);
 
         Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);

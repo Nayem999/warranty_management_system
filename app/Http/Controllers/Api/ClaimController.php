@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Claim\StoreClaimRequest;
 use App\Http\Requests\Claim\ConvertToWorkOrderRequest;
+use App\Http\Requests\Claim\StoreClaimRequest;
+use App\Models\ActivityLog;
 use App\Models\Claim;
 use App\Models\Warranty;
 use App\Models\WorkOrder;
-use App\Models\ActivityLog;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ClaimController extends Controller
@@ -64,13 +64,13 @@ class ClaimController extends Controller
     {
         $data = $request->validated();
 
-        $warranty = Warranty::find($data['product_serial']);
+        $warranty = Warranty::find($data['warranty_id']);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->error('Warranty not found.');
         }
 
-        if (!$warranty->isActive()) {
+        if (! $warranty->isActive()) {
             return $this->error('Warranty is not active or has expired.');
         }
 
@@ -95,7 +95,7 @@ class ClaimController extends Controller
     {
         $claim = Claim::with(['warranty.brand', 'warranty.category', 'serviceCenter', 'creator', 'workOrder'])->find($id);
 
-        if (!$claim) {
+        if (! $claim) {
             return $this->notFound('Claim not found.');
         }
 
@@ -106,7 +106,7 @@ class ClaimController extends Controller
     {
         $claim = Claim::find($id);
 
-        if (!$claim) {
+        if (! $claim) {
             return $this->notFound('Claim not found.');
         }
 
@@ -142,7 +142,7 @@ class ClaimController extends Controller
     {
         $claim = Claim::find($id);
 
-        if (!$claim) {
+        if (! $claim) {
             return $this->notFound('Claim not found.');
         }
 
@@ -167,7 +167,7 @@ class ClaimController extends Controller
     {
         $claim = Claim::find($id);
 
-        if (!$claim) {
+        if (! $claim) {
             return $this->notFound('Claim not found.');
         }
 
@@ -216,7 +216,7 @@ class ClaimController extends Controller
     {
         $claim = Claim::find($id);
 
-        if (!$claim) {
+        if (! $claim) {
             return $this->notFound('Claim not found.');
         }
 
@@ -238,13 +238,13 @@ class ClaimController extends Controller
     {
         $claim = Claim::find($id);
 
-        if (!$claim) {
+        if (! $claim) {
             return $this->notFound('Claim not found.');
         }
 
         $workOrder = $claim->workOrder;
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found for this claim.');
         }
 

@@ -5,7 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Warranty extends BaseModel
 {
@@ -47,10 +47,10 @@ class Warranty extends BaseModel
 
     public function claims(): HasMany
     {
-        return $this->hasMany(Claim::class, 'product_serial', 'id');
+        return $this->hasMany(Claim::class, 'warranty_id');
     }
 
-    public function workOrders(): HasMany
+    public function workOrders(): HasManyThrough
     {
         return $this->hasManyThrough(WorkOrder::class, Claim::class);
     }

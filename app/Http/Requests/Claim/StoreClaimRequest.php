@@ -14,7 +14,7 @@ class StoreClaimRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_serial' => 'required|exists:wms_warranties,id',
+            'warranty_id' => 'required|exists:wms_warranties,id',
             'problem_description' => 'required|string',
             'customer_firstname' => 'required|string|max:255',
             'customer_lastname' => 'required|string|max:255',

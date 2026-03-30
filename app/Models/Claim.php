@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Claim extends BaseModel
@@ -12,7 +11,7 @@ class Claim extends BaseModel
 
     protected $fillable = [
         'claim_number',
-        'product_serial',
+        'warranty_id',
         'problem_description',
         'customer_firstname',
         'customer_lastname',
@@ -33,7 +32,7 @@ class Claim extends BaseModel
 
     public function warranty(): BelongsTo
     {
-        return $this->belongsTo(Warranty::class, 'product_serial');
+        return $this->belongsTo(Warranty::class, 'warranty_id');
     }
 
     public function serviceCenter(): BelongsTo
@@ -71,6 +70,7 @@ class Claim extends BaseModel
         $year = now()->year;
         $lastClaim = static::whereYear('created_at', $year)->latest()->first();
         $seq = $lastClaim ? (intval(substr($lastClaim->claim_number, -5)) + 1) : 1;
-        return 'CLM-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+
+        return 'CLM-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
     }
 }
