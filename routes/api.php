@@ -47,7 +47,9 @@ Route::prefix('')->group(function () {
         Route::get('/brands/{id}/stats', [BrandController::class, 'stats']);
         Route::put('/brands/{id}/toggle-status', [BrandController::class, 'toggleStatus']);
 
+        Route::get('/categories/parents', [CategoryController::class, 'parents']);
         Route::apiResource('categories', CategoryController::class);
+        Route::get('/categories/{id}/subcategories', [CategoryController::class, 'subcategories']);
         Route::put('/categories/{id}/toggle-status', [CategoryController::class, 'toggleStatus']);
 
         Route::apiResource('warranties', WarrantyController::class);

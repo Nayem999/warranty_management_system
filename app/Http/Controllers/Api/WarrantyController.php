@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Warranty\StoreWarrantyRequest;
 use App\Http\Requests\Warranty\UpdateWarrantyRequest;
-use App\Models\Warranty;
-use App\Models\Claim;
 use App\Models\ActivityLog;
+use App\Models\Warranty;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class WarrantyController extends Controller
 {
@@ -19,7 +18,7 @@ class WarrantyController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = Warranty::query()->with(['brand', 'category', 'creator']);
+        $query = Warranty::query()->with(['brand', 'category', 'subCategory', 'creator']);
 
         if ($request->has('brand_id')) {
             $query->where('brand_id', $request->brand_id);
@@ -27,6 +26,10 @@ class WarrantyController extends Controller
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('sub_category_id')) {
+            $query->where('sub_category_id', $request->sub_category_id);
         }
 
         if ($request->has('is_void')) {
@@ -79,14 +82,14 @@ class WarrantyController extends Controller
             $warranty->id
         );
 
-        return $this->created($warranty->load(['brand', 'category']), 'Warranty created successfully.');
+        return $this->created($warranty->load(['brand', 'category', 'subCategory']), 'Warranty created successfully.');
     }
 
     public function show(int $id): JsonResponse
     {
-        $warranty = Warranty::with(['brand', 'category', 'creator'])->find($id);
+        $warranty = Warranty::with(['brand', 'category', 'subCategory', 'creator'])->find($id);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->notFound('Warranty not found.');
         }
 
@@ -97,13 +100,13 @@ class WarrantyController extends Controller
     {
         $warranty = Warranty::find($id);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->notFound('Warranty not found.');
         }
 
         $oldData = $warranty->toArray();
         $data = $request->validated();
-        
+
         $warranty->update($data);
 
         ActivityLog::log(
@@ -115,14 +118,14 @@ class WarrantyController extends Controller
             ['old' => $oldData, 'new' => $warranty->toArray()]
         );
 
-        return $this->success($warranty->load(['brand', 'category']), 'Warranty updated successfully.');
+        return $this->success($warranty->load(['brand', 'category', 'subCategory']), 'Warranty updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
     {
         $warranty = Warranty::find($id);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->notFound('Warranty not found.');
         }
 
@@ -145,9 +148,9 @@ class WarrantyController extends Controller
 
     public function checkSerial(string $serial): JsonResponse
     {
-        $warranty = Warranty::with(['brand', 'category', 'claims'])->where('product_serial', $serial)->first();
+        $warranty = Warranty::with(['brand', 'category', 'subCategory', 'claims'])->where('product_serial', $serial)->first();
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->error('Warranty not found for this serial number.', 404);
         }
 
@@ -162,7 +165,7 @@ class WarrantyController extends Controller
     {
         $warranty = Warranty::find($id);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->notFound('Warranty not found.');
         }
 
@@ -191,7 +194,7 @@ class WarrantyController extends Controller
     {
         $warranty = Warranty::find($id);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->notFound('Warranty not found.');
         }
 
@@ -216,7 +219,7 @@ class WarrantyController extends Controller
     {
         $warranty = Warranty::find($id);
 
-        if (!$warranty) {
+        if (! $warranty) {
             return $this->notFound('Warranty not found.');
         }
 
@@ -229,7 +232,7 @@ class WarrantyController extends Controller
     {
         $days = $request->days ?? 30;
 
-        $warranties = Warranty::with(['brand', 'category'])
+        $warranties = Warranty::with(['brand', 'category', 'subCategory'])
             ->expiringSoon($days)
             ->orderBy('end_date', 'asc')
             ->paginate($request->per_page ?? 15);

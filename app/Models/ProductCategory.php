@@ -10,23 +10,38 @@ class ProductCategory extends BaseModel
     protected $table = 'wms_product_categories';
 
     protected $fillable = [
-        'brand_id',
         'name',
         'short_name',
         'status',
+        'parent_id',
     ];
 
     protected $casts = [
         'status' => 'string',
     ];
 
-    public function brand(): BelongsTo
+    public function parent(): BelongsTo
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(ProductCategory::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(ProductCategory::class, 'parent_id');
     }
 
     public function warranties(): HasMany
     {
         return $this->hasMany(Warranty::class);
+    }
+
+    public function scopeParents($query)
+    {
+        return $query->whereNull('parent_id');
+    }
+
+    public function scopeSubcategories($query)
+    {
+        return $query->whereNotNull('parent_id');
     }
 }

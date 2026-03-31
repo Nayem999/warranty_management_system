@@ -17,6 +17,7 @@ class Warranty extends BaseModel
         'product_info',
         'brand_id',
         'category_id',
+        'sub_category_id',
         'start_date',
         'end_date',
         'is_void',
@@ -38,6 +39,11 @@ class Warranty extends BaseModel
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'category_id');
+    }
+
+    public function subCategory(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'sub_category_id');
     }
 
     public function creator(): BelongsTo

@@ -6,10 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\ProductCategory;
-use App\Models\Brand;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -17,10 +16,14 @@ class CategoryController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = ProductCategory::query()->with(['brand']);
+        $query = ProductCategory::query()->with(['parent', 'children']);
 
-        if ($request->has('brand_id')) {
-            $query->where('brand_id', $request->brand_id);
+        if ($request->has('parent_id')) {
+            if ($request->parent_id === 'null') {
+                $query->whereNull('parent_id');
+            } else {
+                $query->where('parent_id', $request->parent_id);
+            }
         }
 
         if ($request->has('search')) {
@@ -45,14 +48,14 @@ class CategoryController extends Controller
 
         $category = ProductCategory::create($data);
 
-        return $this->created($category, 'Category created successfully.');
+        return $this->created($category->load(['parent', 'children']), 'Category created successfully.');
     }
 
     public function show(int $id): JsonResponse
     {
-        $category = ProductCategory::with(['brand'])->find($id);
+        $category = ProductCategory::with(['parent', 'children', 'warranties'])->find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->notFound('Category not found.');
         }
 
@@ -63,27 +66,35 @@ class CategoryController extends Controller
     {
         $category = ProductCategory::find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->notFound('Category not found.');
         }
 
         $data = $request->validated();
 
+        if (isset($data['parent_id']) && $data['parent_id'] == $id) {
+            return $this->error('A category cannot be its own parent.');
+        }
+
         $category->update($data);
 
-        return $this->success($category, 'Category updated successfully.');
+        return $this->success($category->load(['parent', 'children']), 'Category updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
     {
         $category = ProductCategory::find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->notFound('Category not found.');
         }
 
         if ($category->warranties()->count() > 0) {
             return $this->error('Cannot delete category with associated warranties.');
+        }
+
+        if ($category->children()->count() > 0) {
+            return $this->error('Cannot delete category with sub-categories. Delete sub-categories first.');
         }
 
         $category->delete();
@@ -95,7 +106,7 @@ class CategoryController extends Controller
     {
         $category = ProductCategory::find($id);
 
-        if (!$category) {
+        if (! $category) {
             return $this->notFound('Category not found.');
         }
 
@@ -103,5 +114,38 @@ class CategoryController extends Controller
         $category->save();
 
         return $this->success($category, 'Category status updated successfully.');
+    }
+
+    public function subcategories(int $id): JsonResponse
+    {
+        $category = ProductCategory::find($id);
+
+        if (! $category) {
+            return $this->notFound('Category not found.');
+        }
+
+        $subcategories = $category->children()->orderBy('name')->get();
+
+        return $this->success($subcategories);
+    }
+
+    public function parents(Request $request): JsonResponse
+    {
+        $query = ProductCategory::parents();
+
+        if ($request->has('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('short_name', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $categories = $query->orderBy('name')->get();
+
+        return $this->success($categories);
     }
 }

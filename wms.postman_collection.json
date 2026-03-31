@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "SNP",
+    "name": "SNP Distribution",
     "description": "SNP Distribution - Warranty Management System RESTful API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -11,7 +11,7 @@
       "type": "string"
     },
     {
-      "key": "auth_token",
+      "key": "token",
       "value": "",
       "type": "string"
     }
@@ -21,7 +21,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "{{auth_token}}"
+        "value": "{{token}}"
       }
     ]
   },
@@ -315,7 +315,7 @@
                   },
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
+                    "value": "Bearer {{token}}"
                   }
                 ],
                 "body": {
@@ -358,7 +358,7 @@
                   },
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
+                    "value": "Bearer {{token}}"
                   }
                 ]
               },
@@ -401,7 +401,7 @@
                   },
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
+                    "value": "Bearer {{token}}"
                   }
                 ],
                 "body": {
@@ -862,7 +862,7 @@
             "url": "{{base_url}}/categories",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"brand_id\": 1,\n    \"name\": \"Laptop\",\n    \"short_name\": \"LAP\",\n    \"status\": \"active\"\n}",
+              "raw": "{\n    \"name\": \"Electronics\",\n    \"short_name\": \"ELE\",\n  \"parent_id\": \"1\",\n    \"status\": \"active\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -931,6 +931,32 @@
             ],
             "url": "{{base_url}}/categories/1/toggle-status"
           }
+        },
+        {
+          "name": "Get Parent Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categories/parents"
+          }
+        },
+        {
+          "name": "Get Subcategories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categories/1/subcategories"
+          }
         }
       ]
     },
@@ -947,7 +973,17 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties"
+            "url": {
+              "raw": "{{base_url}}/warranties?brand_id=1&category_id=1&sub_category_id=2",
+              "host": ["{{base_url}}"],
+              "path": ["warranties"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "category_id", "value": "1", "disabled": true},
+                {"key": "sub_category_id", "value": "2", "disabled": true},
+                {"key": "status", "value": "active", "disabled": true}
+              ]
+            }
           }
         },
         {
@@ -963,7 +999,7 @@
             "url": "{{base_url}}/warranties",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_serial\": \"SMG-12345\",\n    \"product_name\": \"Samsung Galaxy S21\",\n    \"product_info\": \"64GB, Black\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2025-01-01\",\n    \"is_void\": \"NO\"\n}",
+              "raw": "{\n    \"product_serial\": \"SMG-12345\",\n    \"product_name\": \"Samsung Galaxy S21\",\n    \"product_info\": \"64GB, Black\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": null,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2025-01-01\",\n    \"is_void\": \"NO\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

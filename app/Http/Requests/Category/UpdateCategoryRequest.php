@@ -14,9 +14,9 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'brand_id' => 'sometimes|exists:wms_brands,id',
             'name' => 'sometimes|string|max:255',
             'short_name' => 'nullable|string|max:50',
+            'parent_id' => 'nullable|exists:wms_product_categories,id',
             'status' => 'sometimes|in:active,inactive',
         ];
     }
