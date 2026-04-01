@@ -88,6 +88,8 @@ class ClaimController extends Controller
             $claim->id
         );
 
+        ClaimCreated::dispatch($claim);
+
         return $this->created($claim->load(['warranty.brand', 'serviceCenter']), 'Claim created successfully.');
     }
 
@@ -207,6 +209,8 @@ class ClaimController extends Controller
                 $workOrder->id,
                 ['claim_id' => $claim->id, 'claim_number' => $claim->claim_number]
             );
+
+            WorkOrderCreated::dispatch($workOrder->load(['claim.warranty', 'claim', 'serviceCenter']));
 
             return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter']), 'Work order created successfully.', 201);
         });

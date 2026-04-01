@@ -1367,7 +1367,7 @@
             "url": "{{base_url}}/work-orders/1/status",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"status\": \"In Progress\"\n}",
+              "raw": "{\n    \"status\": \"Completed\",\n    \"replace_serial\": \"SMG-NEW-12345\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

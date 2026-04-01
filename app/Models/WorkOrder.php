@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class WorkOrder extends BaseModel
@@ -21,6 +20,7 @@ class WorkOrder extends BaseModel
         'tat',
         'doa',
         'replace_serial',
+        'replaced_warranty_id',
         'additional_comment',
         'work_done_comment',
         'customer_feedback',
@@ -51,6 +51,11 @@ class WorkOrder extends BaseModel
     public function warranty(): BelongsTo
     {
         return $this->claim()->warranty();
+    }
+
+    public function replacedWarranty(): BelongsTo
+    {
+        return $this->belongsTo(Warranty::class, 'replaced_warranty_id');
     }
 
     public function serviceCenter(): BelongsTo
@@ -99,7 +104,8 @@ class WorkOrder extends BaseModel
         $year = now()->year;
         $lastWo = static::whereYear('created_at', $year)->latest()->first();
         $seq = $lastWo ? (intval(substr($lastWo->wo_number, -5)) + 1) : 1;
-        return 'WO-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+
+        return 'WO-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
     }
 
     public static function generateFeedbackToken(): string
@@ -112,6 +118,7 @@ class WorkOrder extends BaseModel
         if ($this->wo_assigned_date && $this->wo_closed_date) {
             return $this->wo_assigned_date->diffInDays($this->wo_closed_date);
         }
+
         return null;
     }
 }

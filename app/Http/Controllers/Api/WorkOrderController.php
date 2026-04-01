@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\WorkOrderStatusUpdated;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\WorkOrder\UpdateWorkOrderRequest;
 use App\Http\Requests\WorkOrder\SubmitFeedbackRequest;
-use App\Models\WorkOrder;
-use App\Models\Claim;
+use App\Http\Requests\WorkOrder\UpdateWorkOrderRequest;
 use App\Models\ActivityLog;
+use App\Models\Warranty;
+use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class WorkOrderController extends Controller
 {
@@ -64,10 +65,10 @@ class WorkOrderController extends Controller
             'claim.warranty.category',
             'serviceCenter',
             'creator',
-            'assignedBy'
+            'assignedBy',
         ])->find($id);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
@@ -78,12 +79,12 @@ class WorkOrderController extends Controller
     {
         $workOrder = WorkOrder::find($id);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
         $data = $request->validated();
-        
+
         $oldData = $workOrder->toArray();
 
         if (isset($data['wo_closed_date']) && $data['wo_closed_date']) {
@@ -108,7 +109,7 @@ class WorkOrderController extends Controller
     {
         $workOrder = WorkOrder::find($id);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
@@ -129,7 +130,7 @@ class WorkOrderController extends Controller
     {
         $workOrder = WorkOrder::find($id);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
@@ -157,15 +158,18 @@ class WorkOrderController extends Controller
 
     public function updateStatus(Request $request, int $id): JsonResponse
     {
-        $workOrder = WorkOrder::find($id);
+        $workOrder = WorkOrder::with('claim.warranty', 'replacedWarranty')->find($id);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
         $data = $request->validate([
             'status' => 'required|in:Pending,In Progress,Completed,Delivered',
+            'replace_serial' => 'nullable|string|max:255',
         ]);
+
+        $previousStatus = $workOrder->status;
 
         $statusFlow = ['Pending', 'In Progress', 'Completed', 'Delivered'];
         $currentIndex = array_search($workOrder->status, $statusFlow);
@@ -179,9 +183,75 @@ class WorkOrderController extends Controller
 
         if ($data['status'] === 'Completed') {
             $updateData['wo_closed_date'] = now();
-            $updateData['tat'] = $workOrder->wo_assigned_date 
+            $updateData['tat'] = $workOrder->wo_assigned_date
                 ? Carbon::parse($workOrder->wo_assigned_date)->diffInDays(now())
                 : null;
+        }
+
+        $replaceSerial = $data['replace_serial'] ?? null;
+        $existingReplacedWarranty = $workOrder->replacedWarranty;
+
+        if (! empty($replaceSerial) && $workOrder->claim?->warranty) {
+            if ($existingReplacedWarranty) {
+                if ($existingReplacedWarranty->product_serial !== $replaceSerial) {
+                    $oldSerial = $existingReplacedWarranty->product_serial;
+                    $existingReplacedWarranty->update(['product_serial' => $replaceSerial]);
+
+                    ActivityLog::log(
+                        $request->user()->id,
+                        'updated',
+                        'Warranty',
+                        $existingReplacedWarranty->product_serial,
+                        $existingReplacedWarranty->id,
+                        ['action' => 'serial_updated', 'old_serial' => $oldSerial]
+                    );
+                }
+            } else {
+                $originalWarranty = $workOrder->claim->warranty;
+
+                $newWarranty = Warranty::create([
+                    'product_serial' => $replaceSerial,
+                    'product_name' => $originalWarranty->product_name,
+                    'product_info' => $originalWarranty->product_info,
+                    'brand_id' => $originalWarranty->brand_id,
+                    'category_id' => $originalWarranty->category_id,
+                    'sub_category_id' => $originalWarranty->sub_category_id,
+                    'start_date' => $originalWarranty->start_date,
+                    'end_date' => $originalWarranty->end_date,
+                    'is_void' => 'NO',
+                    'void_reason' => null,
+                    'created_by' => $request->user()->id,
+                ]);
+
+                ActivityLog::log(
+                    $request->user()->id,
+                    'created',
+                    'Warranty',
+                    $newWarranty->product_serial,
+                    $newWarranty->id,
+                    ['action' => 'replaced', 'original_serial' => $originalWarranty->product_serial]
+                );
+
+                $updateData['replaced_warranty_id'] = $newWarranty->id;
+            }
+
+            $updateData['replace_serial'] = $replaceSerial;
+        } elseif (empty($replaceSerial) && $existingReplacedWarranty) {
+            $deletedWarrantySerial = $existingReplacedWarranty->product_serial;
+            $deletedWarrantyId = $existingReplacedWarranty->id;
+            $existingReplacedWarranty->delete();
+
+            ActivityLog::log(
+                $request->user()->id,
+                'deleted',
+                'Warranty',
+                $deletedWarrantySerial,
+                $deletedWarrantyId,
+                ['action' => 'replaced_warranty_removed']
+            );
+
+            $updateData['replace_serial'] = null;
+            $updateData['replaced_warranty_id'] = null;
         }
 
         if ($data['status'] === 'Delivered') {
@@ -199,14 +269,16 @@ class WorkOrderController extends Controller
             ['action' => 'status_changed', 'new_status' => $data['status']]
         );
 
-        return $this->success($workOrder, 'Work order status updated successfully.');
+        WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.warranty']), $previousStatus);
+
+        return $this->success($workOrder->load(['claim.warranty.brand', 'claim.warranty.category', 'serviceCenter', 'replacedWarranty']), 'Work order status updated successfully.');
     }
 
     public function getFeedbackLink(int $id): JsonResponse
     {
         $workOrder = WorkOrder::find($id);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
@@ -223,7 +295,7 @@ class WorkOrderController extends Controller
     {
         $workOrder = WorkOrder::where('feedback_token', $token)->first();
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
 
