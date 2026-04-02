@@ -1,6 +1,11 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\EventServiceProvider;
+use Illuminate\View\ViewServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\EventServiceProvider::class,
+    ViewServiceProvider::class,
+    AppServiceProvider::class,
+    EventServiceProvider::class,
 ];
