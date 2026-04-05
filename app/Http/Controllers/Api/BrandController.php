@@ -33,7 +33,7 @@ class BrandController extends Controller
             $query->where('status', $request->status);
         }
 
-        $brands = $query->orderBy('display_order', 'asc')->paginate($request->per_page ?? 15);
+        $brands = $query->orderBy('display_order', 'asc')->paginate($request->limit ?? 15);
 
         return $this->success($brands);
     }
@@ -124,7 +124,7 @@ class BrandController extends Controller
         $warranties = $brand->warranties()
             ->with(['category', 'creator'])
             ->orderBy('id', 'desc')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->limit ?? 15);
 
         return $this->success($warranties);
     }

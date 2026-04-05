@@ -62,7 +62,7 @@ class WarrantyController extends Controller
             });
         }
 
-        $warranties = $query->orderBy('id', 'desc')->paginate($request->per_page ?? 15);
+        $warranties = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($warranties);
     }
@@ -235,7 +235,7 @@ class WarrantyController extends Controller
         $warranties = Warranty::with(['brand', 'category', 'subCategory'])
             ->expiringSoon($days)
             ->orderBy('end_date', 'asc')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->limit ?? 15);
 
         return $this->success($warranties);
     }

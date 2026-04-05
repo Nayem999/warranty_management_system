@@ -20,7 +20,7 @@ class RoleController extends Controller
             $query->where('title', 'like', "%{$request->search}%");
         }
 
-        $roles = $query->orderBy('id', 'desc')->paginate($request->per_page ?? 15);
+        $roles = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($roles);
     }

@@ -20,7 +20,7 @@ class DashboardController extends Controller
     public function stats(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         $warrantyQuery = Warranty::query();
         $claimQuery = Claim::query();
         $workOrderQuery = WorkOrder::query();
@@ -157,9 +157,9 @@ class DashboardController extends Controller
     public function brandWiseSummary(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         $brands = Brand::query();
-        
+
         if ($user->isBrandRestricted()) {
             $brands->whereIn('id', $user->accessibleBrandIds());
         }
@@ -240,7 +240,7 @@ class DashboardController extends Controller
             $query->whereIn('brand_id', $user->accessibleBrandIds());
         }
 
-        $warranties = $query->orderBy('end_date', 'asc')->paginate($request->per_page ?? 15);
+        $warranties = $query->orderBy('end_date', 'asc')->paginate($request->limit ?? 15);
 
         return $this->success($warranties);
     }

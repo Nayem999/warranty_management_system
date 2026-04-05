@@ -18,7 +18,7 @@ trait ApiResponse
             $response['data'] = $data->items();
             $response['pagination'] = [
                 'current_page' => $data->currentPage(),
-                'per_page' => $data->perPage(),
+                'limit' => $data->perPage(),
                 'total' => $data->total(),
                 'last_page' => $data->lastPage(),
             ];

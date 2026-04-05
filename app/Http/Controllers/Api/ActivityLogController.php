@@ -36,7 +36,7 @@ class ActivityLogController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $logs = $query->orderBy('id', 'desc')->paginate($request->per_page ?? 15);
+        $logs = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($logs);
     }

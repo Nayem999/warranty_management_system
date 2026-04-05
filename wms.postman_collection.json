@@ -436,11 +436,11 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/users?per_page=15&page=1",
+              "raw": "{{base_url}}/users?limit=15&page=1",
               "host": ["{{base_url}}"],
               "path": ["users"],
               "query": [
-                {"key": "per_page", "value": "15"},
+                {"key": "limit", "value": "15"},
                 {"key": "page", "value": "1"}
               ]
             }

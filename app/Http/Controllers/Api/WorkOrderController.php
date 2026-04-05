@@ -53,7 +53,7 @@ class WorkOrderController extends Controller
             });
         }
 
-        $workOrders = $query->orderBy('id', 'desc')->paginate($request->per_page ?? 15);
+        $workOrders = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($workOrders);
     }
@@ -314,7 +314,7 @@ class WorkOrderController extends Controller
         $workOrders = WorkOrder::with(['claim.warranty.brand', 'serviceCenter'])
             ->pending()
             ->orderBy('wo_assigned_date', 'asc')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->limit ?? 15);
 
         return $this->success($workOrders);
     }
@@ -324,7 +324,7 @@ class WorkOrderController extends Controller
         $workOrders = WorkOrder::with(['claim.warranty.brand', 'serviceCenter'])
             ->overdue()
             ->orderBy('wo_assigned_date', 'asc')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->limit ?? 15);
 
         return $this->success($workOrders);
     }

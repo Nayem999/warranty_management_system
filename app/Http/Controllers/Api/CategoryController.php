@@ -37,7 +37,7 @@ class CategoryController extends Controller
             $query->where('status', $request->status);
         }
 
-        $categories = $query->orderBy('name')->paginate($request->per_page ?? 15);
+        $categories = $query->orderBy('name')->paginate($request->limit ?? 15);
 
         return $this->success($categories);
     }

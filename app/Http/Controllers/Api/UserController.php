@@ -45,7 +45,7 @@ class UserController extends Controller
             $query->where('role_id', $request->role_id);
         }
 
-        $users = $query->orderBy('id', 'desc')->paginate($request->per_page ?? 15);
+        $users = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($users);
     }
@@ -56,7 +56,7 @@ class UserController extends Controller
 
         $password = $data['password'] ?? Str::random(12);
         $data['password'] = Hash::make($password);
-        
+
         if (!isset($data['is_admin'])) {
             $data['is_admin'] = false;
         }

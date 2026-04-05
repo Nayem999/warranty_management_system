@@ -55,7 +55,7 @@ class ClaimController extends Controller
             });
         }
 
-        $claims = $query->orderBy('id', 'desc')->paginate($request->per_page ?? 15);
+        $claims = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($claims);
     }

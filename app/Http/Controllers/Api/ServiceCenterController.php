@@ -30,7 +30,7 @@ class ServiceCenterController extends Controller
             $query->where('is_active', $request->is_active);
         }
 
-        $serviceCenters = $query->orderBy('display_order', 'asc')->paginate($request->per_page ?? 15);
+        $serviceCenters = $query->orderBy('display_order', 'asc')->paginate($request->limit ?? 15);
 
         return $this->success($serviceCenters);
     }
@@ -140,7 +140,7 @@ class ServiceCenterController extends Controller
         $workOrders = $serviceCenter->workOrders()
             ->with(['claim.warranty.brand', 'claim.warranty.category'])
             ->orderBy('id', 'desc')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->limit ?? 15);
 
         return $this->success($workOrders);
     }
