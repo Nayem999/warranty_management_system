@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasApiTokens, SoftDeletes;
+    use HasApiTokens, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'first_name',
@@ -22,6 +22,7 @@ class User extends Authenticatable
         'user_type',
         'is_admin',
         'role_id',
+        'personal_permissions',
         'status',
         'image',
         'phone',
@@ -49,6 +50,7 @@ class User extends Authenticatable
         'last_online' => 'datetime',
         'enable_web_notification' => 'boolean',
         'enable_email_notification' => 'boolean',
+        'personal_permissions' => 'array',
     ];
 
     public function role(): BelongsTo
@@ -95,7 +97,7 @@ class User extends Authenticatable
 
     public function isBrandRestricted(): bool
     {
-        return !$this->is_admin && $this->brandAccess()->exists();
+        return ! $this->is_admin && $this->brandAccess()->exists();
     }
 
     public function accessibleBrandIds(): array
@@ -103,6 +105,7 @@ class User extends Authenticatable
         if ($this->is_admin) {
             return Brand::pluck('id')->toArray();
         }
+
         return $this->brandAccess()->pluck('brand_id')->toArray();
     }
 
@@ -121,10 +124,15 @@ class User extends Authenticatable
                 'service_centers' => ['view', 'create', 'edit', 'delete'],
                 'brands' => ['view', 'create', 'edit', 'delete'],
                 'categories' => ['view', 'create', 'edit', 'delete'],
+                'couriers' => ['view', 'create', 'edit', 'delete'],
                 'users' => ['view', 'create', 'edit', 'delete'],
                 'settings' => ['view', 'edit'],
                 'reports' => ['view'],
             ];
+        }
+
+        if (! empty($this->personal_permissions)) {
+            return $this->personal_permissions;
         }
 
         return $this->role?->permissions ?? [];
@@ -137,6 +145,7 @@ class User extends Authenticatable
         }
 
         $permissions = $this->permissions;
+
         return isset($permissions[$module]) && in_array($action, $permissions[$module]);
     }
 

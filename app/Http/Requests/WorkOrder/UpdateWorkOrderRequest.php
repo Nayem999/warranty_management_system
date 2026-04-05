@@ -15,6 +15,16 @@ class UpdateWorkOrderRequest extends FormRequest
     {
         return [
             'service_center_id' => 'nullable|exists:wms_service_centers,id',
+            'engineer_id' => 'nullable|exists:users,id',
+            'courier_in_id' => 'nullable|exists:wms_couriers,id',
+            'courier_slip_inward' => 'nullable|string',
+            'courier_out_id' => 'nullable|exists:wms_couriers,id',
+            'courier_slip_outward' => 'nullable|string',
+            'attachments' => 'nullable|string',
+            'feedback_preference' => 'nullable|boolean',
+            'received_date_time' => 'nullable|date',
+            'delivered_date_time' => 'nullable|date',
+            'counter' => 'nullable|integer|min:1',
             'wo_assigned_date' => 'nullable|date',
             'wo_closed_date' => 'nullable|date',
             'wo_delivery_date' => 'nullable|date',

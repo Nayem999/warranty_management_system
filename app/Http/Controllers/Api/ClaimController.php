@@ -184,14 +184,25 @@ class ClaimController extends Controller
         $data = $request->validated();
 
         return DB::transaction(function () use ($claim, $data, $request) {
+            $warranty = $claim->warranty;
+            $counter = WorkOrder::whereHas('claim', function ($query) use ($warranty) {
+                $query->where('warranty_id', $warranty->id);
+            })->count() + 1;
+
+            $feedbackPreference = $data['feedback_preference'] ?? false;
+            $feedbackToken = $feedbackPreference ? WorkOrder::generateFeedbackToken() : null;
+
             $workOrder = WorkOrder::create([
                 'wo_number' => WorkOrder::generateWoNumber(),
                 'claim_id' => $claim->id,
                 'service_center_id' => $data['service_center_id'] ?? null,
+                'engineer_id' => $data['engineer_id'] ?? null,
+                'feedback_preference' => $feedbackPreference,
+                'feedback_token' => $feedbackToken,
+                'counter' => $counter,
                 'wo_assigned_date' => now(),
                 'additional_comment' => $data['additional_comment'] ?? null,
                 'status' => 'Pending',
-                'feedback_token' => WorkOrder::generateFeedbackToken(),
                 'created_by' => $request->user()->id,
                 'assigned_by' => $request->user()->id,
             ]);

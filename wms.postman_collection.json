@@ -589,6 +589,54 @@
             ],
             "url": "{{base_url}}/users/1/toggle-status"
           }
+        },
+        {
+          "name": "Get User Permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/permissions"
+          }
+        },
+        {
+          "name": "Assign Personal Permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/permissions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\"],\n        \"claims\": [\"view\", \"create\"],\n        \"work_orders\": [\"view\", \"edit\"]\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Remove Personal Permissions",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/permissions"
+          }
         }
       ]
     },
@@ -1248,7 +1296,7 @@
             "url": "{{base_url}}/claims/1/convert-to-work-order",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"additional_comment\": \"Urgent repair needed\"\n}",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"feedback_preference\": true,\n    \"additional_comment\": \"Urgent repair needed\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1298,7 +1346,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/work-orders"
+            "url": {
+              "raw": "{{base_url}}/work-orders?status=Pending&service_center_id=1&courier_in_id=1&courier_out_id=1&engineer_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["work-orders"],
+              "query": [
+                {"key": "status", "value": "Pending", "disabled": true},
+                {"key": "service_center_id", "value": "1", "disabled": true},
+                {"key": "courier_in_id", "value": "1", "disabled": true},
+                {"key": "courier_out_id", "value": "1", "disabled": true},
+                {"key": "engineer_id", "value": "1", "disabled": true}
+              ]
+            }
           }
         },
         {
@@ -1327,7 +1386,7 @@
             "url": "{{base_url}}/work-orders/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"part1_used\": \"New Screen Display\"\n}",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"SLIP-IN-12345\",\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"SLIP-OUT-67890\",\n    \"received_date_time\": \"2026-04-05 10:00:00\",\n    \"delivered_date_time\": \"2026-04-06 14:00:00\",\n    \"feedback_preference\": true,\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"part1_used\": \"New Screen Display\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1557,6 +1616,114 @@
               }
             ],
             "url": "{{base_url}}/service-centers/1/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Couriers",
+      "item": [
+        {
+          "name": "List Couriers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/couriers?is_active=true",
+              "host": ["{{base_url}}"],
+              "path": ["couriers"],
+              "query": [
+                {"key": "is_active", "value": "true", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Courier",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/couriers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Pathao\",\n    \"phone\": \"+8801234567890\",\n    \"address\": \"Dhaka, Bangladesh\",\n    \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Courier",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/couriers/1"
+          }
+        },
+        {
+          "name": "Update Courier",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/couriers/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"phone\": \"+8809876543210\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Courier",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/couriers/1"
+          }
+        },
+        {
+          "name": "Toggle Courier Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/couriers/1/toggle-status"
           }
         }
       ]

@@ -20,7 +20,14 @@ class WorkOrderController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = WorkOrder::query()->with(['claim.warranty.brand', 'serviceCenter', 'creator']);
+        $query = WorkOrder::query()->with([
+            'claim.warranty.brand',
+            'serviceCenter',
+            'courierIn',
+            'courierOut',
+            'engineer',
+            'creator',
+        ]);
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -28,6 +35,18 @@ class WorkOrderController extends Controller
 
         if ($request->has('service_center_id')) {
             $query->where('service_center_id', $request->service_center_id);
+        }
+
+        if ($request->has('courier_in_id')) {
+            $query->where('courier_in_id', $request->courier_in_id);
+        }
+
+        if ($request->has('courier_out_id')) {
+            $query->where('courier_out_id', $request->courier_out_id);
+        }
+
+        if ($request->has('engineer_id')) {
+            $query->where('engineer_id', $request->engineer_id);
         }
 
         if ($request->has('brand_id')) {
@@ -64,6 +83,9 @@ class WorkOrderController extends Controller
             'claim.warranty.brand',
             'claim.warranty.category',
             'serviceCenter',
+            'courierIn',
+            'courierOut',
+            'engineer',
             'creator',
             'assignedBy',
         ])->find($id);
@@ -102,7 +124,7 @@ class WorkOrderController extends Controller
             ['old' => $oldData, 'new' => $workOrder->toArray()]
         );
 
-        return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter']), 'Work order updated successfully.');
+        return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter', 'courierIn', 'courierOut', 'engineer']), 'Work order updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
@@ -256,6 +278,7 @@ class WorkOrderController extends Controller
 
         if ($data['status'] === 'Delivered') {
             $updateData['wo_delivery_date'] = now();
+            $updateData['delivered_date_time'] = now();
         }
 
         $workOrder->update($updateData);
@@ -282,6 +305,10 @@ class WorkOrderController extends Controller
             return $this->notFound('Work order not found.');
         }
 
+        if (! $workOrder->feedback_preference) {
+            return $this->error('Feedback preference is disabled for this work order.');
+        }
+
         $baseUrl = config('app.frontend_url', 'http://localhost:3000');
         $feedbackUrl = "{$baseUrl}/feedback/{$workOrder->feedback_token}";
 
@@ -297,6 +324,10 @@ class WorkOrderController extends Controller
 
         if (! $workOrder) {
             return $this->notFound('Work order not found.');
+        }
+
+        if (! $workOrder->feedback_preference) {
+            return $this->error('Feedback preference is disabled for this work order.');
         }
 
         $data = $request->validated();

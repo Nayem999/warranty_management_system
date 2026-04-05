@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClaimController;
+use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
@@ -37,6 +38,9 @@ Route::prefix('')->group(function () {
         Route::post('/users/{id}/brand-access', [UserController::class, 'assignBrandAccess']);
         Route::delete('/users/{id}/brand-access/{brandId}', [UserController::class, 'revokeBrandAccess']);
         Route::put('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
+        Route::get('/users/{id}/permissions', [UserController::class, 'getPermissions']);
+        Route::post('/users/{id}/permissions', [UserController::class, 'assignPermissions']);
+        Route::delete('/users/{id}/permissions', [UserController::class, 'removePersonalPermissions']);
 
         Route::apiResource('roles', RoleController::class);
         Route::get('/roles/permissions/list', [RoleController::class, 'permissionsList']);
@@ -74,6 +78,9 @@ Route::prefix('')->group(function () {
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
         Route::get('/service-centers/{id}/work-orders', [ServiceCenterController::class, 'workOrders']);
         Route::get('/service-centers/{id}/stats', [ServiceCenterController::class, 'stats']);
+
+        Route::apiResource('couriers', CourierController::class);
+        Route::put('/couriers/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
 
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/settings', [SettingController::class, 'upsert']);

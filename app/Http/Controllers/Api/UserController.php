@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
-use App\Models\Brand;
 use App\Models\UserBrandAccess;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -57,16 +55,16 @@ class UserController extends Controller
         $password = $data['password'] ?? Str::random(12);
         $data['password'] = Hash::make($password);
 
-        if (!isset($data['is_admin'])) {
+        if (! isset($data['is_admin'])) {
             $data['is_admin'] = false;
         }
-        if (!isset($data['status'])) {
+        if (! isset($data['status'])) {
             $data['status'] = 'active';
         }
 
         $user = User::create($data);
 
-        if (!empty($data['brand_ids'])) {
+        if (! empty($data['brand_ids'])) {
             foreach ($data['brand_ids'] as $brandId) {
                 UserBrandAccess::create([
                     'user_id' => $user->id,
@@ -76,14 +74,14 @@ class UserController extends Controller
             }
         }
 
-        return $this->created($user, 'User created successfully. Password: ' . $password);
+        return $this->created($user, 'User created successfully. Password: '.$password);
     }
 
     public function show(int $id): JsonResponse
     {
         $user = User::with(['role', 'brands', 'brandAccess.brand'])->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -94,7 +92,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -113,7 +111,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -126,7 +124,7 @@ class UserController extends Controller
     {
         $user = User::withTrashed()->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -139,7 +137,7 @@ class UserController extends Controller
     {
         $user = User::with(['brandAccess.brand'])->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -150,7 +148,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -176,7 +174,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -191,7 +189,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->notFound('User not found.');
         }
 
@@ -199,5 +197,50 @@ class UserController extends Controller
         $user->save();
 
         return $this->success($user, 'User status updated successfully.');
+    }
+
+    public function assignPermissions(Request $request, int $id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return $this->notFound('User not found.');
+        }
+
+        $permissions = $request->validate([
+            'permissions' => 'required|array',
+        ])['permissions'];
+
+        $user->update(['personal_permissions' => $permissions]);
+
+        return $this->success($user->fresh(), 'Personal permissions assigned successfully.');
+    }
+
+    public function removePersonalPermissions(int $id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return $this->notFound('User not found.');
+        }
+
+        $user->update(['personal_permissions' => null]);
+
+        return $this->success($user->fresh(), 'Personal permissions removed. Role permissions will be used.');
+    }
+
+    public function getPermissions(int $id): JsonResponse
+    {
+        $user = User::with('role')->find($id);
+
+        if (! $user) {
+            return $this->notFound('User not found.');
+        }
+
+        return $this->success([
+            'role_permissions' => $user->role?->permissions ?? [],
+            'personal_permissions' => $user->personal_permissions,
+            'effective_permissions' => $user->permissions,
+        ]);
     }
 }

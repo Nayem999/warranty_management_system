@@ -15,6 +15,8 @@ class ConvertToWorkOrderRequest extends FormRequest
     {
         return [
             'service_center_id' => 'nullable|exists:wms_service_centers,id',
+            'engineer_id' => 'nullable|exists:users,id',
+            'feedback_preference' => 'nullable|boolean',
             'additional_comment' => 'nullable|string',
         ];
     }

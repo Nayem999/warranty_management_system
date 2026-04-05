@@ -14,6 +14,16 @@ class WorkOrder extends BaseModel
         'wo_number',
         'claim_id',
         'service_center_id',
+        'engineer_id',
+        'courier_in_id',
+        'courier_slip_inward',
+        'courier_out_id',
+        'courier_slip_outward',
+        'attachments',
+        'feedback_preference',
+        'received_date_time',
+        'delivered_date_time',
+        'counter',
         'wo_assigned_date',
         'wo_closed_date',
         'wo_delivery_date',
@@ -38,14 +48,48 @@ class WorkOrder extends BaseModel
         'wo_assigned_date' => 'date',
         'wo_closed_date' => 'date',
         'wo_delivery_date' => 'date',
+        'received_date_time' => 'datetime',
+        'delivered_date_time' => 'datetime',
         'doa' => 'boolean',
+        'feedback_preference' => 'boolean',
         'customer_rating' => 'integer',
+        'counter' => 'integer',
         'status' => 'string',
     ];
 
     public function claim(): BelongsTo
     {
         return $this->belongsTo(Claim::class);
+    }
+
+    public function warranty(): BelongsTo
+    {
+        return $this->claim()->warranty();
+    }
+
+    public function replacedWarranty(): BelongsTo
+    {
+        return $this->belongsTo(Warranty::class, 'replaced_warranty_id');
+    }
+
+    public function serviceCenter(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCenter::class);
+    }
+
+    public function courierIn(): BelongsTo
+    {
+        return $this->belongsTo(Courier::class, 'courier_in_id');
+    }
+
+    public function courierOut(): BelongsTo
+    {
+        return $this->belongsTo(Courier::class, 'courier_out_id');
+    }
+
+    public function engineer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'engineer_id');
     }
 
     public function warranty(): BelongsTo
