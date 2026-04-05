@@ -16,7 +16,11 @@ class CategoryController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = ProductCategory::query()->with(['parent', 'children']);
+        $query = ProductCategory::query()->with(['parent', 'children', 'brand']);
+
+        if ($request->has('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
 
         if ($request->has('parent_id')) {
             if ($request->parent_id === 'null') {

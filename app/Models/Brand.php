@@ -20,6 +20,11 @@ class Brand extends BaseModel
         'status' => 'string',
     ];
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(ProductCategory::class);
+    }
+
     public function warranties(): HasMany
     {
         return $this->hasMany(Warranty::class);

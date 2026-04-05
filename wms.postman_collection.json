@@ -789,7 +789,15 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1/categories"
+            "url": {
+              "raw": "{{base_url}}/brands/1/categories?parent_id=null&status=active",
+              "host": ["{{base_url}}"],
+              "path": ["brands", "1", "categories"],
+              "query": [
+                {"key": "parent_id", "value": "null", "description": "null for parent categories, or category ID for subcategories", "disabled": true},
+                {"key": "status", "value": "active", "disabled": true}
+              ]
+            }
           }
         },
         {
@@ -846,7 +854,16 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories"
+            "url": {
+              "raw": "{{base_url}}/categories?brand_id=1&parent_id=null&status=active",
+              "host": ["{{base_url}}"],
+              "path": ["categories"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "parent_id", "value": "null", "disabled": true},
+                {"key": "status", "value": "active", "disabled": true}
+              ]
+            }
           }
         },
         {
@@ -862,7 +879,7 @@
             "url": "{{base_url}}/categories",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Electronics\",\n    \"short_name\": \"ELE\",\n  \"parent_id\": \"1\",\n    \"status\": \"active\"\n}",
+              "raw": "{\n    \"name\": \"Electronics\",\n    \"short_name\": \"ELE\",\n    \"brand_id\": 1,\n    \"parent_id\": null,\n    \"status\": \"active\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -897,7 +914,7 @@
             "url": "{{base_url}}/categories/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Smartphones\"\n}",
+              "raw": "{\n    \"name\": \"Smartphones\",\n    \"brand_id\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"

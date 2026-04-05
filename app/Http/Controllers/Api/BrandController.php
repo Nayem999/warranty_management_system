@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Brand\StoreBrandRequest;
 use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Models\Brand;
-use App\Models\Warranty;
-use App\Models\Claim;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
@@ -55,7 +53,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
@@ -66,7 +64,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
@@ -86,7 +84,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
@@ -100,15 +98,37 @@ class BrandController extends Controller
         return $this->deleted('Brand deleted successfully.');
     }
 
-    public function categories(int $id): JsonResponse
+    public function categories(Request $request, int $id): JsonResponse
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
-        $categories = $brand->categories()->orderBy('name')->get();
+        $categories = $brand->categories()
+            ->with(['parent', 'children']);
+
+        if ($request->has('parent_id')) {
+            if ($request->parent_id === 'null') {
+                $categories->whereNull('parent_id');
+            } else {
+                $categories->where('parent_id', $request->parent_id);
+            }
+        }
+
+        if ($request->has('search')) {
+            $categories->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('short_name', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->has('status')) {
+            $categories->where('status', $request->status);
+        }
+
+        $categories = $categories->orderBy('name')->paginate($request->limit ?? 15);
 
         return $this->success($categories);
     }
@@ -117,7 +137,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
@@ -133,7 +153,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
@@ -159,7 +179,7 @@ class BrandController extends Controller
     {
         $brand = Brand::find($id);
 
-        if (!$brand) {
+        if (! $brand) {
             return $this->notFound('Brand not found.');
         }
 
@@ -172,6 +192,7 @@ class BrandController extends Controller
     protected function uploadFile($file, string $folder): string
     {
         $path = $file->store("uploads/{$folder}", 'public');
+
         return $path;
     }
 
