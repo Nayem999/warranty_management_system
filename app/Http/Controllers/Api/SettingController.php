@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
@@ -14,36 +14,49 @@ class SettingController extends Controller
 
     public function index(): JsonResponse
     {
-        $settings = Setting::all()->pluck('setting_value', 'setting_name');
-        
         $defaultSettings = [
-            'company_name' => 'SNP Distribution',
-            'company_email' => 'info@snpdist.com',
-            'company_phone' => '',
-            'company_address' => '',
-            'company_logo' => '',
-            'warranty_default_days' => '365',
-            'smtp_host' => '',
-            'smtp_port' => '',
-            'smtp_username' => '',
-            'smtp_password' => '',
-            'smtp_from_email' => '',
-            'smtp_from_name' => 'SNP Distribution',
-            'date_format' => 'Y-m-d',
-            'timezone' => 'Asia/Dhaka',
-            'app_currency' => 'BDT',
+            'company_name' => ['value' => 'SNP Distribution', 'type' => 'app'],
+            'company_email' => ['value' => 'info@snpdist.com', 'type' => 'app'],
+            'company_phone' => ['value' => '', 'type' => 'app'],
+            'company_address' => ['value' => '', 'type' => 'app'],
+            'company_logo' => ['value' => '', 'type' => 'app'],
+            'warranty_default_days' => ['value' => '365', 'type' => 'app'],
+            'smtp_host' => ['value' => '', 'type' => 'smtp'],
+            'smtp_port' => ['value' => '', 'type' => 'smtp'],
+            'smtp_username' => ['value' => '', 'type' => 'smtp'],
+            'smtp_password' => ['value' => '', 'type' => 'smtp'],
+            'smtp_from_email' => ['value' => '', 'type' => 'smtp'],
+            'smtp_from_name' => ['value' => 'SNP Distribution', 'type' => 'smtp'],
+            'date_format' => ['value' => 'Y-m-d', 'type' => 'app'],
+            'timezone' => ['value' => 'Asia/Dhaka', 'type' => 'app'],
+            'app_currency' => ['value' => 'BDT', 'type' => 'app'],
         ];
 
-        $merged = array_merge($defaultSettings, $settings->toArray());
+        $dbSettings = Setting::all()->keyBy('setting_name')->map(function ($item) {
+            return [
+                'value' => $item->setting_value,
+                'type' => $item->type,
+            ];
+        });
 
-        return $this->success($merged);
+        $merged = array_merge($defaultSettings, $dbSettings->toArray());
+
+        $result = collect($merged)->map(function ($data, $key) {
+            return [
+                'key' => $key,
+                'value' => $data['value'],
+                'type' => $data['type'],
+            ];
+        })->values();
+
+        return $this->success($result);
     }
 
     public function show(string $key): JsonResponse
     {
         $setting = Setting::where('setting_name', $key)->first();
 
-        if (!$setting) {
+        if (! $setting) {
             return $this->notFound('Setting not found.');
         }
 
@@ -77,7 +90,7 @@ class SettingController extends Controller
     {
         $setting = Setting::where('setting_name', $key)->first();
 
-        if (!$setting) {
+        if (! $setting) {
             return $this->notFound('Setting not found.');
         }
 
