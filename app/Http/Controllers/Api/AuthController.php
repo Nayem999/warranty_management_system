@@ -89,7 +89,7 @@ class AuthController extends Controller
         $otp = env("SMS_STATUS") ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
 
         DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $login],
+            ['email' => $user->email],
             [
                 'token' => $otp,
                 'created_at' => now(),
@@ -97,7 +97,7 @@ class AuthController extends Controller
         );
 
         return $this->success([
-            'otp' => $otp,
+            // 'otp' => $otp,
             'user_id' => $user->id,
             'login' => $login,
         ], 'OTP sent successfully. Use this OTP to login.');
@@ -170,7 +170,7 @@ class AuthController extends Controller
             return $this->error('We could not find a user with that email address.', 404);
         }
 
-        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $otp = env("SMS_STATUS") ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
 
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $email],
@@ -181,7 +181,7 @@ class AuthController extends Controller
         );
 
         return $this->success([
-            'otp' => $otp,
+            // 'otp' => $otp,
             'email' => $email,
         ], 'Password reset OTP has been sent to your email.');
     }
