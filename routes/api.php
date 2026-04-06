@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\CustomerRegistrationController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
@@ -22,6 +23,7 @@ Route::prefix('')->group(function () {
     Route::post('/auth/login-with-otp', [AuthController::class, 'loginWithOtp']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/auth/register', [CustomerRegistrationController::class, 'register']);
     Route::get('/warranties/check/{serial}', [WarrantyController::class, 'checkSerial']);
     Route::post('/work-orders/feedback/{token}', [WorkOrderController::class, 'submitFeedback']);
 

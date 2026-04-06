@@ -38,28 +38,7 @@ class ProductCategory extends BaseModel
 
     public function warranties(): HasMany
     {
-        return $this->hasMany(Warranty::class);
-    }
-
-    public function scopeParents($query)
-    {
-        return $query->whereNull('parent_id');
-    }
-
-    public function scopeSubcategories($query)
-    {
-        return $query->whereNotNull('parent_id');
-    }
-}
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(ProductCategory::class, 'parent_id');
-    }
-
-    public function warranties(): HasMany
-    {
-        return $this->hasMany(Warranty::class);
+        return $this->hasMany(Warranty::class, 'category_id');
     }
 
     public function scopeParents($query)

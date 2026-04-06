@@ -57,7 +57,7 @@ class CategoryController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $category = ProductCategory::with(['parent', 'children', 'warranties'])->find($id);
+        $category = ProductCategory::with(['parent', 'children', 'brand'])->find($id);
 
         if (! $category) {
             return $this->notFound('Category not found.');
