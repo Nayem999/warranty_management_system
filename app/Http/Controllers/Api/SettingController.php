@@ -70,20 +70,44 @@ class SettingController extends Controller
     public function upsert(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'key' => 'required|string',
-            'value' => 'nullable',
-            'type' => 'nullable|string',
+            'settings' => 'required|array',
+            'settings.*.key' => 'required|string',
+            'settings.*.value' => 'nullable',
+            'settings.*.type' => 'nullable|string',
         ]);
 
-        Setting::updateOrCreate(
-            ['setting_name' => $data['key']],
-            [
-                'setting_value' => $data['value'],
-                'type' => $data['type'] ?? 'app',
-            ]
-        );
+        foreach ($data['settings'] as $setting) {
+            Setting::updateOrCreate(
+                ['setting_name' => $setting['key']],
+                [
+                    'setting_value' => $setting['value'] ?? '',
+                    'type' => $setting['type'] ?? 'app',
+                ]
+            );
+        }
 
-        return $this->success(null, 'Setting saved successfully.');
+        return $this->success(null, 'Settings saved successfully.');
+    }
+
+    public function updateAll(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'settings' => 'required|array',
+        ]);
+
+        foreach ($data['settings'] as $item) {
+            if (isset($item['key']) && isset($item['value'])) {
+                Setting::updateOrCreate(
+                    ['setting_name' => $item['key']],
+                    [
+                        'setting_value' => $item['value'],
+                        'type' => $item['type'] ?? 'app',
+                    ]
+                );
+            }
+        }
+
+        return $this->success(null, 'All settings updated successfully.');
     }
 
     public function destroy(string $key): JsonResponse

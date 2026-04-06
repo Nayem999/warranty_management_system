@@ -1789,6 +1789,28 @@
           }
         },
         {
+          "name": "Update All Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/settings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"settings\": [\n        {\"key\": \"company_name\", \"value\": \"SNP Distribution Ltd.\", \"type\": \"app\"},\n        {\"key\": \"company_email\", \"value\": \"info@snpdist.com\", \"type\": \"app\"},\n        {\"key\": \"company_phone\", \"value\": \"+8802\", \"type\": \"app\"},\n        {\"key\": \"warranty_default_days\", \"value\": \"365\", \"type\": \"app\"}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Get Setting",
           "request": {
             "method": "GET",

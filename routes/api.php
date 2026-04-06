@@ -86,6 +86,7 @@ Route::prefix('')->group(function () {
 
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/settings', [SettingController::class, 'upsert']);
+        Route::put('/settings', [SettingController::class, 'updateAll']);
         Route::get('/settings/{key}', [SettingController::class, 'show']);
         Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
 
