@@ -36,6 +36,17 @@ class BrandController extends Controller
         return $this->success($brands);
     }
 
+    public function show(int $id): JsonResponse
+    {
+        $brand = Brand::find($id);
+
+        if (! $brand) {
+            return $this->notFound('Brand not found.');
+        }
+
+        return $this->success($brand);
+    }
+
     public function store(StoreBrandRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -47,17 +58,6 @@ class BrandController extends Controller
         $brand = Brand::create($data);
 
         return $this->created($brand, 'Brand created successfully.');
-    }
-
-    public function show(int $id): JsonResponse
-    {
-        $brand = Brand::find($id);
-
-        if (! $brand) {
-            return $this->notFound('Brand not found.');
-        }
-
-        return $this->success($brand);
     }
 
     public function update(UpdateBrandRequest $request, int $id): JsonResponse

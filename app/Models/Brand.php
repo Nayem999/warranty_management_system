@@ -20,6 +20,10 @@ class Brand extends BaseModel
         'status' => 'string',
     ];
 
+    protected $appends = [
+        'service_centers',
+    ];
+
     public function categories(): HasMany
     {
         return $this->hasMany(ProductCategory::class);
@@ -33,5 +37,15 @@ class Brand extends BaseModel
     public function userBrandAccess(): HasMany
     {
         return $this->hasMany(UserBrandAccess::class);
+    }
+
+    public function getServiceCentersAttribute()
+    {
+        return ServiceCenter::where('is_active', true)
+            ->where(function ($query) {
+                $query->whereJsonContains('brand_ids', $this->id)
+                    ->orWhereJsonContains('brand_ids', (string) $this->id);
+            })
+            ->get();
     }
 }

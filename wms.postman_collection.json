@@ -659,6 +659,32 @@
             ],
             "url": "{{base_url}}/users/1/permissions"
           }
+        },
+        {
+          "name": "List Trashed Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/trashed"
+          }
+        },
+        {
+          "name": "Restore User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/restore"
+          }
         }
       ]
     },
@@ -1544,7 +1570,7 @@
             "url": "{{base_url}}/service-centers",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Mirpur Service Center\",\n    \"address\": \"Mirpur, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"mirpur@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}",
+              "raw": "{\n    \"title\": \"Mirpur Service Center\",\n    \"brand_ids\": [1, 2, 3],\n    \"address\": \"Mirpur, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"mirpur@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1579,7 +1605,7 @@
             "url": "{{base_url}}/service-centers/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Mirpur Service Center - Updated\"\n}",
+              "raw": "{\n    \"title\": \"Mirpur Service Center - Updated\",\n    \"brand_ids\": [1, 2, 3],\n}",
               "options": {
                 "raw": {
                   "language": "json"

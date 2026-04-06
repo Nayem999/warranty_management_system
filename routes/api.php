@@ -35,6 +35,7 @@ Route::prefix('')->group(function () {
         Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
 
         Route::apiResource('users', UserController::class);
+        Route::get('/users/trashed', [UserController::class, 'trashed']);
         Route::post('/users/{id}/restore', [UserController::class, 'restore']);
         Route::get('/users/{id}/brand-access', [UserController::class, 'getBrandAccess']);
         Route::post('/users/{id}/brand-access', [UserController::class, 'assignBrandAccess']);
@@ -77,6 +78,7 @@ Route::prefix('')->group(function () {
         Route::get('/work-orders/{id}/feedback-link', [WorkOrderController::class, 'getFeedbackLink']);
 
         Route::apiResource('service-centers', ServiceCenterController::class);
+        Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
         Route::get('/service-centers/{id}/work-orders', [ServiceCenterController::class, 'workOrders']);
         Route::get('/service-centers/{id}/stats', [ServiceCenterController::class, 'stats']);

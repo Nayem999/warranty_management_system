@@ -13,6 +13,7 @@ class ServiceCenter extends BaseModel
         'address',
         'uan',
         'email',
+        'brand_ids',
         'working_hours',
         'logo',
         'display_order',
@@ -22,6 +23,7 @@ class ServiceCenter extends BaseModel
     protected $casts = [
         'is_active' => 'boolean',
         'display_order' => 'integer',
+        'brand_ids' => 'array',
     ];
 
     public function claims(): HasMany
@@ -32,5 +34,10 @@ class ServiceCenter extends BaseModel
     public function workOrders(): HasMany
     {
         return $this->hasMany(WorkOrder::class);
+    }
+
+    public function getBrandIdsAttribute($value)
+    {
+        return $value ?? [];
     }
 }

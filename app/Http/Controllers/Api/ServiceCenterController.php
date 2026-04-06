@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ServiceCenter;
-use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ServiceCenterController extends Controller
@@ -42,6 +41,8 @@ class ServiceCenterController extends Controller
             'address' => 'nullable|string',
             'uan' => 'nullable|string|max:20',
             'email' => 'nullable|email',
+            'brand_ids' => 'nullable|array',
+            'brand_ids.*' => 'exists:wms_brands,id',
             'working_hours' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'display_order' => 'nullable|integer',
@@ -61,7 +62,7 @@ class ServiceCenterController extends Controller
     {
         $serviceCenter = ServiceCenter::find($id);
 
-        if (!$serviceCenter) {
+        if (! $serviceCenter) {
             return $this->notFound('Service center not found.');
         }
 
@@ -72,7 +73,7 @@ class ServiceCenterController extends Controller
     {
         $serviceCenter = ServiceCenter::find($id);
 
-        if (!$serviceCenter) {
+        if (! $serviceCenter) {
             return $this->notFound('Service center not found.');
         }
 
@@ -81,6 +82,8 @@ class ServiceCenterController extends Controller
             'address' => 'nullable|string',
             'uan' => 'nullable|string|max:20',
             'email' => 'nullable|email',
+            'brand_ids' => 'nullable|array',
+            'brand_ids.*' => 'exists:wms_brands,id',
             'working_hours' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'display_order' => 'nullable|integer',
@@ -101,7 +104,7 @@ class ServiceCenterController extends Controller
     {
         $serviceCenter = ServiceCenter::find($id);
 
-        if (!$serviceCenter) {
+        if (! $serviceCenter) {
             return $this->notFound('Service center not found.');
         }
 
@@ -119,11 +122,11 @@ class ServiceCenterController extends Controller
     {
         $serviceCenter = ServiceCenter::find($id);
 
-        if (!$serviceCenter) {
+        if (! $serviceCenter) {
             return $this->notFound('Service center not found.');
         }
 
-        $serviceCenter->is_active = !$serviceCenter->is_active;
+        $serviceCenter->is_active = ! $serviceCenter->is_active;
         $serviceCenter->save();
 
         return $this->success($serviceCenter, 'Service center status updated successfully.');
@@ -133,7 +136,7 @@ class ServiceCenterController extends Controller
     {
         $serviceCenter = ServiceCenter::find($id);
 
-        if (!$serviceCenter) {
+        if (! $serviceCenter) {
             return $this->notFound('Service center not found.');
         }
 
@@ -149,7 +152,7 @@ class ServiceCenterController extends Controller
     {
         $serviceCenter = ServiceCenter::find($id);
 
-        if (!$serviceCenter) {
+        if (! $serviceCenter) {
             return $this->notFound('Service center not found.');
         }
 
@@ -167,9 +170,29 @@ class ServiceCenterController extends Controller
         return $this->success($stats);
     }
 
+    public function byBrand(Request $request): JsonResponse
+    {
+        $brandId = $request->query('brand_id');
+
+        if (! $brandId) {
+            return $this->error('brand_id query parameter is required.');
+        }
+
+        $serviceCenters = ServiceCenter::where('is_active', true)
+            ->where(function ($query) use ($brandId) {
+                $query->whereJsonContains('brand_ids', (int) $brandId)
+                    ->orWhereJsonContains('brand_ids', (string) $brandId);
+            })
+            ->orderBy('display_order', 'asc')
+            ->get();
+
+        return $this->success($serviceCenters);
+    }
+
     protected function uploadFile($file, string $folder): string
     {
         $path = $file->store("uploads/{$folder}", 'public');
+
         return $path;
     }
 

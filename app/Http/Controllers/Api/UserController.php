@@ -133,6 +133,15 @@ class UserController extends Controller
         return $this->success($user, 'User restored successfully.');
     }
 
+    public function trashed(Request $request): JsonResponse
+    {
+        $users = User::onlyTrashed()
+            ->orderBy('deleted_at', 'desc')
+            ->paginate($request->limit ?? 15);
+
+        return $this->success($users);
+    }
+
     public function getBrandAccess(int $id): JsonResponse
     {
         $user = User::with(['brandAccess.brand'])->find($id);
