@@ -58,7 +58,6 @@ class DashboardController extends Controller
             'total_warranties' => $warrantyQuery->count(),
             'active_warranties' => (clone $warrantyQuery)->active()->count(),
             'expired_warranties' => (clone $warrantyQuery)->expired()->count(),
-            'void_warranties' => (clone $warrantyQuery)->void()->count(),
             'total_claims' => $claimQuery->count(),
             'open_claims' => (clone $claimQuery)->open()->count(),
             'converted_claims' => (clone $claimQuery)->converted()->count(),
@@ -74,10 +73,89 @@ class DashboardController extends Controller
             'avg_tat_days' => (clone $workOrderQuery)->whereNotNull('tat')->avg('tat') ?? 0,
         ];
 
-        return $this->success($stats);
+        $recentClaims = Claim::with(['warranty.brand', 'serviceCenter'])
+            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($brandId, fn ($q) => $q->whereHas('warranty', fn ($q) => $q->where('brand_id', $brandId)))
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $recentWorkOrders = WorkOrder::with(['claim.warranty.brand', 'serviceCenter'])
+            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($brandId, fn ($q) => $q->whereHas('claim.warranty', fn ($q) => $q->where('brand_id', $brandId)))
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $year = $request->year ?? now()->year;
+        $monthlyClaims = Claim::query()
+            ->selectRaw('MONTH(claim_date) as month, COUNT(*) as count')
+            ->whereYear('claim_date', $year)
+            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->groupBy('month')
+            ->get();
+
+        $monthlyData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $monthlyData[] = [
+                'month' => $i,
+                'month_name' => Carbon::createFromDate($year, $i)->format('M'),
+                'count' => $monthlyClaims->where('month', $i)->first()?->count ?? 0,
+            ];
+        }
+
+        $expiringWarranties = Warranty::with(['brand', 'category'])
+            ->expiringSoon(30)
+            ->when($user->isBrandRestricted(), fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()))
+            ->orderBy('end_date', 'asc')
+            ->limit(10)
+            ->get();
+
+        $data = [
+            'stats' => $stats,
+            'warranty' => [
+                'total' => $stats['total_warranties'],
+                'active' => $stats['active_warranties'],
+                'expired' => $stats['expired_warranties'],
+                'expiring_soon' => $expiringWarranties,
+            ],
+            'claim' => [
+                'total' => $stats['total_claims'],
+                'open' => $stats['open_claims'],
+                'converted' => $stats['converted_claims'],
+                'closed' => $stats['closed_claims'],
+                'recent' => $recentClaims,
+                'monthly' => $monthlyData,
+            ],
+            'work_order' => [
+                'total' => $stats['total_work_orders'],
+                'pending' => $stats['pending_work_orders'],
+                'in_progress' => $stats['in_progress_work_orders'],
+                'completed' => $stats['completed_work_orders'],
+                'delivered' => $stats['delivered_work_orders'],
+                'recent' => $recentWorkOrders,
+            ],
+            'service_center' => [
+                'total' => $stats['total_service_centers'],
+            ],
+            'brand' => [
+                'total' => $stats['total_brands'],
+            ],
+            'metrics' => [
+                'avg_customer_rating' => $stats['avg_customer_rating'],
+                'avg_tat_days' => $stats['avg_tat_days'],
+            ],
+        ];
+
+        return $this->success($data);
     }
 
     public function stats(Request $request): JsonResponse
+    {
+        return $this->index($request);
+    }
+
+    public function warrantyStats(Request $request): JsonResponse
     {
         $user = $request->user();
 
@@ -100,7 +178,6 @@ class DashboardController extends Controller
             'total_warranties' => $warrantyQuery->count(),
             'active_warranties' => (clone $warrantyQuery)->active()->count(),
             'expired_warranties' => (clone $warrantyQuery)->expired()->count(),
-            'void_warranties' => (clone $warrantyQuery)->void()->count(),
             'total_claims' => $claimQuery->count(),
             'open_claims' => (clone $claimQuery)->open()->count(),
             'converted_claims' => (clone $claimQuery)->converted()->count(),
@@ -119,7 +196,7 @@ class DashboardController extends Controller
         return $this->success($stats);
     }
 
-    public function warrantyStats(Request $request): JsonResponse
+    /* public function warrantyStats(Request $request): JsonResponse
     {
         $user = $request->user();
         $query = Warranty::query();
@@ -132,11 +209,10 @@ class DashboardController extends Controller
             'total' => $query->count(),
             'active' => (clone $query)->active()->count(),
             'expired' => (clone $query)->expired()->count(),
-            'void' => (clone $query)->void()->count(),
         ];
 
         return $this->success($stats);
-    }
+    } */
 
     public function claimStats(Request $request): JsonResponse
     {

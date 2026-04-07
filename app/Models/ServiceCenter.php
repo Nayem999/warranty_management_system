@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServiceCenter extends BaseModel
@@ -36,8 +37,37 @@ class ServiceCenter extends BaseModel
         return $this->hasMany(WorkOrder::class);
     }
 
+    public function brands(): BelongsToMany
+    {
+        return $this->belongsToMany(Brand::class, 'wms_service_centers_brands', 'service_center_id', 'brand_id')
+            ->where('wms_brands.is_active', true);
+    }
+
     public function getBrandIdsAttribute($value)
     {
+        if (is_string($value)) {
+            $value = json_decode($value, true);
+        }
+
         return $value ?? [];
+    }
+
+    public function getBrandsListAttribute()
+    {
+        $brandIds = $this->brand_ids;
+
+        if (empty($brandIds) || ! is_array($brandIds)) {
+            return collect();
+        }
+
+        $ids = array_filter($brandIds, fn ($id) => is_numeric($id));
+
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return Brand::where('status', 'active')
+            ->whereIn('id', $ids)
+            ->get();
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('type');
             $table->json('filter')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

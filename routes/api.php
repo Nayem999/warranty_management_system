@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\CustomerRegistrationController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\MemorizeReportController;
+use App\Http\Controllers\Api\PartController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
 use App\Http\Controllers\Api\SettingController;
@@ -74,8 +77,8 @@ Route::prefix('')->group(function () {
         Route::put('/work-orders/{id}/status', [WorkOrderController::class, 'updateStatus']);
         Route::get('/work-orders/{id}/feedback-link', [WorkOrderController::class, 'getFeedbackLink']);
 
-        Route::apiResource('service-centers', ServiceCenterController::class);
         Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
+        Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
         Route::get('/service-centers/{id}/work-orders', [ServiceCenterController::class, 'workOrders']);
         Route::get('/service-centers/{id}/stats', [ServiceCenterController::class, 'stats']);
@@ -92,19 +95,7 @@ Route::prefix('')->group(function () {
         Route::get('/settings/{key}', [SettingController::class, 'show']);
         Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
 
-        Route::prefix('dashboard')->group(function () {
-            Route::get('/', [DashboardController::class, 'index']);
-            Route::get('/stats', [DashboardController::class, 'stats']);
-            Route::get('/warranty-stats', [DashboardController::class, 'warrantyStats']);
-            Route::get('/claim-stats', [DashboardController::class, 'claimStats']);
-            Route::get('/work-order-stats', [DashboardController::class, 'workOrderStats']);
-            Route::get('/recent-claims', [DashboardController::class, 'recentClaims']);
-            Route::get('/recent-work-orders', [DashboardController::class, 'recentWorkOrders']);
-            Route::get('/brand-wise-summary', [DashboardController::class, 'brandWiseSummary']);
-            Route::get('/service-center-performance', [DashboardController::class, 'serviceCenterPerformance']);
-            Route::get('/monthly-claims', [DashboardController::class, 'monthlyClaims']);
-            Route::get('/expiring-warranties', [DashboardController::class, 'expiringWarranties']);
-        });
+        Route::get('/dashboard', [DashboardController::class, 'index']);
 
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 
