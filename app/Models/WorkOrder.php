@@ -75,7 +75,7 @@ class WorkOrder extends BaseModel
             if (filter_var($attachment, FILTER_VALIDATE_URL)) {
                 $urls[] = $attachment;
             } else {
-                $urls[] = $backendUrl.'/public/storage/'.$attachment;
+                $urls[] = $backendUrl.'/storage/'.$attachment;
             }
         }
 

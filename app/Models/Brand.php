@@ -37,7 +37,7 @@ class Brand extends BaseModel
 
         $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
 
-        return $backendUrl.'/public/storage/'.$this->logo;
+        return $backendUrl.'/storage/'.$this->logo;
     }
 
     public function categories(): HasMany
