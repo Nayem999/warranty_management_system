@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Warranty;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateWarrantyRequest extends FormRequest
 {
@@ -16,7 +17,11 @@ class UpdateWarrantyRequest extends FormRequest
         $warrantyId = $this->route('id');
 
         return [
-            'product_serial' => 'sometimes|string|max:255|unique:wms_warranties,product_serial,'.$warrantyId,
+            'product_serial' => [
+                'sometimes',
+                'string',
+                Rule::unique('wms_warranties', 'product_serial')->ignore($warrantyId),
+            ],
             'product_name' => 'sometimes|string|max:255',
             'product_info' => 'nullable|string',
             'brand_id' => 'sometimes|exists:wms_brands,id',
