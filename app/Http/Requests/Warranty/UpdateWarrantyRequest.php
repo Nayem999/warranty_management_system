@@ -7,20 +7,29 @@ use Illuminate\Validation\Rule;
 
 class UpdateWarrantyRequest extends FormRequest
 {
+    protected $warrantyId;
+
     public function authorize(): bool
     {
         return true;
     }
 
+    public function prepareForValidation(): void
+    {
+        $this->warrantyId = $this->route('warranty');
+
+        if (! $this->warrantyId && is_numeric($this->route('id'))) {
+            $this->warrantyId = $this->route('id');
+        }
+    }
+
     public function rules(): array
     {
-        $warrantyId = $this->route('id');
-
         return [
             'product_serial' => [
                 'sometimes',
                 'string',
-                Rule::unique('wms_warranties', 'product_serial')->ignore($warrantyId),
+                Rule::unique('wms_warranties', 'product_serial')->ignore($this->warrantyId),
             ],
             'product_name' => 'sometimes|string|max:255',
             'product_info' => 'nullable|string',
