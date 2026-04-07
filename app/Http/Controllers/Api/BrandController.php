@@ -53,6 +53,8 @@ class BrandController extends Controller
 
         if ($request->hasFile('logo')) {
             $data['logo'] = $this->uploadFile($request->file('logo'), 'brands');
+        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+            $data['logo'] = $this->handleImageUpload($data['logo'], 'brands');
         }
 
         $brand = Brand::create($data);
@@ -73,6 +75,11 @@ class BrandController extends Controller
         if ($request->hasFile('logo')) {
             $this->deleteFile($brand->logo);
             $data['logo'] = $this->uploadFile($request->file('logo'), 'brands');
+        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+            if ($brand->logo !== $data['logo']) {
+                $this->deleteFile($brand->logo);
+                $data['logo'] = $this->handleImageUpload($data['logo'], 'brands');
+            }
         }
 
         $brand->update($data);

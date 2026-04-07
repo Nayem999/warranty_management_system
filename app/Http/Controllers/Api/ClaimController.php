@@ -202,7 +202,7 @@ class ClaimController extends Controller
                 'counter' => $counter,
                 'wo_assigned_date' => now(),
                 'additional_comment' => $data['additional_comment'] ?? null,
-                'status' => 'Pending',
+                'status' => 'Progress',
                 'created_by' => $request->user()->id,
                 'assigned_by' => $request->user()->id,
             ]);

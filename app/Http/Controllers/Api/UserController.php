@@ -54,7 +54,9 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        if (! empty($data['image'])) {
+        if ($request->hasFile('image')) {
+            $data['image'] = $this->uploadFile($request->file('image'), 'users');
+        } elseif (! empty($data['image']) && is_string($data['image'])) {
             $data['image'] = $this->handleImageUpload($data['image'], 'users');
         }
 
@@ -104,11 +106,14 @@ class UserController extends Controller
 
         $data = $request->validated();
 
-        if (! empty($data['image'])) {
-            if ($user->image) {
+        if ($request->hasFile('image')) {
+            $this->deleteFile($user->image);
+            $data['image'] = $this->uploadFile($request->file('image'), 'users');
+        } elseif (! empty($data['image']) && is_string($data['image'])) {
+            if ($user->image !== $data['image']) {
                 $this->deleteFile($user->image);
+                $data['image'] = $this->handleImageUpload($data['image'], 'users');
             }
-            $data['image'] = $this->handleImageUpload($data['image'], 'users');
         }
 
         if (isset($data['password'])) {

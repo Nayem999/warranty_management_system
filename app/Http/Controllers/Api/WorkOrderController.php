@@ -111,7 +111,16 @@ class WorkOrderController extends Controller
 
         $oldData = $workOrder->toArray();
 
-        if (isset($data['attachments']) && $data['attachments']) {
+        if ($request->hasFile('attachments')) {
+            $files = $request->file('attachments');
+            $paths = $this->uploadFiles($files, 'work-orders');
+            $existingAttachments = $workOrder->attachments ?? [];
+            if (is_array($existingAttachments)) {
+                $data['attachments'] = json_encode(array_merge($existingAttachments, $paths));
+            } else {
+                $data['attachments'] = json_encode($paths);
+            }
+        } elseif (isset($data['attachments']) && $data['attachments']) {
             $data['attachments'] = $this->handleAttachments($data['attachments'], 'work-orders');
         }
 
@@ -207,13 +216,13 @@ class WorkOrderController extends Controller
         }
 
         $data = $request->validate([
-            'status' => 'required|in:Pending,In Progress,Completed,Delivered',
+            'status' => 'required|in:Progress,Closed,Delivered',
             'replace_serial' => 'nullable|string|max:255',
         ]);
 
         $previousStatus = $workOrder->status;
 
-        $statusFlow = ['Pending', 'In Progress', 'Completed', 'Delivered'];
+        $statusFlow = ['Progress', 'Closed', 'Delivered'];
         $currentIndex = array_search($workOrder->status, $statusFlow);
         $newIndex = array_search($data['status'], $statusFlow);
 
@@ -223,7 +232,7 @@ class WorkOrderController extends Controller
 
         $updateData = ['status' => $data['status']];
 
-        if ($data['status'] === 'Completed') {
+        if ($data['status'] === 'Closed') {
             $updateData['wo_closed_date'] = now();
             $updateData['tat'] = $workOrder->wo_assigned_date
                 ? Carbon::parse($workOrder->wo_assigned_date)->diffInDays(now())

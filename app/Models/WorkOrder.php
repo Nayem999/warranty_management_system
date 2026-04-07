@@ -134,17 +134,17 @@ class WorkOrder extends BaseModel
 
     public function scopePending($query)
     {
-        return $query->where('status', 'Pending');
+        return $query->where('status', 'Progress');
     }
 
     public function scopeInProgress($query)
     {
-        return $query->where('status', 'In Progress');
+        return $query->where('status', 'Progress');
     }
 
     public function scopeCompleted($query)
     {
-        return $query->where('status', 'Completed');
+        return $query->where('status', 'Closed');
     }
 
     public function scopeDelivered($query)

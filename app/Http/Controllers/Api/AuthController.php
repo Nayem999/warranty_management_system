@@ -240,7 +240,7 @@ class AuthController extends Controller
     public function updateProfile(Request $request): JsonResponse
     {
         $user = $request->user();
-
+        // dd($request->all());
         $validated = $request->validate([
             'first_name' => 'sometimes|string|max:255',
             'last_name' => 'sometimes|string|max:255',
@@ -249,11 +249,22 @@ class AuthController extends Controller
             'dob' => 'sometimes|date',
             'gender' => 'sometimes|in:male,female,other',
             'language' => 'sometimes|string|max:10',
-            'image' => 'nullable|string',
+            'image' => 'nullable',
         ]);
 
-        if (! empty($validated['image'])) {
-            $validated['image'] = $this->handleImageUpload($validated['image'], 'users');
+
+        if ($request->hasFile('image')) {
+            if ($user->image) {
+                $this->deleteFile($user->image);
+            }
+            $validated['image'] = $this->uploadFile($request->file('image'), 'users');
+        } elseif (! empty($validated['image']) && is_string($validated['image'])) {
+            if ($user->image !== $validated['image']) {
+                if ($user->image) {
+                    $this->deleteFile($user->image);
+                }
+                $validated['image'] = $this->handleImageUpload($validated['image'], 'users');
+            }
         }
 
         $user->update($validated);

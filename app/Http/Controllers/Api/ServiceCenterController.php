@@ -52,6 +52,8 @@ class ServiceCenterController extends Controller
 
         if ($request->hasFile('logo')) {
             $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
+        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+            $data['logo'] = $this->handleImageUpload($data['logo'], 'service-centers');
         }
 
         $serviceCenter = ServiceCenter::create($data);
@@ -94,6 +96,11 @@ class ServiceCenterController extends Controller
         if ($request->hasFile('logo')) {
             $this->deleteFile($serviceCenter->logo);
             $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
+        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+            if ($serviceCenter->logo !== $data['logo']) {
+                $this->deleteFile($serviceCenter->logo);
+                $data['logo'] = $this->handleImageUpload($data['logo'], 'service-centers');
+            }
         }
 
         $serviceCenter->update($data);
