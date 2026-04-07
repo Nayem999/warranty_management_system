@@ -88,6 +88,7 @@ class WorkOrderController extends Controller
             'engineer',
             'creator',
             'assignedBy',
+            'parts.part',
         ])->find($id);
 
         if (! $workOrder) {
@@ -113,7 +114,21 @@ class WorkOrderController extends Controller
             $data['tat'] = Carbon::parse($workOrder->wo_assigned_date)->diffInDays(Carbon::parse($data['wo_closed_date']));
         }
 
+        $parts = null;
+        if (isset($data['parts'])) {
+            $parts = $data['parts'];
+            unset($data['parts']);
+        }
+
         $workOrder->update($data);
+
+        if ($parts) {
+            $workOrder->parts()->delete();
+            foreach ($parts as $partData) {
+                $partData['work_order_id'] = $workOrder->id;
+                $workOrder->parts()->create($partData);
+            }
+        }
 
         ActivityLog::log(
             $request->user()->id,
@@ -124,7 +139,7 @@ class WorkOrderController extends Controller
             ['old' => $oldData, 'new' => $workOrder->toArray()]
         );
 
-        return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter', 'courierIn', 'courierOut', 'engineer']), 'Work order updated successfully.');
+        return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter', 'courierIn', 'courierOut', 'engineer', 'parts.part']), 'Work order updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

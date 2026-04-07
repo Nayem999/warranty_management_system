@@ -3,19 +3,79 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Warranty;
-use App\Models\Claim;
-use App\Models\WorkOrder;
-use App\Models\ServiceCenter;
 use App\Models\Brand;
+use App\Models\Claim;
+use App\Models\ServiceCenter;
+use App\Models\Warranty;
+use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     use ApiResponse;
+
+    public function index(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $brandId = $request->brand_id;
+        $serviceCenterId = $request->service_center_id;
+
+        $warrantyQuery = Warranty::query();
+        $claimQuery = Claim::query();
+        $workOrderQuery = WorkOrder::query();
+
+        if ($user->isBrandRestricted()) {
+            $brandIds = $user->accessibleBrandIds();
+            $warrantyQuery->whereIn('brand_id', $brandIds);
+            $claimQuery->whereHas('warranty', function ($q) use ($brandIds) {
+                $q->whereIn('brand_id', $brandIds);
+            });
+            $workOrderQuery->whereHas('claim.warranty', function ($q) use ($brandIds) {
+                $q->whereIn('brand_id', $brandIds);
+            });
+        }
+
+        if ($brandId) {
+            $warrantyQuery->where('brand_id', $brandId);
+            $claimQuery->whereHas('warranty', function ($q) use ($brandId) {
+                $q->where('brand_id', $brandId);
+            });
+            $workOrderQuery->whereHas('claim.warranty', function ($q) use ($brandId) {
+                $q->where('brand_id', $brandId);
+            });
+        }
+
+        if ($serviceCenterId) {
+            $claimQuery->where('service_center_id', $serviceCenterId);
+            $workOrderQuery->where('service_center_id', $serviceCenterId);
+        }
+
+        $stats = [
+            'total_warranties' => $warrantyQuery->count(),
+            'active_warranties' => (clone $warrantyQuery)->active()->count(),
+            'expired_warranties' => (clone $warrantyQuery)->expired()->count(),
+            'void_warranties' => (clone $warrantyQuery)->void()->count(),
+            'total_claims' => $claimQuery->count(),
+            'open_claims' => (clone $claimQuery)->open()->count(),
+            'converted_claims' => (clone $claimQuery)->converted()->count(),
+            'closed_claims' => (clone $claimQuery)->closed()->count(),
+            'total_work_orders' => $workOrderQuery->count(),
+            'pending_work_orders' => (clone $workOrderQuery)->pending()->count(),
+            'in_progress_work_orders' => (clone $workOrderQuery)->inProgress()->count(),
+            'completed_work_orders' => (clone $workOrderQuery)->completed()->count(),
+            'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
+            'total_service_centers' => ServiceCenter::when($brandId, fn ($q) => $q->whereJsonContains('brand_ids', (int) $brandId))->where('is_active', true)->count(),
+            'total_brands' => Brand::where('status', 'active')->count(),
+            'avg_customer_rating' => (clone $workOrderQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
+            'avg_tat_days' => (clone $workOrderQuery)->whereNotNull('tat')->avg('tat') ?? 0,
+        ];
+
+        return $this->success($stats);
+    }
 
     public function stats(Request $request): JsonResponse
     {

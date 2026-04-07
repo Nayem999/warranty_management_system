@@ -539,19 +539,6 @@
           }
         },
         {
-          "name": "Restore User",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/users/1/restore"
-          }
-        },
-        {
           "name": "Get User Brand Access",
           "request": {
             "method": "GET",
@@ -934,6 +921,19 @@
             ],
             "url": "{{base_url}}/brands/1/toggle-status"
           }
+        },
+        {
+          "name": "Get Service Centers by Brand",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/service-centers/by-brand?brand_id=1"
+          }
         }
       ]
     },
@@ -1183,41 +1183,6 @@
           }
         },
         {
-          "name": "Void Warranty",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/warranties/1/void",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"void_reason\": \"Customer requested cancellation\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Unvoid Warranty",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/warranties/1/unvoid"
-          }
-        },
-        {
           "name": "Get Warranty Claims",
           "request": {
             "method": "GET",
@@ -1434,7 +1399,7 @@
             "url": "{{base_url}}/work-orders/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"SLIP-IN-12345\",\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"SLIP-OUT-67890\",\n    \"received_date_time\": \"2026-04-05 10:00:00\",\n    \"delivered_date_time\": \"2026-04-06 14:00:00\",\n    \"feedback_preference\": true,\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"part1_used\": \"New Screen Display\"\n}",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"SLIP-IN-12345\",\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"SLIP-OUT-67890\",\n    \"received_date_time\": \"2026-04-05 10:00:00\",\n    \"delivered_date_time\": \"2026-04-06 14:00:00\",\n    \"feedback_preference\": true,\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"service_type\": \"warranty void\",\n    \"job_type\": \"Carry In\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1537,6 +1502,28 @@
               }
             ],
             "url": "{{base_url}}/work-orders/overdue"
+          }
+        },
+        {
+          "name": "Update Work Order with Parts",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/work-orders/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"service_type\": \"warranty void\",\n    \"job_type\": \"Carry In\",\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"parts\": [\n        {\"part_id\": 1, \"quantity\": 2},\n        {\"part_id\": 2, \"quantity\": 1}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           }
         }
       ]
@@ -1777,6 +1764,205 @@
       ]
     },
     {
+      "name": "Parts",
+      "item": [
+        {
+          "name": "List Parts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/parts?brand_id=1&category_id=1&sub_category_id=2",
+              "host": ["{{base_url}}"],
+              "path": ["parts"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "category_id", "value": "1", "disabled": true},
+                {"key": "sub_category_id", "value": "2", "disabled": true},
+                {"key": "is_active", "value": "true", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Part",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"LCD Display\",\n    \"part_number\": \"LCD-SMG-001\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": 2,\n    \"price\": 5000,\n    \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Part",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1"
+          }
+        },
+        {
+          "name": "Update Part",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"price\": 5500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Part",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1"
+          }
+        },
+        {
+          "name": "Toggle Part Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1/toggle-status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Memorize Reports",
+      "item": [
+        {
+          "name": "List Memorize Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports"
+          }
+        },
+        {
+          "name": "Create Memorize Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Monthly Warranty Summary\",\n    \"type\": \"warranty_summary\",\n    \"filter\": {\"brand_id\": 1, \"date_from\": \"2026-01-01\", \"date_to\": \"2026-12-31\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Memorize Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports/1"
+          }
+        },
+        {
+          "name": "Update Memorize Report",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Monthly Warranty Summary - Updated\",\n    \"filter\": {\"brand_id\": 1, \"date_from\": \"2026-01-01\", \"date_to\": \"2026-06-30\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Memorize Report",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports/1"
+          }
+        }
+      ]
+    },
+    {
       "name": "Settings",
       "item": [
         {
@@ -1867,6 +2053,27 @@
     {
       "name": "Dashboard",
       "item": [
+        {
+          "name": "Dashboard Index (with filters)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard?brand_id=1&service_center_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "service_center_id", "value": "1", "disabled": true}
+              ]
+            }
+          }
+        },
         {
           "name": "Dashboard Stats",
           "request": {
@@ -2013,6 +2220,205 @@
               }
             ],
             "url": "{{base_url}}/activity-logs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parts",
+      "item": [
+        {
+          "name": "List Parts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/parts?brand_id=1&category_id=1&sub_category_id=2",
+              "host": ["{{base_url}}"],
+              "path": ["parts"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "category_id", "value": "1", "disabled": true},
+                {"key": "sub_category_id", "value": "2", "disabled": true},
+                {"key": "is_active", "value": "true", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Part",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"LCD Display\",\n    \"part_number\": \"LCD-SMG-001\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": 2,\n    \"price\": 5000,\n    \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Part",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1"
+          }
+        },
+        {
+          "name": "Update Part",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"price\": 5500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Part",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1"
+          }
+        },
+        {
+          "name": "Toggle Part Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/parts/1/toggle-status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Memorize Reports",
+      "item": [
+        {
+          "name": "List Memorize Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports"
+          }
+        },
+        {
+          "name": "Create Memorize Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Monthly Warranty Summary\",\n    \"type\": \"warranty_summary\",\n    \"filter\": {\"brand_id\": 1, \"date_from\": \"2026-01-01\", \"date_to\": \"2026-12-31\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Memorize Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports/1"
+          }
+        },
+        {
+          "name": "Update Memorize Report",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Monthly Warranty Summary - Updated\",\n    \"filter\": {\"brand_id\": 1, \"date_from\": \"2026-01-01\", \"date_to\": \"2026-06-30\"}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Memorize Report",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/memorize-reports/1"
           }
         }
       ]

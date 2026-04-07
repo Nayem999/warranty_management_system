@@ -20,15 +20,12 @@ class Warranty extends BaseModel
         'sub_category_id',
         'start_date',
         'end_date',
-        'is_void',
-        'void_reason',
         'created_by',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'is_void' => 'string',
     ];
 
     public function brand(): BelongsTo
@@ -63,10 +60,6 @@ class Warranty extends BaseModel
 
     public function getWarrantyStatusAttribute(): string
     {
-        if ($this->is_void === 'YES') {
-            return 'Void';
-        }
-
         $today = Carbon::today();
 
         if ($this->end_date->lt($today)) {
@@ -78,29 +71,21 @@ class Warranty extends BaseModel
 
     public function isActive(): bool
     {
-        return $this->is_void === 'NO' && $this->end_date->gte(Carbon::today());
+        return $this->end_date->gte(Carbon::today());
     }
 
     public function scopeActive($query)
     {
-        return $query->where('is_void', 'NO')
-            ->where('end_date', '>=', Carbon::today());
+        return $query->where('end_date', '>=', Carbon::today());
     }
 
     public function scopeExpired($query)
     {
-        return $query->where('end_date', '<', Carbon::today())
-            ->where('is_void', 'NO');
-    }
-
-    public function scopeVoid($query)
-    {
-        return $query->where('is_void', 'YES');
+        return $query->where('end_date', '<', Carbon::today());
     }
 
     public function scopeExpiringSoon($query, int $days = 30)
     {
-        return $query->where('is_void', 'NO')
-            ->whereBetween('end_date', [Carbon::today(), Carbon::today()->addDays($days)]);
+        return $query->whereBetween('end_date', [Carbon::today(), Carbon::today()->addDays($days)]);
     }
 }

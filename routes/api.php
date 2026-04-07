@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
-use App\Http\Controllers\Api\CustomerRegistrationController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
@@ -60,8 +59,6 @@ Route::prefix('')->group(function () {
         Route::put('/categories/{id}/toggle-status', [CategoryController::class, 'toggleStatus']);
 
         Route::apiResource('warranties', WarrantyController::class);
-        Route::post('/warranties/{id}/void', [WarrantyController::class, 'void']);
-        Route::post('/warranties/{id}/unvoid', [WarrantyController::class, 'unvoid']);
         Route::get('/warranties/{id}/claims', [WarrantyController::class, 'claims']);
         Route::get('/warranties/expiring-soon', [WarrantyController::class, 'expiringSoon']);
 
@@ -86,6 +83,9 @@ Route::prefix('')->group(function () {
         Route::apiResource('couriers', CourierController::class);
         Route::put('/couriers/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
 
+        Route::apiResource('parts', PartController::class);
+        Route::put('/parts/{id}/toggle-status', [PartController::class, 'toggleStatus']);
+
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/settings', [SettingController::class, 'upsert']);
         Route::put('/settings', [SettingController::class, 'updateAll']);
@@ -93,6 +93,7 @@ Route::prefix('')->group(function () {
         Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
 
         Route::prefix('dashboard')->group(function () {
+            Route::get('/', [DashboardController::class, 'index']);
             Route::get('/stats', [DashboardController::class, 'stats']);
             Route::get('/warranty-stats', [DashboardController::class, 'warrantyStats']);
             Route::get('/claim-stats', [DashboardController::class, 'claimStats']);
@@ -106,5 +107,7 @@ Route::prefix('')->group(function () {
         });
 
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);
+
+        Route::apiResource('memorize-reports', MemorizeReportController::class);
     });
 });

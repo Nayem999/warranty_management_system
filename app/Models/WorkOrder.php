@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class WorkOrder extends BaseModel
@@ -37,9 +38,8 @@ class WorkOrder extends BaseModel
         'customer_rating',
         'feedback_token',
         'status',
-        'part1_used',
-        'part2_used',
-        'part3_used',
+        'service_type',
+        'job_type',
         'created_by',
         'assigned_by',
     ];
@@ -92,21 +92,6 @@ class WorkOrder extends BaseModel
         return $this->belongsTo(User::class, 'engineer_id');
     }
 
-    public function warranty(): BelongsTo
-    {
-        return $this->claim()->warranty();
-    }
-
-    public function replacedWarranty(): BelongsTo
-    {
-        return $this->belongsTo(Warranty::class, 'replaced_warranty_id');
-    }
-
-    public function serviceCenter(): BelongsTo
-    {
-        return $this->belongsTo(ServiceCenter::class);
-    }
-
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -115,6 +100,11 @@ class WorkOrder extends BaseModel
     public function assignedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_by');
+    }
+
+    public function parts(): HasMany
+    {
+        return $this->hasMany(WorkOrderPart::class);
     }
 
     public function scopePending($query)
