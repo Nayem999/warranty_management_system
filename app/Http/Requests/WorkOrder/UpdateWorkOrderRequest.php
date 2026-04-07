@@ -20,7 +20,7 @@ class UpdateWorkOrderRequest extends FormRequest
             'courier_slip_inward' => 'nullable|string',
             'courier_out_id' => 'nullable|exists:wms_couriers,id',
             'courier_slip_outward' => 'nullable|string',
-            'attachments' => 'nullable|string',
+            'attachments' => 'nullable',
             'feedback_preference' => 'nullable|boolean',
             'received_date_time' => 'nullable|date',
             'delivered_date_time' => 'nullable|date',

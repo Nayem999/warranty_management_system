@@ -8,13 +8,13 @@ use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Models\Brand;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
+use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, FileUpload;
 
     public function index(Request $request): JsonResponse
     {
@@ -187,19 +187,5 @@ class BrandController extends Controller
         $brand->save();
 
         return $this->success($brand, 'Brand status updated successfully.');
-    }
-
-    protected function uploadFile($file, string $folder): string
-    {
-        $path = $file->store("uploads/{$folder}", 'public');
-
-        return $path;
-    }
-
-    protected function deleteFile(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
-        }
     }
 }

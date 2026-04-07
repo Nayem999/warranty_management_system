@@ -8,14 +8,16 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use App\Models\UserBrandAccess;
 use App\Traits\ApiResponse;
+use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, FileUpload;
 
     public function index(Request $request): JsonResponse
     {
@@ -51,6 +53,10 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         $data = $request->validated();
+
+        if (! empty($data['image'])) {
+            $data['image'] = $this->handleImageUpload($data['image'], 'users');
+        }
 
         $password = $data['password'] ?? Str::random(12);
         $data['password'] = Hash::make($password);
@@ -97,6 +103,13 @@ class UserController extends Controller
         }
 
         $data = $request->validated();
+
+        if (! empty($data['image'])) {
+            if ($user->image) {
+                $this->deleteFile($user->image);
+            }
+            $data['image'] = $this->handleImageUpload($data['image'], 'users');
+        }
 
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -251,5 +264,34 @@ class UserController extends Controller
             'personal_permissions' => $user->personal_permissions,
             'effective_permissions' => $user->permissions,
         ]);
+    }
+
+    public function handleImageUpload(string $base64Data, string $folder): string
+    {
+        if (empty($base64Data)) {
+            return '';
+        }
+
+        if (str_starts_with($base64Data, 'data:')) {
+            $ext = 'jpg';
+            if (preg_match('/data:image\/(\w+);/', $base64Data, $matches)) {
+                $ext = $matches[1];
+            }
+
+            $base64Data = preg_replace('/^data:image\/\w+;base64,/', '', $base64Data);
+            $base64Data = base64_decode($base64Data);
+
+            if ($base64Data === false) {
+                return '';
+            }
+
+            $filename = Str::uuid().'.'.$ext;
+            $path = "uploads/{$folder}/{$filename}";
+            Storage::disk('public')->put($path, $base64Data);
+
+            return $path;
+        }
+
+        return $base64Data;
     }
 }

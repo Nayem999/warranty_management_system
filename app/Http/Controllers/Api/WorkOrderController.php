@@ -10,13 +10,14 @@ use App\Models\ActivityLog;
 use App\Models\Warranty;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
+use App\Traits\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WorkOrderController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, FileUpload;
 
     public function index(Request $request): JsonResponse
     {
@@ -109,6 +110,10 @@ class WorkOrderController extends Controller
         $data = $request->validated();
 
         $oldData = $workOrder->toArray();
+
+        if (isset($data['attachments']) && $data['attachments']) {
+            $data['attachments'] = $this->handleAttachments($data['attachments'], 'work-orders');
+        }
 
         if (isset($data['wo_closed_date']) && $data['wo_closed_date']) {
             $data['tat'] = Carbon::parse($workOrder->wo_assigned_date)->diffInDays(Carbon::parse($data['wo_closed_date']));

@@ -55,7 +55,32 @@ class WorkOrder extends BaseModel
         'customer_rating' => 'integer',
         'counter' => 'integer',
         'status' => 'string',
+        'attachments' => 'array',
     ];
+
+    protected $appends = [
+        'attachments_urls',
+    ];
+
+    public function getAttachmentsUrlsAttribute(): ?array
+    {
+        if (empty($this->attachments)) {
+            return null;
+        }
+
+        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+
+        $urls = [];
+        foreach ($this->attachments as $attachment) {
+            if (filter_var($attachment, FILTER_VALIDATE_URL)) {
+                $urls[] = $attachment;
+            } else {
+                $urls[] = $backendUrl.'/public/storage/'.$attachment;
+            }
+        }
+
+        return $urls;
+    }
 
     public function claim(): BelongsTo
     {

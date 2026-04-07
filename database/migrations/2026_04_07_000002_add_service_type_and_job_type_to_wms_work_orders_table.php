@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('wms_work_orders', function (Blueprint $table) {
-            $table->enum('service_type', ['dead on arrival', 'out of warranty expire', 'warranty void'])->nullable()->after('status');
+            $table->enum('service_type', ['In Warranty', 'Warranty Void', 'DOA', 'OOW/Expired'])->nullable()->after('status');
             $table->enum('job_type', ['Carry In', 'On Site', 'Pick Up'])->nullable()->after('service_type');
         });
     }

@@ -53,6 +53,25 @@ class User extends Authenticatable
         'personal_permissions' => 'array',
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (empty($this->image)) {
+            return null;
+        }
+
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+
+        return $backendUrl.'/public/storage/'.$this->image;
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

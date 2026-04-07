@@ -27,6 +27,25 @@ class ServiceCenter extends BaseModel
         'brand_ids' => 'array',
     ];
 
+    protected $appends = [
+        'logo_url',
+    ];
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (empty($this->logo)) {
+            return null;
+        }
+
+        if (filter_var($this->logo, FILTER_VALIDATE_URL)) {
+            return $this->logo;
+        }
+
+        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+
+        return $backendUrl.'/storage/uploads/'.$this->logo;
+    }
+
     public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);

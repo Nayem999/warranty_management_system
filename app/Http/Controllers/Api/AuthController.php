@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\Auth\ForgotPasswordRequest;
-use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\ChangePasswordRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
+use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, FileUpload;
 
     public function login(LoginRequest $request): JsonResponse
     {
@@ -29,7 +32,7 @@ class AuthController extends Controller
             ->orWhere('phone', $loginField)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('Invalid credentials.', 401);
         }
 
@@ -41,7 +44,7 @@ class AuthController extends Controller
             return $this->error('Login is disabled for this user.', 403);
         }
 
-        if (!Hash::check($password, $user->password)) {
+        if (! Hash::check($password, $user->password)) {
             return $this->error('Invalid credentials.', 401);
         }
 
@@ -74,7 +77,7 @@ class AuthController extends Controller
             ->orWhere('phone', $login)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('User not found with this email or phone.', 404);
         }
 
@@ -86,7 +89,7 @@ class AuthController extends Controller
             return $this->error('Login is disabled for this user.', 403);
         }
 
-        $otp = env("SMS_STATUS") ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
+        $otp = env('SMS_STATUS') ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
 
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $user->email],
@@ -117,7 +120,7 @@ class AuthController extends Controller
             ->orWhere('phone', $login)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('User not found.', 404);
         }
 
@@ -133,7 +136,7 @@ class AuthController extends Controller
             ->where('email', $user->email)
             ->first();
 
-        if (!$record || $record->token !== $otp) {
+        if (! $record || $record->token !== $otp) {
             return $this->error('Invalid or expired OTP.', 400);
         }
 
@@ -157,6 +160,7 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
+
         return $this->success(null, 'Logout successful.');
     }
 
@@ -166,11 +170,11 @@ class AuthController extends Controller
 
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('We could not find a user with that email address.', 404);
         }
 
-        $otp = env("SMS_STATUS") ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
+        $otp = env('SMS_STATUS') ? str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT) : 123456;
 
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $email],
@@ -194,7 +198,7 @@ class AuthController extends Controller
             ->where('email', $data['email'])
             ->first();
 
-        if (!$record || $record->token !== $data['otp']) {
+        if (! $record || $record->token !== $data['otp']) {
             return $this->error('Invalid or expired OTP.', 400);
         }
 
@@ -213,7 +217,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        if (!Hash::check($request->validated()['current_password'], $user->password)) {
+        if (! Hash::check($request->validated()['current_password'], $user->password)) {
             return $this->error('Current password is incorrect.', 400);
         }
 
@@ -226,6 +230,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
+
         return $this->success([
             'user' => $user,
             'permissions' => $user->permissions,
@@ -244,10 +249,44 @@ class AuthController extends Controller
             'dob' => 'sometimes|date',
             'gender' => 'sometimes|in:male,female,other',
             'language' => 'sometimes|string|max:10',
+            'image' => 'nullable|string',
         ]);
+
+        if (! empty($validated['image'])) {
+            $validated['image'] = $this->handleImageUpload($validated['image'], 'users');
+        }
 
         $user->update($validated);
 
         return $this->success($user, 'Profile updated successfully.');
+    }
+
+    protected function handleImageUpload(string $base64Data, string $folder): string
+    {
+        if (empty($base64Data)) {
+            return '';
+        }
+
+        if (str_starts_with($base64Data, 'data:')) {
+            $ext = 'jpg';
+            if (preg_match('/data:image\/(\w+);/', $base64Data, $matches)) {
+                $ext = $matches[1];
+            }
+
+            $base64Data = preg_replace('/^data:image\/\w+;base64,/', '', $base64Data);
+            $base64Data = base64_decode($base64Data);
+
+            if ($base64Data === false) {
+                return '';
+            }
+
+            $filename = Str::uuid().'.'.$ext;
+            $path = "uploads/{$folder}/{$filename}";
+            Storage::disk('public')->put($path, $base64Data);
+
+            return $path;
+        }
+
+        return $base64Data;
     }
 }

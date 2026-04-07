@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ServiceCenterResource;
 use App\Models\ServiceCenter;
 use App\Traits\ApiResponse;
+use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ServiceCenterController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, FileUpload;
 
     public function index(Request $request): JsonResponse
     {
@@ -150,19 +150,5 @@ class ServiceCenterController extends Controller
             ->get();
 
         return $this->success(ServiceCenterResource::collection($serviceCenters));
-    }
-
-    protected function uploadFile($file, string $folder): string
-    {
-        $path = $file->store("uploads/{$folder}", 'public');
-
-        return $path;
-    }
-
-    protected function deleteFile(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
-        }
     }
 }

@@ -22,7 +22,23 @@ class Brand extends BaseModel
 
     protected $appends = [
         'service_centers',
+        'logo_url',
     ];
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (empty($this->logo)) {
+            return null;
+        }
+
+        if (filter_var($this->logo, FILTER_VALIDATE_URL)) {
+            return $this->logo;
+        }
+
+        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+
+        return $backendUrl.'/public/storage/'.$this->logo;
+    }
 
     public function categories(): HasMany
     {
