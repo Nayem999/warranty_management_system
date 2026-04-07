@@ -29,8 +29,6 @@ class UpdateWarrantyRequest extends FormRequest
             'sub_category_id' => 'nullable|exists:wms_product_categories,id',
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date|after:start_date',
-            'is_void' => 'sometimes|in:YES,NO',
-            'void_reason' => 'nullable|string',
         ];
     }
 }

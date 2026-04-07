@@ -22,8 +22,6 @@ class StoreWarrantyRequest extends FormRequest
             'sub_category_id' => 'nullable|exists:wms_product_categories,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'is_void' => 'sometimes|in:YES,NO',
-            'void_reason' => 'nullable|string',
         ];
     }
 }

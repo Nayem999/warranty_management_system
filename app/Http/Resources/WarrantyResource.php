@@ -22,8 +22,6 @@ class WarrantyResource extends JsonResource
             'sub_category' => $this->whenLoaded('subCategory'),
             'start_date' => $this->start_date?->format('Y-m-d'),
             'end_date' => $this->end_date?->format('Y-m-d'),
-            'is_void' => $this->is_void,
-            'void_reason' => $this->void_reason,
             'warranty_status' => $this->warranty_status,
             'created_by' => $this->created_by,
             'creator' => $this->whenLoaded('creator'),

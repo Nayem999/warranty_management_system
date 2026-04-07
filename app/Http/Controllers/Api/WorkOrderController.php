@@ -260,8 +260,6 @@ class WorkOrderController extends Controller
                     'sub_category_id' => $originalWarranty->sub_category_id,
                     'start_date' => $originalWarranty->start_date,
                     'end_date' => $originalWarranty->end_date,
-                    'is_void' => 'NO',
-                    'void_reason' => null,
                     'created_by' => $request->user()->id,
                 ]);
 
