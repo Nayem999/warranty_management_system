@@ -20,6 +20,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ClaimController extends Controller
@@ -212,7 +213,11 @@ class ClaimController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $claim = Claim::with(['warranty.brand', 'warranty.category', 'serviceCenter', 'creator', 'workOrder'])->find($id);
+        $claim = Claim::with(['warranty.brand', 'warranty.category', 'serviceCenter', 'creator', 'workOrder'])
+            ->when(Auth::user_type() == "client", function ($query) {
+                $query->where('customer_user_id', Auth::id());
+            })
+            ->find($id);
 
         if (! $claim) {
             return $this->notFound('Claim not found.');

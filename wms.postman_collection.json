@@ -566,7 +566,7 @@
             "url": "{{base_url}}/claims/public",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\"\n}",
+              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"service_center_id\": \"1\",\n    \"customer_address\": \"123 Main Street\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -587,7 +587,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\"\n}",
+                  "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n     \"service_center_id\": \"1\",\n   \"customer_address\": \"123 Main Street\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1476,7 +1476,7 @@
             "url": "{{base_url}}/claims",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\",\n    \"claim_date\": \"2024-06-01\"\n}",
+              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\",\n    \"service_center_id\": \"1\",\n    \"claim_date\": \"2024-06-01\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
