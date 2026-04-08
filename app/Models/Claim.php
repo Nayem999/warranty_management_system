@@ -23,6 +23,7 @@ class Claim extends BaseModel
         'claim_date',
         'status',
         'created_by',
+        'customer_user_id',
     ];
 
     protected $casts = [
@@ -48,6 +49,11 @@ class Claim extends BaseModel
     public function workOrder(): HasOne
     {
         return $this->hasOne(WorkOrder::class);
+    }
+
+    public function customerUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'customer_user_id');
     }
 
     public function scopeOpen($query)

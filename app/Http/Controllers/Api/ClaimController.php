@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ClaimCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Claim\ConvertToWorkOrderRequest;
 use App\Http\Requests\Claim\StoreClaimRequest;
+use App\Mail\ClientWelcomeEmail;
 use App\Models\ActivityLog;
 use App\Models\Claim;
+use App\Models\User;
 use App\Models\Warranty;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
@@ -14,6 +17,9 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ClaimController extends Controller
 {
@@ -74,9 +80,35 @@ class ClaimController extends Controller
             return $this->error('Warranty is not active or has expired.');
         }
 
+        $customerEmail = $data['customer_email'] ?? null;
+        $customerUserId = null;
+
+        if ($customerEmail) {
+            $customerUser = User::where('email', $customerEmail)->first();
+
+            if (! $customerUser) {
+                $password = Str::random(12);
+                $customerUser = User::create([
+                    'first_name' => $data['customer_firstname'] ?? 'Customer',
+                    'last_name' => $data['customer_lastname'] ?? '',
+                    'email' => $customerEmail,
+                    'password' => Hash::make($password),
+                    'user_type' => 'client',
+                    'role_id' => 4,
+                    'phone' => $data['customer_phone'] ?? null,
+                    'status' => 'active',
+                ]);
+
+                Mail::to($customerUser->email)->send(new ClientWelcomeEmail($customerUser, $password));
+            }
+
+            $customerUserId = $customerUser->id;
+        }
+
         $data['claim_number'] = Claim::generateClaimNumber();
         $data['created_by'] = $request->user()->id;
         $data['claim_date'] = $data['claim_date'] ?? Carbon::today();
+        $data['customer_user_id'] = $customerUserId;
 
         $claim = Claim::create($data);
 
@@ -91,6 +123,90 @@ class ClaimController extends Controller
         ClaimCreated::dispatch($claim);
 
         return $this->created($claim->load(['warranty.brand', 'serviceCenter']), 'Claim created successfully.');
+    }
+
+    public function publicStore(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'warranty_id' => 'required|exists:wms_warranties,id',
+            'problem_description' => 'required|string',
+            'customer_firstname' => 'required|string|max:255',
+            'customer_lastname' => 'nullable|string|max:255',
+            'customer_email' => 'required|email',
+            'customer_phone' => 'required|string|max:20',
+            'customer_city' => 'nullable|string|max:100',
+            'customer_address' => 'nullable|string',
+            'service_center_id' => 'nullable|exists:wms_service_centers,id',
+            'claim_date' => 'nullable|date',
+        ]);
+
+        $warranty = Warranty::find($data['warranty_id']);
+
+        if (! $warranty) {
+            return $this->error('Warranty not found.');
+        }
+
+        if (! $warranty->isActive()) {
+            return $this->error('Warranty is not active or has expired.');
+        }
+
+        $customerEmail = $data['customer_email'];
+        $customerUserId = null;
+        $password = null;
+
+        $customerUser = User::where('email', $customerEmail)->first();
+
+        if (! $customerUser) {
+            $password = Str::random(12);
+            $customerUser = User::create([
+                'first_name' => $data['customer_firstname'],
+                'last_name' => $data['customer_lastname'] ?? '',
+                'email' => $customerEmail,
+                'password' => Hash::make($password),
+                'user_type' => 'client',
+                'role_id' => 4,
+                'phone' => $data['customer_phone'] ?? null,
+                'status' => 'active',
+            ]);
+
+            Mail::to($customerUser->email)->send(new ClientWelcomeEmail($customerUser, $password));
+        }
+
+        $customerUserId = $customerUser->id;
+
+        $data['claim_number'] = Claim::generateClaimNumber();
+        $data['created_by'] = $customerUserId;
+        $data['claim_date'] = $data['claim_date'] ?? Carbon::today();
+        $data['customer_user_id'] = $customerUserId;
+        $data['status'] = 'Open';
+
+        $claim = Claim::create($data);
+
+        return $this->created($claim->load(['warranty.brand', 'serviceCenter']), 'Claim created successfully');
+    }
+
+    public function track(string $claimNumber): JsonResponse
+    {
+        $claim = Claim::with([
+            'warranty.brand',
+            'warranty.category',
+            'serviceCenter',
+            'workOrder',
+        ])->where('claim_number', $claimNumber)->first();
+
+        if (! $claim) {
+            return $this->notFound('Claim not found.');
+        }
+
+        return $this->success([
+            'claim_number' => $claim->claim_number,
+            'status' => $claim->status,
+            'claim_date' => $claim->claim_date,
+            'problem_description' => $claim->problem_description,
+            'warranty' => $claim->warranty,
+            'service_center' => $claim->serviceCenter,
+            'work_order' => $claim->workOrder,
+        ]);
     }
 
     public function show(int $id): JsonResponse
@@ -264,5 +380,17 @@ class ClaimController extends Controller
         }
 
         return $this->success($workOrder->load(['serviceCenter', 'claim.warranty.brand']));
+    }
+
+    public function myClaims(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $claims = Claim::with(['warranty.brand', 'serviceCenter', 'workOrder'])
+            ->where('customer_user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->limit ?? 15);
+
+        return $this->success($claims);
     }
 }

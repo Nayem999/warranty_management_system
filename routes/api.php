@@ -26,7 +26,10 @@ Route::prefix('')->group(function () {
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/auth/register', [CustomerRegistrationController::class, 'register']);
+
     Route::get('/warranties/check/{serial}', [WarrantyController::class, 'checkSerial']);
+    Route::post('/claims/public', [ClaimController::class, 'publicStore']);
+    Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
     Route::post('/work-orders/feedback/{token}', [WorkOrderController::class, 'submitFeedback']);
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -69,6 +72,7 @@ Route::prefix('')->group(function () {
         Route::post('/claims/{id}/convert-to-work-order', [ClaimController::class, 'convertToWorkOrder']);
         Route::put('/claims/{id}/close', [ClaimController::class, 'close']);
         Route::get('/claims/{id}/work-order', [ClaimController::class, 'workOrder']);
+        Route::get('/my-claims', [ClaimController::class, 'myClaims']);
 
         Route::get('/work-orders/pending', [WorkOrderController::class, 'pending']);
         Route::get('/work-orders/overdue', [WorkOrderController::class, 'overdue']);
@@ -96,6 +100,7 @@ Route::prefix('')->group(function () {
         Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
+        Route::get('/client-dashboard', [DashboardController::class, 'clientDashboard']);
 
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 

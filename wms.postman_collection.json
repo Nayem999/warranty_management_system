@@ -441,6 +441,243 @@
               "body": "{\n    \"success\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {}\n}"
             }
           ]
+        },
+        {
+          "name": "My Claims",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/my-claims"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"claim_number\": \"CLM-2026-00001\",\n                \"status\": \"Open\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Client Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{base_url}}/client-dashboard"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"total_claims\": 10,\n        \"status_wise\": [\n            {\"status\": \"Open\", \"count\": 5},\n            {\"status\": \"Converted\", \"count\": 3},\n            {\"status\": \"Closed\", \"count\": 2}\n        ],\n        \"recent_claims\": []\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Check Warranty by Serial",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/warranties/check/SMG-12345"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"product_serial\": \"SMG-12345\",\n        \"product_name\": \"Samsung Galaxy S21\",\n        \"brand\": {},\n        \"status\": \"active\",\n        \"start_date\": \"2024-01-01\",\n        \"end_date\": \"2025-01-01\",\n        \"is_active\": true\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Claim (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/claims/public",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Claim created successfully. Please check your email for login credentials.\",\n    \"data\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Track Claim by Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/claims/track/CLM-2026-00001"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"claim_number\": \"CLM-2026-00001\",\n        \"status\": \"Open\",\n        \"claim_date\": \"2026-04-01\",\n        \"problem_description\": \"Screen not responding\",\n        \"warranty\": {},\n        \"service_center\": {},\n        \"work_order\": {}\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit Work Order Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/work-orders/feedback/{token}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_feedback\": \"Great service!\",\n    \"customer_rating\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"customer_feedback\": \"Great service!\",\n    \"customer_rating\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Feedback submitted successfully.\",\n    \"data\": {}\n}"
+            }
+          ]
         }
       ]
     },

@@ -252,7 +252,6 @@ class AuthController extends Controller
             'image' => 'nullable',
         ]);
 
-
         if ($request->hasFile('image')) {
             if ($user->image) {
                 $this->deleteFile($user->image);
@@ -300,4 +299,5 @@ class AuthController extends Controller
 
         return $base64Data;
     }
+
 }
