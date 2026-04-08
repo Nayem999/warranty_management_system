@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Warranty;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
+use App\Traits\EmailHelper;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
