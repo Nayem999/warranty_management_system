@@ -19,16 +19,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ClaimController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, EmailHelper;
 
     public function index(Request $request): JsonResponse
     {
-        $query = Claim::query()->with(['warranty.brand', 'serviceCenter', 'creator','workOrder']);
+        $query = Claim::query()->with(['warranty.brand', 'serviceCenter', 'creator', 'workOrder']);
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -100,7 +99,7 @@ class ClaimController extends Controller
                     'status' => 'active',
                 ]);
 
-                Mail::to($customerUser->email)->send(new ClientWelcomeEmail($customerUser, $password));
+                $this->sendEmail(new ClientWelcomeEmail($customerUser, $password), $customerUser->email, 'Welcome to Warranty Management System');
             }
 
             $customerUserId = $customerUser->id;
@@ -170,7 +169,7 @@ class ClaimController extends Controller
                 'status' => 'active',
             ]);
 
-            Mail::to($customerUser->email)->send(new ClientWelcomeEmail($customerUser, $password));
+            $this->sendEmail(new ClientWelcomeEmail($customerUser, $password), $customerUser->email, 'Welcome to Warranty Management System');
         }
 
         $customerUserId = $customerUser->id;

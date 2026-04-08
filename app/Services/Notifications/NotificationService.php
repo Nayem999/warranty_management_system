@@ -4,8 +4,6 @@ namespace App\Services\Notifications;
 
 use App\Models\Claim;
 use App\Models\WorkOrder;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class NotificationService
 {
@@ -103,9 +101,8 @@ class NotificationService
         $updatedDate = now()->format('Y-m-d H:i');
 
         $statusMessages = [
-            'Pending' => 'Your work order is pending. Our team will assign it to a service center soon.',
-            'In Progress' => 'Your product is now being serviced. Our technicians are working on it.',
-            'Completed' => 'Your product has been serviced successfully. We will arrange for delivery.',
+            'Progress' => 'Your work order is in progress. Our team is working on it.',
+            'Closed' => 'Your product has been serviced. We will arrange for delivery.',
             'Delivered' => 'Your product has been delivered. Thank you for your patience!',
         ];
 
@@ -138,18 +135,11 @@ class NotificationService
             return false;
         }
 
-        try {
-            Mail::send('emails.claim.created', $data, function ($message) use ($email, $data) {
-                $message->to($email)
-                    ->subject('Claim Created Successfully - '.$data['claimNumber']);
-            });
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Claim Created Email failed: '.$e->getMessage());
-
-            return false;
-        }
+        return $this->emailService->send(
+            $email,
+            'Claim Created Successfully - '.$data['claimNumber'],
+            view('emails.claim.created', $data)->render()
+        );
     }
 
     protected function sendClaimCreatedSms(string $phone, array $data): bool
@@ -189,18 +179,11 @@ class NotificationService
             return false;
         }
 
-        try {
-            Mail::send('emails.work-order.created', $data, function ($message) use ($email, $data) {
-                $message->to($email)
-                    ->subject('Work Order Created - '.$data['workOrderNumber']);
-            });
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Work Order Created Email failed: '.$e->getMessage());
-
-            return false;
-        }
+        return $this->emailService->send(
+            $email,
+            'Work Order Created - '.$data['workOrderNumber'],
+            view('emails.work-order.created', $data)->render()
+        );
     }
 
     protected function sendWorkOrderCreatedSms(string $phone, array $data): bool
@@ -240,18 +223,11 @@ class NotificationService
             return false;
         }
 
-        try {
-            Mail::send('emails.work-order.status-updated', $data, function ($message) use ($email, $data) {
-                $message->to($email)
-                    ->subject('Work Order Status Update - '.$data['workOrderNumber']);
-            });
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Work Order Status Email failed: '.$e->getMessage());
-
-            return false;
-        }
+        return $this->emailService->send(
+            $email,
+            'Work Order Status Update - '.$data['workOrderNumber'],
+            view('emails.work-order.status-updated', $data)->render()
+        );
     }
 
     protected function sendWorkOrderStatusSms(string $phone, array $data): bool

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services\Notifications;
+namespace App\Traits;
 
 use App\Models\EmailLog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class EmailService implements NotificationChannelInterface
+trait EmailHelper
 {
-    public function send(string $to, string $subject, string $message): bool
+    public function sendEmail($mailable, string $to, string $subject = ''): bool
     {
         $emailLog = EmailLog::create([
             'to_email' => $to,
@@ -26,10 +26,7 @@ class EmailService implements NotificationChannelInterface
         }
 
         try {
-            Mail::raw($message, function ($mail) use ($to, $subject) {
-                $mail->to($to)
-                    ->subject($subject);
-            });
+            Mail::to($to)->send($mailable);
 
             $emailLog->update([
                 'status' => 'sent',
