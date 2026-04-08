@@ -16,7 +16,7 @@ class EmailService implements NotificationChannelInterface
             'status' => 'pending',
         ]);
 
-        if (! env('EMAIL_STATUS', false)) {
+        if (! config('app.email_status', false)) {
             $emailLog->update([
                 'status' => 'skipped',
                 'reason' => 'EMAIL_STATUS is false',

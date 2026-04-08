@@ -17,6 +17,9 @@ return [
 
     'backend_url' => env('BACKEND_URL', ''),
 
+    'email_status' => env('EMAIL_STATUS', false),
+    'sms_status' => env('SMS_STATUS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
