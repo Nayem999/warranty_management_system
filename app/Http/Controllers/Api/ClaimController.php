@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\ClaimCreated;
+use App\Events\WorkOrderCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Claim\ConvertToWorkOrderRequest;
 use App\Http\Requests\Claim\StoreClaimRequest;
@@ -27,7 +28,7 @@ class ClaimController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = Claim::query()->with(['warranty.brand', 'serviceCenter', 'creator']);
+        $query = Claim::query()->with(['warranty.brand', 'serviceCenter', 'creator','workOrder']);
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
