@@ -84,6 +84,7 @@ Route::prefix('')->group(function () {
         Route::post('/work-orders/{id}/assign', [WorkOrderController::class, 'assignServiceCenter']);
         Route::put('/work-orders/{id}/status', [WorkOrderController::class, 'updateStatus']);
         Route::get('/work-orders/{id}/feedback-link', [WorkOrderController::class, 'getFeedbackLink']);
+        Route::get('/work-orders/{id}/activity-timeline', [WorkOrderController::class, 'activityTimeline']);
 
         Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);

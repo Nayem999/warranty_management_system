@@ -1806,6 +1806,26 @@
           }
         },
         {
+          "name": "Activity Timeline",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/work-orders/1/activity-timeline?limit=15",
+              "host": ["{{base_url}}"],
+              "path": ["work-orders", "1", "activity-timeline"],
+              "query": [
+                {"key": "limit", "value": "15", "disabled": true, "description": "Items per page"}
+              ]
+            }
+          }
+        },
+        {
           "name": "Pending Work Orders",
           "request": {
             "method": "GET",

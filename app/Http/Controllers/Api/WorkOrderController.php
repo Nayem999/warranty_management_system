@@ -96,7 +96,41 @@ class WorkOrderController extends Controller
             return $this->notFound('Work order not found.');
         }
 
-        return $this->success($workOrder);
+        $activityLogs = ActivityLog::with('user:id,first_name,last_name,email')
+            ->where('log_type', 'WorkOrder')
+            ->where('log_type_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $activityLogs->transform(function ($log) {
+            if ($log->user) {
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+            }
+
+            if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
+                $oldData = $log->changes['old'];
+                $newData = $log->changes['new'];
+                $filteredChanges = [];
+
+                foreach ($newData as $key => $value) {
+                    if (! array_key_exists($key, $oldData) || $oldData[$key] !== $value) {
+                        $filteredChanges[$key] = [
+                            'old' => array_key_exists($key, $oldData) ? $oldData[$key] : null,
+                            'new' => $value,
+                        ];
+                    }
+                }
+
+                $log->changes = $filteredChanges;
+            }
+
+            return $log;
+        });
+
+        return $this->success([
+            'work_order' => $workOrder,
+            'activity_timeline' => $activityLogs,
+        ]);
     }
 
     public function update(UpdateWorkOrderRequest $request, int $id): JsonResponse
@@ -184,7 +218,7 @@ class WorkOrderController extends Controller
         if (! $workOrder) {
             return $this->notFound('Work order not found.');
         }
-
+        $previousData = $workOrder;
         $data = $request->validate([
             'service_center_id' => 'required|exists:wms_service_centers,id',
         ]);
@@ -197,11 +231,11 @@ class WorkOrderController extends Controller
 
         ActivityLog::log(
             $request->user()->id,
-            'updated',
+            'assigned_service_center',
             'WorkOrder',
             $workOrder->wo_number,
             $workOrder->id,
-            ['action' => 'assigned_service_center', 'service_center_id' => $data['service_center_id']]
+            ['old' => $previousData, 'new' => $workOrder]
         );
 
         return $this->success($workOrder->load(['serviceCenter']), 'Service center assigned successfully.');
@@ -220,6 +254,7 @@ class WorkOrderController extends Controller
             'replace_serial' => 'nullable|string|max:255',
         ]);
 
+        $previousData = $workOrder;
         $previousStatus = $workOrder->status;
 
         $statusFlow = ['Progress', 'Closed', 'Delivered'];
@@ -250,11 +285,11 @@ class WorkOrderController extends Controller
 
                     ActivityLog::log(
                         $request->user()->id,
-                        'updated',
+                        'serial_updated',
                         'Warranty',
                         $existingReplacedWarranty->product_serial,
                         $existingReplacedWarranty->id,
-                        ['action' => 'serial_updated', 'old_serial' => $oldSerial]
+                        ['old' =>  $previousData, 'old_serial' => $existingReplacedWarranty]
                     );
                 }
             } else {
@@ -274,11 +309,10 @@ class WorkOrderController extends Controller
 
                 ActivityLog::log(
                     $request->user()->id,
-                    'created',
+                    'create',
                     'Warranty',
                     $newWarranty->product_serial,
-                    $newWarranty->id,
-                    ['action' => 'replaced', 'original_serial' => $originalWarranty->product_serial]
+                    $newWarranty->id
                 );
 
                 $updateData['replaced_warranty_id'] = $newWarranty->id;
@@ -312,11 +346,11 @@ class WorkOrderController extends Controller
 
         ActivityLog::log(
             $request->user()->id,
-            'updated',
+            'status_changed',
             'WorkOrder',
             $workOrder->wo_number,
             $workOrder->id,
-            ['action' => 'status_changed', 'new_status' => $data['status']]
+            ['old' => $previousData, 'new' => $workOrder]
         );
 
         WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.warranty']), $previousStatus);
@@ -385,5 +419,47 @@ class WorkOrderController extends Controller
             ->paginate($request->limit ?? 15);
 
         return $this->success($workOrders);
+    }
+
+    public function activityTimeline(int $id): JsonResponse
+    {
+        $workOrder = WorkOrder::find($id);
+
+        if (! $workOrder) {
+            return $this->notFound('Work order not found.');
+        }
+
+        $activityLogs = ActivityLog::with('user:id,first_name,last_name,email')
+            ->where('log_type', 'WorkOrder')
+            ->where('log_type_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(request('limit', 15));
+
+        $activityLogs->getCollection()->transform(function ($log) {
+            if ($log->user) {
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+            }
+
+            if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
+                $oldData = $log->changes['old'];
+                $newData = $log->changes['new'];
+                $filteredChanges = [];
+
+                foreach ($newData as $key => $value) {
+                    if (! array_key_exists($key, $oldData) || $oldData[$key] !== $value) {
+                        $filteredChanges[$key] = [
+                            'old' => array_key_exists($key, $oldData) ? $oldData[$key] : null,
+                            'new' => $value,
+                        ];
+                    }
+                }
+
+                $log->changes = $filteredChanges;
+            }
+
+            return $log;
+        });
+
+        return $this->success($activityLogs);
     }
 }
