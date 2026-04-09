@@ -22,7 +22,7 @@ class ServiceCenterController extends Controller
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
                     ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('city', 'like', "%{$request->search}%");
+                    ->orWhere('address', 'like', "%{$request->search}%");
             });
         }
 
@@ -167,7 +167,7 @@ class ServiceCenterController extends Controller
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
                     ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('city', 'like', "%{$request->search}%");
+                    ->orWhere('address', 'like', "%{$request->search}%");
             });
         }
 
