@@ -2176,6 +2176,29 @@
             ],
             "url": "{{base_url}}/parts/1/toggle-status"
           }
+        },
+        {
+          "name": "Work Order Usage History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/work-order-history?brand_id=1&category_id=1&part_id=1&limit=15",
+              "host": ["{{base_url}}"],
+              "path": ["work-order-history"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand ID"},
+                {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category ID"},
+                {"key": "part_id", "value": "1", "disabled": true, "description": "Filter by part ID"},
+                {"key": "limit", "value": "15", "disabled": true, "description": "Items per page"}
+              ]
+            }
+          }
         }
       ]
     },

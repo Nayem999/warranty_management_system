@@ -95,6 +95,7 @@ Route::prefix('')->group(function () {
 
         Route::apiResource('parts', PartController::class);
         Route::put('/parts/{id}/toggle-status', [PartController::class, 'toggleStatus']);
+        Route::get('/work-order-history', [PartController::class, 'workOrderUsageHistory']);
 
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/settings', [SettingController::class, 'upsert']);

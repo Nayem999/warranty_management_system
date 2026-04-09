@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Part;
+use App\Models\WorkOrderPart;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -79,7 +80,7 @@ class PartController extends Controller
             'brand_id' => 'sometimes|exists:wms_brands,id',
             'category_id' => 'nullable|exists:wms_product_categories,id',
             'sub_category_id' => 'nullable|exists:wms_product_categories,id',
-            'part_id' => 'sometimes|string|unique:wms_parts,part_id,'.$id,
+            'part_id' => 'sometimes|string|unique:wms_parts,part_id,' . $id,
             'part_description' => 'sometimes|string',
             'is_active' => 'nullable|boolean',
         ]);
@@ -118,5 +119,31 @@ class PartController extends Controller
         $part->save();
 
         return $this->success($part, 'Part status updated successfully.');
+    }
+
+    public function workOrderUsageHistory(Request $request): JsonResponse
+    {
+        $query = WorkOrderPart::with([
+            'workOrder.claim:id,claim_number,customer_firstname,customer_lastname',
+            'workOrder.serviceCenter:id,title',
+            'part.brand',
+            'part.category',
+            'part.subCategory',
+            'workOrder.assignedBy:id,first_name,last_name,email',
+        ])
+            ->when($request->filled('created_at'), function ($q) use ($request) {
+                $q->where('brand_id', $request->brand_id);
+            })
+            ->when($request->filled('category_id'), function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            })
+            ->when($request->filled('part_id'), function ($q) use ($request) {
+                $q->where('part_id', $request->part_id);
+            })
+            ->orderBy('install_date_time', 'desc');
+
+        $history = $query->paginate($request->limit ?? 15);
+
+        return $this->success($history);
     }
 }

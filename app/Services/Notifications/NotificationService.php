@@ -34,7 +34,7 @@ class NotificationService
     public function sendClaimCreatedNotification(Claim $claim): void
     {
         $warranty = $claim->warranty;
-        $customerName = trim(($claim->customer_firstname ?? '').' '.($claim->customer_lastname ?? ''));
+        $customerName = trim(($claim->customer_firstname ?? '') . ' ' . ($claim->customer_lastname ?? ''));
         $productName = $warranty ? ($warranty->product_name ?? 'N/A') : 'N/A';
         $productSerial = $warranty ? ($warranty->product_serial ?? 'N/A') : 'N/A';
         $claimDate = $claim->claim_date ? $claim->claim_date->format('Y-m-d') : 'N/A';
@@ -42,10 +42,13 @@ class NotificationService
         $data = [
             'customerName' => $customerName,
             'claimNumber' => $claim->claim_number,
+            'claimStatus' => $claim->status,
             'productName' => $productName,
             'productSerial' => $productSerial,
             'problemDescription' => $claim->problem_description,
             'claimDate' => $claimDate,
+            'companyName' => config('settings.company_name', 'SNP Distribution'),
+            'companySubtitle' => config('settings.company_subtitle', 'Warranty Service Center'),
         ];
 
         if ($this->channels['email'] ?? false) {
@@ -65,16 +68,22 @@ class NotificationService
     {
         $claim = $workOrder->claim;
         $warranty = $claim?->warranty;
-        $customerName = $claim ? trim(($claim->customer_firstname ?? '').' '.($claim->customer_lastname ?? '')) : 'Customer';
+        $customerName = $claim ? trim(($claim->customer_firstname ?? '') . ' ' . ($claim->customer_lastname ?? '')) : 'Customer';
         $claimNumber = $claim ? ($claim->claim_number ?? 'N/A') : 'N/A';
         $productName = $warranty ? ($warranty->product_name ?? 'N/A') : 'N/A';
+        $productSerial = $warranty ? ($warranty->product_serial ?? 'N/A') : 'N/A';
         $createdDate = $workOrder->created_at ? $workOrder->created_at->format('Y-m-d H:i') : 'N/A';
 
         $data = [
             'customerName' => $customerName,
             'workOrderNumber' => $workOrder->wo_number,
+            'workOrderStatus' => $workOrder->status,
+            'workOrderFeedbackPreference' => $workOrder->feedback_preference,
+            'workOrderFeedbackToken ' => $workOrder->feedback_token,
             'claimNumber' => $claimNumber,
+            'claimStatus' => $claim->status,
             'productName' => $productName,
+            'productSerial' => $productSerial,
             'status' => $workOrder->status,
             'createdDate' => $createdDate,
         ];
@@ -96,8 +105,11 @@ class NotificationService
     {
         $claim = $workOrder->claim;
         $warranty = $claim?->warranty;
-        $customerName = $claim ? trim(($claim->customer_firstname ?? '').' '.($claim->customer_lastname ?? '')) : 'Customer';
+        $customerName = $claim ? trim(($claim->customer_firstname ?? '') . ' ' . ($claim->customer_lastname ?? '')) : 'Customer';
         $productName = $warranty ? ($warranty->product_name ?? 'N/A') : 'N/A';
+        $claimNumber = $claim ? ($claim->claim_number ?? 'N/A') : 'N/A';
+        $productSerial = $warranty ? ($warranty->product_serial ?? 'N/A') : 'N/A';
+        $createdDate = $workOrder->created_at ? $workOrder->created_at->format('Y-m-d H:i') : 'N/A';
         $updatedDate = now()->format('Y-m-d H:i');
 
         $statusMessages = [
@@ -109,9 +121,16 @@ class NotificationService
         $data = [
             'customerName' => $customerName,
             'workOrderNumber' => $workOrder->wo_number,
+            'workOrderStatus' => $workOrder->status,
+            'workOrderFeedbackPreference' => $workOrder->feedback_preference,
+            'workOrderFeedbackToken ' => $workOrder->feedback_token,
             'previousStatus' => $previousStatus,
             'currentStatus' => $workOrder->status,
+            'claimNumber' => $claimNumber,
+            'claimStatus' => $claim->status,
             'productName' => $productName,
+            'productSerial' => $productSerial,
+            'createdDate' => $createdDate,
             'updatedDate' => $updatedDate,
             'statusMessage' => $statusMessages[$workOrder->status] ?? "Your work order status has been updated to: {$workOrder->status}",
         ];
@@ -137,7 +156,7 @@ class NotificationService
 
         return $this->emailService->send(
             $email,
-            'Claim Created Successfully - '.$data['claimNumber'],
+            'Claim Created Successfully - ' . $data['claimNumber'],
             view('emails.claim.created', $data)->render()
         );
     }
@@ -149,8 +168,8 @@ class NotificationService
         }
 
         $message = "Dear {$data['customerName']}, your claim {$data['claimNumber']} has been created successfully. "
-            ."Product: {$data['productName']}. Issue: {$data['problemDescription']}. "
-            .'We will keep you updated on the progress. Thank you!';
+            . "Product: {$data['productName']}. Issue: {$data['problemDescription']}. "
+            . 'We will keep you updated on the progress. Thank you!';
 
         return $this->smsService->send($phone, 'Claim Created', $message);
     }
@@ -162,13 +181,13 @@ class NotificationService
         }
 
         $message = "✅ *Claim Created Successfully*\n\n"
-            ."Dear {$data['customerName']},\n\n"
-            ."Your claim has been created.\n\n"
-            ."📋 *Claim Number:* {$data['claimNumber']}\n"
-            ."📦 *Product:* {$data['productName']}\n"
-            ."🔢 *Serial:* {$data['productSerial']}\n"
-            ."📝 *Issue:* {$data['problemDescription']}\n\n"
-            .'We will keep you updated. Thank you!';
+            . "Dear {$data['customerName']},\n\n"
+            . "Your claim has been created.\n\n"
+            . "📋 *Claim Number:* {$data['claimNumber']}\n"
+            . "📦 *Product:* {$data['productName']}\n"
+            . "🔢 *Serial:* {$data['productSerial']}\n"
+            . "📝 *Issue:* {$data['problemDescription']}\n\n"
+            . 'We will keep you updated. Thank you!';
 
         return $this->whatsAppService->send($phone, 'Claim Created', $message);
     }
@@ -181,7 +200,7 @@ class NotificationService
 
         return $this->emailService->send(
             $email,
-            'Work Order Created - '.$data['workOrderNumber'],
+            'Work Order Created - ' . $data['workOrderNumber'],
             view('emails.work-order.created', $data)->render()
         );
     }
@@ -193,8 +212,8 @@ class NotificationService
         }
 
         $message = "Dear {$data['customerName']}, your work order {$data['workOrderNumber']} has been created. "
-            ."Status: {$data['status']}. "
-            .'Our service team will contact you soon. Thank you!';
+            . "Status: {$data['status']}. "
+            . 'Our service team will contact you soon. Thank you!';
 
         return $this->smsService->send($phone, 'Work Order Created', $message);
     }
@@ -206,13 +225,13 @@ class NotificationService
         }
 
         $message = "🔧 *Work Order Created*\n\n"
-            ."Dear {$data['customerName']},\n\n"
-            ."Your work order has been created.\n\n"
-            ."📋 *WO Number:* {$data['workOrderNumber']}\n"
-            ."📎 *Claim:* {$data['claimNumber']}\n"
-            ."📦 *Product:* {$data['productName']}\n"
-            ."⏳ *Status:* {$data['status']}\n\n"
-            .'Our service team will contact you soon.';
+            . "Dear {$data['customerName']},\n\n"
+            . "Your work order has been created.\n\n"
+            . "📋 *WO Number:* {$data['workOrderNumber']}\n"
+            . "📎 *Claim:* {$data['claimNumber']}\n"
+            . "📦 *Product:* {$data['productName']}\n"
+            . "⏳ *Status:* {$data['status']}\n\n"
+            . 'Our service team will contact you soon.';
 
         return $this->whatsAppService->send($phone, 'Work Order Created', $message);
     }
@@ -225,7 +244,7 @@ class NotificationService
 
         return $this->emailService->send(
             $email,
-            'Work Order Status Update - '.$data['workOrderNumber'],
+            'Work Order Status Update - ' . $data['workOrderNumber'],
             view('emails.work-order.status-updated', $data)->render()
         );
     }
@@ -237,8 +256,8 @@ class NotificationService
         }
 
         $message = "Dear {$data['customerName']}, your work order {$data['workOrderNumber']} status changed from "
-            ."{$data['previousStatus']} to {$data['currentStatus']}. "
-            ."{$data['statusMessage']} Thank you!";
+            . "{$data['previousStatus']} to {$data['currentStatus']}. "
+            . "{$data['statusMessage']} Thank you!";
 
         return $this->smsService->send($phone, 'WO Status Update', $message);
     }
@@ -250,13 +269,13 @@ class NotificationService
         }
 
         $message = "📋 *Work Order Status Update*\n\n"
-            ."Dear {$data['customerName']},\n\n"
-            ."Your work order status has been updated.\n\n"
-            ."📋 *WO Number:* {$data['workOrderNumber']}\n"
-            ."🔄 *Previous Status:* {$data['previousStatus']}\n"
-            ."✅ *Current Status:* {$data['currentStatus']}\n\n"
-            ."{$data['statusMessage']}\n\n"
-            .'Thank you for your patience!';
+            . "Dear {$data['customerName']},\n\n"
+            . "Your work order status has been updated.\n\n"
+            . "📋 *WO Number:* {$data['workOrderNumber']}\n"
+            . "🔄 *Previous Status:* {$data['previousStatus']}\n"
+            . "✅ *Current Status:* {$data['currentStatus']}\n\n"
+            . "{$data['statusMessage']}\n\n"
+            . 'Thank you for your patience!';
 
         return $this->whatsAppService->send($phone, 'WO Status Update', $message);
     }

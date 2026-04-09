@@ -27,7 +27,7 @@ class ClientWelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome to Warranty Management System',
+            subject: 'Welcome to SNP Distribution',
         );
     }
 
