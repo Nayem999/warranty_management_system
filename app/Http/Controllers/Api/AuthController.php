@@ -245,10 +245,10 @@ class AuthController extends Controller
             'first_name' => 'sometimes|string|max:255',
             'last_name' => 'sometimes|string|max:255',
             'phone' => 'sometimes|string|max:20',
-            'address' => 'sometimes|string',
-            'dob' => 'sometimes|date',
-            'gender' => 'sometimes|in:male,female,other',
-            'language' => 'sometimes|string|max:10',
+            'address' => 'nullable|string',
+            'dob' => 'nullable|date',
+            'gender' => 'nullable|in:male,female,other',
+            'language' => 'nullable|string|max:10',
             'image' => 'nullable',
         ]);
 

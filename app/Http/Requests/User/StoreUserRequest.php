@@ -25,7 +25,7 @@ class StoreUserRequest extends FormRequest
             'image' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
             'job_title' => 'nullable|string|max:255',
-            'disable_login' => 'sometimes|boolean',
+            'disable_login' => 'nullable|boolean',
             'note' => 'nullable|string',
             'address' => 'nullable|string',
             'dob' => 'nullable|date',

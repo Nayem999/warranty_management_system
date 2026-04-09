@@ -195,4 +195,21 @@ class BrandController extends Controller
 
         return $this->success($brand, 'Brand status updated successfully.');
     }
+
+    public function brands_list(Request $request): JsonResponse
+    {
+        $query = Brand::query();
+
+        if ($request->has('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('short_name', 'like', "%{$request->search}%");
+            });
+        }
+
+        $query->where('status', "active");
+        $brands = $query->orderBy('display_order', 'asc')->get();
+
+        return $this->success($brands);
+    }
 }

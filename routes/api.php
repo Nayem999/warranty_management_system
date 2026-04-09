@@ -27,7 +27,11 @@ Route::prefix('')->group(function () {
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/auth/register', [CustomerRegistrationController::class, 'register']);
 
+    Route::get('/brands/list', [BrandController::class, 'brands_list']);
+    Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
+    Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
     Route::get('/warranties/check/{serial}', [WarrantyController::class, 'checkSerial']);
+    Route::post('/claims/public', [ClaimController::class, 'publicStore']);
     Route::post('/claims/public', [ClaimController::class, 'publicStore']);
     Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
     Route::post('/work-orders/feedback/{token}', [WorkOrderController::class, 'submitFeedback']);
@@ -81,7 +85,6 @@ Route::prefix('')->group(function () {
         Route::put('/work-orders/{id}/status', [WorkOrderController::class, 'updateStatus']);
         Route::get('/work-orders/{id}/feedback-link', [WorkOrderController::class, 'getFeedbackLink']);
 
-        Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
         Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
         Route::get('/service-centers/{id}/work-orders', [ServiceCenterController::class, 'workOrders']);

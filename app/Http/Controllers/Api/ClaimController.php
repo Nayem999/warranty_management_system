@@ -235,16 +235,16 @@ class ClaimController extends Controller
         }
 
         $data = $request->validate([
-            'service_center_id' => 'sometimes|nullable|exists:wms_service_centers,id',
-            'problem_description' => 'sometimes|string',
+            'service_center_id' => 'nullable|exists:wms_service_centers,id',
+            'problem_description' => 'nullable|string',
             'customer_firstname' => 'sometimes|string',
             'customer_lastname' => 'sometimes|string',
             'customer_email' => 'sometimes|email',
-            'customer_phone' => 'sometimes|string',
-            'customer_city' => 'sometimes|string',
-            'customer_address' => 'sometimes|string',
-            'claim_date' => 'sometimes|date',
-            'status' => 'sometimes|in:Open,Closed,Converted',
+            'customer_phone' => 'nullable|string',
+            'customer_city' => 'nullable|string',
+            'customer_address' => 'nullable|string',
+            'claim_date' => 'nullable|date',
+            'status' => 'nullable|in:Open,Closed,Converted',
         ]);
 
         $oldData = $claim->toArray();

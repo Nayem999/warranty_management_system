@@ -158,4 +158,22 @@ class ServiceCenterController extends Controller
 
         return $this->success(ServiceCenterResource::collection($serviceCenters));
     }
+
+    public function service_centers_list(Request $request): JsonResponse
+    {
+        $query = ServiceCenter::query();
+
+        if ($request->has('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('city', 'like', "%{$request->search}%");
+            });
+        }
+
+        $query->where('is_active', 1);
+        $serviceCenters = $query->orderBy('display_order', 'asc')->get();
+
+        return $this->success(ServiceCenterResource::collection($serviceCenters));
+    }
 }

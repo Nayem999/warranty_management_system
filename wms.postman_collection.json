@@ -678,6 +678,96 @@
               "body": "{\n    \"success\": true,\n    \"message\": \"Feedback submitted successfully.\",\n    \"data\": {}\n}"
             }
           ]
+        },
+        {
+          "name": "List Brands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/brands"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"name\": \"Samsung\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Service Centers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/service-centers"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"title\": \"Service Center 1\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Service Centers by Brand",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/service-centers/by-brand?brand_id=1"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": []\n}"
+            }
+          ]
         }
       ]
     },
@@ -1636,7 +1726,7 @@
             "url": "{{base_url}}/work-orders/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"SLIP-IN-12345\",\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"SLIP-OUT-67890\",\n    \"received_date_time\": \"2026-04-05 10:00:00\",\n    \"delivered_date_time\": \"2026-04-06 14:00:00\",\n    \"feedback_preference\": true,\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"service_type\": \"warranty void\",\n    \"job_type\": \"Carry In\"\n}",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"SLIP-IN-12345\",\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"SLIP-OUT-67890\",\n    \"received_date_time\": \"2026-04-05 10:00:00\",\n    \"delivered_date_time\": \"2026-04-06 14:00:00\",\n    \"feedback_preference\": true,\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"service_type\": \"warranty void\",\n    \"job_type\": \"Carry In\",\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"parts\": [\n        {\"part_id\": 1, \"case_id\": \"\", \"case_date_time\": \"\", \"order_id\": \"\", \"order_date_time\": \"\", \"received_date_time\": \"\", \"install_date_time\": \"\", \"good_part_serial\": \"\", \"faulty_part_serial\": \"\", \"return_date_time\": \"\", \"part_returned\": \"\", \"part_status\": \"\", \"part_return_comment\": \"\"},\n        {\"part_id\": 1, \"case_id\": \"\", \"case_date_time\": \"\", \"order_id\": \"\", \"order_date_time\": \"\", \"received_date_time\": \"\", \"install_date_time\": \"\", \"good_part_serial\": \"\", \"faulty_part_serial\": \"\", \"return_date_time\": \"\", \"part_returned\": \"\", \"part_status\": \"\", \"part_return_comment\": \"\"}\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1739,28 +1829,6 @@
               }
             ],
             "url": "{{base_url}}/work-orders/overdue"
-          }
-        },
-        {
-          "name": "Update Work Order with Parts",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"service_type\": \"warranty void\",\n    \"job_type\": \"Carry In\",\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"parts\": [\n        {\"part_id\": 1, \"quantity\": 2},\n        {\"part_id\": 2, \"quantity\": 1}\n    ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
           }
         }
       ]
@@ -2039,7 +2107,7 @@
             "url": "{{base_url}}/parts",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"LCD Display\",\n    \"part_number\": \"LCD-SMG-001\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": 2,\n    \"price\": 5000,\n    \"is_active\": true\n}",
+              "raw": "{\n    \"part_id\": \"LCD Display\",\n    \"part_description\": \"LCD-SMG-001\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": 2,\n    \"is_active\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
