@@ -18,6 +18,8 @@ class ConvertToWorkOrderRequest extends FormRequest
             'engineer_id' => 'nullable|exists:users,id',
             'feedback_preference' => 'nullable|boolean',
             'additional_comment' => 'nullable|string',
+            'service_type' => 'nullable|in:In Warranty,Warranty Void,DOA,OOW/Expired',
+            'job_type' => 'nullable|in:Carry In, On Site, Pick Up',
         ];
     }
 }

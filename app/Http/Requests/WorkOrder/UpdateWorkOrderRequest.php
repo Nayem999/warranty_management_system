@@ -32,6 +32,8 @@ class UpdateWorkOrderRequest extends FormRequest
             'replace_serial' => 'nullable|string',
             'additional_comment' => 'nullable|string',
             'work_done_comment' => 'nullable|string',
+            'service_type' => 'nullable|in:In Warranty,Warranty Void,DOA,OOW/Expired',
+            'job_type' => 'nullable|in:Carry In, On Site, Pick Up',
             'parts' => 'nullable|array',
             'parts.*.part_id' => 'nullable|exists:wms_parts,id',
             'parts.*.case_id' => 'nullable|string',

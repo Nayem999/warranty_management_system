@@ -343,6 +343,8 @@ class ClaimController extends Controller
                 'counter' => $counter,
                 'wo_assigned_date' => now(),
                 'additional_comment' => $data['additional_comment'] ?? null,
+                'service_type' => $data['service_type'] ?? null,
+                'job_type' => $data['job_type'] ?? null,
                 'status' => 'Progress',
                 'created_by' => $request->user()->id,
                 'assigned_by' => $request->user()->id,
