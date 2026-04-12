@@ -16,7 +16,7 @@ class UpdateBrandRequest extends FormRequest
         return [
             'name' => 'sometimes|string|max:255',
             'short_name' => 'nullable|string|max:50',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logo' => 'nullable|string',
             'description' => 'nullable|string',
             'status' => 'sometimes|in:active,inactive',
         ];

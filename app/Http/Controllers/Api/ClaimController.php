@@ -81,6 +81,14 @@ class ClaimController extends Controller
             return $this->error('Warranty is not active or has expired.');
         }
 
+        $existingClaim = Claim::where('warranty_id', $data['warranty_id'])
+            ->whereIn('status', ['Open', 'Converted'])
+            ->first();
+
+        if ($existingClaim) {
+            return $this->error('A claim with status Open or Converted already exists for this warranty. Claim Number: ' . $existingClaim->claim_number);
+        }
+
         $customerEmail = $data['customer_email'] ?? null;
         $customerUserId = null;
 
@@ -149,6 +157,14 @@ class ClaimController extends Controller
 
         if (! $warranty->isActive()) {
             return $this->error('Warranty is not active or has expired.');
+        }
+
+        $existingClaim = Claim::where('warranty_id', $data['warranty_id'])
+            ->whereIn('status', ['Open', 'Converted'])
+            ->first();
+
+        if ($existingClaim) {
+            return $this->error('A claim with status Open or Converted already exists for this warranty. Claim Number: ' . $existingClaim->claim_number);
         }
 
         $customerEmail = $data['customer_email'];

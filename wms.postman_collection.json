@@ -2441,6 +2441,88 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Excel Download",
+      "item": [
+        {
+          "name": "Download Claims Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/claims?status=Open&brand_id=1&date_from=2024-01-01&date_to=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["exports", "claims"],
+              "query": [
+                {"key": "status", "value": "Open", "disabled": true, "description": "Filter by status"},
+                {"key": "warranty_id", "value": "1", "disabled": true, "description": "Filter by warranty ID"},
+                {"key": "service_center_id", "value": "1", "disabled": true, "description": "Filter by service center"},
+                {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
+                {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
+                {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download Warranties Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/warranties?brand_id=1&status=active&date_from=2024-01-01&date_to=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["exports", "warranties"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
+                {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category"},
+                {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/inactive)"},
+                {"key": "is_active", "value": "true", "disabled": true, "description": "Filter by is_active"},
+                {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
+                {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"},
+                {"key": "search", "value": "", "disabled": true, "description": "Search by serial or name"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download Work Orders Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/work-orders?status=Progress&service_center_id=1&brand_id=1&date_from=2024-01-01&date_to=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["exports", "work-orders"],
+              "query": [
+                {"key": "status", "value": "Progress", "disabled": true, "description": "Filter by status"},
+                {"key": "service_center_id", "value": "1", "disabled": true, "description": "Filter by service center"},
+                {"key": "engineer_id", "value": "1", "disabled": true, "description": "Filter by engineer"},
+                {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
+                {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
+                {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"},
+                {"key": "search", "value": "", "disabled": true, "description": "Search by WO or claim number"}
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

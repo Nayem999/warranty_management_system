@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CustomerRegistrationController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\MemorizeReportController;
 use App\Http\Controllers\Api\PartController;
 use App\Http\Controllers\Api\RoleController;
@@ -31,7 +32,6 @@ Route::prefix('')->group(function () {
     Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
     Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
     Route::get('/warranties/check/{serial}', [WarrantyController::class, 'checkSerial']);
-    Route::post('/claims/public', [ClaimController::class, 'publicStore']);
     Route::post('/claims/public', [ClaimController::class, 'publicStore']);
     Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
     Route::post('/work-orders/feedback/{token}', [WorkOrderController::class, 'submitFeedback']);
@@ -106,6 +106,10 @@ Route::prefix('')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
         Route::get('/client-dashboard', [DashboardController::class, 'clientDashboard']);
+
+        Route::get('/exports/claims', [ExportController::class, 'downloadClaims']);
+        Route::get('/exports/warranties', [ExportController::class, 'downloadWarranties']);
+        Route::get('/exports/work-orders', [ExportController::class, 'downloadWorkOrders']);
 
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 
