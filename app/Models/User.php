@@ -82,6 +82,11 @@ class User extends Authenticatable
         return $this->hasMany(UserBrandAccess::class);
     }
 
+    public function serviceCenterAccess(): HasMany
+    {
+        return $this->hasMany(UserServiceCenterAccess::class);
+    }
+
     public function activityLogs(): HasMany
     {
         return $this->hasMany(ActivityLog::class, 'created_by');
@@ -114,6 +119,13 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function serviceCenters(): BelongsToMany
+    {
+        return $this->belongsToMany(ServiceCenter::class, 'wms_user_service_center_access')
+            ->withPivot('created_by')
+            ->withTimestamps();
+    }
+
     public function isBrandRestricted(): bool
     {
         return ! $this->is_admin && $this->brandAccess()->exists();
@@ -126,6 +138,20 @@ class User extends Authenticatable
         }
 
         return $this->brandAccess()->pluck('brand_id')->toArray();
+    }
+
+    public function isServiceCenterRestricted(): bool
+    {
+        return ! $this->is_admin && $this->serviceCenterAccess()->exists();
+    }
+
+    public function accessibleServiceCenterIds(): array
+    {
+        if ($this->is_admin) {
+            return ServiceCenter::pluck('id')->toArray();
+        }
+
+        return $this->serviceCenterAccess()->pluck('service_center_id')->toArray();
     }
 
     public function getFullNameAttribute(): string

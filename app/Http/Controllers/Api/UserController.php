@@ -7,6 +7,7 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use App\Models\UserBrandAccess;
+use App\Models\UserServiceCenterAccess;
 use App\Traits\ApiResponse;
 use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
@@ -210,6 +211,58 @@ class UserController extends Controller
             ->delete();
 
         return $this->success(null, 'Brand access revoked successfully.');
+    }
+
+    public function getServiceCenterAccess(int $id): JsonResponse
+    {
+        $user = User::with(['serviceCenterAccess.serviceCenter'])->find($id);
+
+        if (! $user) {
+            return $this->notFound('User not found.');
+        }
+
+        return $this->success($user->serviceCenterAccess);
+    }
+
+    public function assignServiceCenterAccess(Request $request, int $id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return $this->notFound('User not found.');
+        }
+
+        $serviceCenterIds = $request->validate([
+            'service_center_ids' => 'required|array',
+            'service_center_ids.*' => 'exists:wms_service_centers,id',
+        ])['service_center_ids'];
+
+        UserServiceCenterAccess::where('user_id', $id)->delete();
+
+        foreach ($serviceCenterIds as $serviceCenterId) {
+            UserServiceCenterAccess::create([
+                'user_id' => $user->id,
+                'service_center_id' => $serviceCenterId,
+                'created_by' => $request->user()->id,
+            ]);
+        }
+
+        return $this->success($user->load('serviceCenterAccess.serviceCenter'), 'Service center access assigned successfully.');
+    }
+
+    public function revokeServiceCenterAccess(Request $request, int $id, int $serviceCenterId): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return $this->notFound('User not found.');
+        }
+
+        UserServiceCenterAccess::where('user_id', $id)
+            ->where('service_center_id', $serviceCenterId)
+            ->delete();
+
+        return $this->success(null, 'Service center access revoked successfully.');
     }
 
     public function toggleStatus(Request $request, int $id): JsonResponse

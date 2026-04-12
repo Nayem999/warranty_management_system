@@ -914,6 +914,54 @@
           }
         },
         {
+          "name": "Get Service Center Access",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/service-center-access"
+          }
+        },
+        {
+          "name": "Assign Service Center Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/service-center-access",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"service_center_ids\": [1, 2]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Revoke Service Center Access",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/users/1/service-center-access/1"
+          }
+        },
+        {
           "name": "Toggle User Status",
           "request": {
             "method": "PUT",

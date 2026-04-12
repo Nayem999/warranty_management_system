@@ -49,6 +49,9 @@ Route::prefix('')->group(function () {
         Route::get('/users/{id}/brand-access', [UserController::class, 'getBrandAccess']);
         Route::post('/users/{id}/brand-access', [UserController::class, 'assignBrandAccess']);
         Route::delete('/users/{id}/brand-access/{brandId}', [UserController::class, 'revokeBrandAccess']);
+        Route::get('/users/{id}/service-center-access', [UserController::class, 'getServiceCenterAccess']);
+        Route::post('/users/{id}/service-center-access', [UserController::class, 'assignServiceCenterAccess']);
+        Route::delete('/users/{id}/service-center-access/{serviceCenterId}', [UserController::class, 'revokeServiceCenterAccess']);
         Route::put('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
         Route::get('/users/{id}/permissions', [UserController::class, 'getPermissions']);
         Route::post('/users/{id}/permissions', [UserController::class, 'assignPermissions']);

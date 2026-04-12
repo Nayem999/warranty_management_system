@@ -62,6 +62,11 @@ class ServiceCenter extends BaseModel
             ->where('wms_brands.is_active', true);
     }
 
+    public function userAccess(): HasMany
+    {
+        return $this->hasMany(UserServiceCenterAccess::class, 'service_center_id');
+    }
+
     public function getBrandIdsAttribute($value)
     {
         if (is_string($value)) {

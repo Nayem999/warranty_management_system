@@ -45,7 +45,7 @@ class ServiceCenterController extends Controller
             'brand_ids' => 'nullable|array',
             'brand_ids.*' => 'exists:wms_brands,id',
             'working_hours' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logo' => 'nullable|string',
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -88,7 +88,7 @@ class ServiceCenterController extends Controller
             'brand_ids' => 'nullable|array',
             'brand_ids.*' => 'exists:wms_brands,id',
             'working_hours' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logo' => 'nullable|string',
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
