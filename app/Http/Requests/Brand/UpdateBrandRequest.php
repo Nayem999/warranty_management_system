@@ -3,18 +3,35 @@
 namespace App\Http\Requests\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBrandRequest extends FormRequest
 {
+    protected $brandId;
+
     public function authorize(): bool
     {
         return true;
     }
 
+    public function prepareForValidation(): void
+    {
+        $this->brandId = $this->route('brand');
+
+        if (! $this->brandId && is_numeric($this->route('id'))) {
+            $this->brandId = $this->route('id');
+        }
+    }
+
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
+            'name' => [
+                'sometimes',
+                'string',
+                'max:255',
+                Rule::unique('wms_brands', 'name')->ignore($this->brandId),
+            ],
             'short_name' => 'nullable|string|max:50',
             'logo' => 'nullable|string',
             'description' => 'nullable|string',

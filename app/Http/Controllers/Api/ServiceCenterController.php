@@ -38,7 +38,7 @@ class ServiceCenterController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|string|unique:wms_service_centers,title|max:255',
             'address' => 'nullable|string',
             'uan' => 'nullable|string|max:20',
             'email' => 'nullable|email',
