@@ -35,6 +35,7 @@ Route::prefix('')->group(function () {
     Route::post('/claims/public', [ClaimController::class, 'publicStore']);
     Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
     Route::post('/work-orders/feedback/{token}', [WorkOrderController::class, 'submitFeedback']);
+    Route::get('/settings/{key}', [SettingController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
 
@@ -104,7 +105,6 @@ Route::prefix('')->group(function () {
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/settings', [SettingController::class, 'upsert']);
         Route::put('/settings', [SettingController::class, 'updateAll']);
-        Route::get('/settings/{key}', [SettingController::class, 'show']);
         Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
