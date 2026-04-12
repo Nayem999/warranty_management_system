@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 trait FileUpload
 {
@@ -12,7 +13,7 @@ trait FileUpload
             return '';
         }
 
-        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
 
         return $file->storeAs("uploads/{$folder}", $filename);
     }
@@ -42,7 +43,7 @@ trait FileUpload
             return '';
         }
 
-        $filename = Str::uuid().'.'.$extension;
+        $filename = Str::uuid() . '.' . $extension;
         $path = "uploads/{$folder}/{$filename}";
 
         $fullPath = storage_path($path);
@@ -118,12 +119,29 @@ trait FileUpload
         }
 
         if (str_starts_with($base64Data, 'data:')) {
+            /* $ext = 'jpg';
+            if (preg_match('/data:image\/(\w+);/', $base64Data, $matches)) {
+                $ext = $matches[1];
+            }
+
+            return $this->uploadBase64File($base64Data, $folder, $ext); */
             $ext = 'jpg';
             if (preg_match('/data:image\/(\w+);/', $base64Data, $matches)) {
                 $ext = $matches[1];
             }
 
-            return $this->uploadBase64File($base64Data, $folder, $ext);
+            $base64Data = preg_replace('/^data:image\/\w+;base64,/', '', $base64Data);
+            $base64Data = base64_decode($base64Data);
+
+            if ($base64Data === false) {
+                return '';
+            }
+
+            $filename = Str::uuid() . '.' . $ext;
+            $path = "uploads/{$folder}/{$filename}";
+            Storage::disk('public')->put($path, $base64Data);
+
+            return $path;
         }
 
         return $base64Data;
