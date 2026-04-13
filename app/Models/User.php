@@ -161,7 +161,7 @@ class User extends Authenticatable
 
     public function getPermissionsAttribute(): array
     {
-        if ($this->is_admin) {
+        /* if ($this->is_admin) {
             return [
                 'warranties' => ['view', 'create', 'edit', 'delete'],
                 'claims' => ['view', 'create', 'edit', 'delete', 'convert_to_wo'],
@@ -174,7 +174,7 @@ class User extends Authenticatable
                 'settings' => ['view', 'edit'],
                 'reports' => ['view'],
             ];
-        }
+        } */
 
         if (! empty($this->personal_permissions)) {
             return $this->personal_permissions;

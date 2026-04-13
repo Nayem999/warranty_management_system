@@ -9,7 +9,7 @@ class Setting extends BaseModel
     protected $fillable = [
         'setting_name',
         'setting_value',
-        'type',
+        'type'
     ];
 
     protected $casts = [
@@ -19,6 +19,7 @@ class Setting extends BaseModel
     public static function get(string $key, $default = null)
     {
         $setting = static::where('setting_name', $key)->first();
+
         return $setting ? $setting->setting_value : $default;
     }
 
