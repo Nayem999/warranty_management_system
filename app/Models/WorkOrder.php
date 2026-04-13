@@ -75,7 +75,7 @@ class WorkOrder extends BaseModel
             if (filter_var($attachment, FILTER_VALIDATE_URL)) {
                 $urls[] = $attachment;
             } else {
-                $urls[] = $backendUrl.'/storage/'.$attachment;
+                $urls[] = $backendUrl . '/storage/' . $attachment;
             }
         }
 
@@ -163,14 +163,15 @@ class WorkOrder extends BaseModel
         $year = now()->year;
 
         return \DB::transaction(function () use ($year) {
-            $lastWo = static::whereYear('created_at', $year)
+            $lastWo = static::withTrashed() // 👈 include soft deleted
+                ->whereYear('created_at', $year)
                 ->lockForUpdate()
                 ->latest()
                 ->first();
 
             $seq = $lastWo ? (intval(substr($lastWo->wo_number, -5)) + 1) : 1;
 
-            return 'WO-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+            return 'WO-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
         });
     }
 

@@ -76,14 +76,15 @@ class Claim extends BaseModel
         $year = now()->year;
 
         return \DB::transaction(function () use ($year) {
-            $lastClaim = static::whereYear('created_at', $year)
+            $lastClaim = static::withTrashed() // 👈 include soft deleted
+                ->whereYear('created_at', $year)
                 ->lockForUpdate()
                 ->latest()
                 ->first();
 
             $seq = $lastClaim ? (intval(substr($lastClaim->claim_number, -5)) + 1) : 1;
 
-            return 'CLM-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+            return 'CLM-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
         });
     }
 }
