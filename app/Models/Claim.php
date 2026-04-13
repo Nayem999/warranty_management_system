@@ -74,9 +74,16 @@ class Claim extends BaseModel
     public static function generateClaimNumber(): string
     {
         $year = now()->year;
-        $lastClaim = static::whereYear('created_at', $year)->latest()->first();
-        $seq = $lastClaim ? (intval(substr($lastClaim->claim_number, -5)) + 1) : 1;
 
-        return 'CLM-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+        return \DB::transaction(function () use ($year) {
+            $lastClaim = static::whereYear('created_at', $year)
+                ->lockForUpdate()
+                ->latest()
+                ->first();
+
+            $seq = $lastClaim ? (intval(substr($lastClaim->claim_number, -5)) + 1) : 1;
+
+            return 'CLM-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+        });
     }
 }

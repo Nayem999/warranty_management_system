@@ -161,10 +161,17 @@ class WorkOrder extends BaseModel
     public static function generateWoNumber(): string
     {
         $year = now()->year;
-        $lastWo = static::whereYear('created_at', $year)->latest()->first();
-        $seq = $lastWo ? (intval(substr($lastWo->wo_number, -5)) + 1) : 1;
 
-        return 'WO-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+        return \DB::transaction(function () use ($year) {
+            $lastWo = static::whereYear('created_at', $year)
+                ->lockForUpdate()
+                ->latest()
+                ->first();
+
+            $seq = $lastWo ? (intval(substr($lastWo->wo_number, -5)) + 1) : 1;
+
+            return 'WO-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+        });
     }
 
     public static function generateFeedbackToken(): string
