@@ -8,17 +8,21 @@ use App\Http\Requests\Warranty\UpdateWarrantyRequest;
 use App\Models\ActivityLog;
 use App\Models\Warranty;
 use App\Traits\ApiResponse;
+use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WarrantyController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, UserAccessFilter;
 
     public function index(Request $request): JsonResponse
     {
+        $user = $request->user();
         $query = Warranty::query()->with(['brand', 'category', 'subCategory', 'creator']);
+
+        $this->applyBrandFilter($query, $user);
 
         if ($request->has('brand_id')) {
             $query->where('brand_id', $request->brand_id);
@@ -87,7 +91,10 @@ class WarrantyController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $warranty = Warranty::with(['brand', 'category', 'subCategory', 'creator'])->find($id);
+        $user = request()->user();
+        $warranty = Warranty::with(['brand', 'category', 'subCategory', 'creator'])
+            ->when(! $user->is_admin, fn ($q) => $q->whereIn('brand_id', $this->getAccessibleBrandIds($user)))
+            ->find($id);
 
         if (! $warranty) {
             return $this->notFound('Warranty not found.');

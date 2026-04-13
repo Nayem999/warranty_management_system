@@ -11,16 +11,18 @@ use App\Models\Warranty;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
 use App\Traits\FileUpload;
+use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WorkOrderController extends Controller
 {
-    use ApiResponse, FileUpload;
+    use ApiResponse, FileUpload, UserAccessFilter;
 
     public function index(Request $request): JsonResponse
     {
+        $user = $request->user();
         $query = WorkOrder::query()->with([
             'claim.warranty.brand',
             'serviceCenter',
@@ -29,6 +31,14 @@ class WorkOrderController extends Controller
             'engineer',
             'creator',
         ]);
+
+        if ($user->isBrandRestricted()) {
+            $query->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+        }
+
+        if ($user->isServiceCenterRestricted()) {
+            $query->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+        }
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -80,7 +90,9 @@ class WorkOrderController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $workOrder = WorkOrder::with([
+        $user = request()->user();
+
+        $workOrderQuery = WorkOrder::with([
             'claim.warranty.brand',
             'claim.warranty.category',
             'serviceCenter',
@@ -90,7 +102,17 @@ class WorkOrderController extends Controller
             'creator',
             'assignedBy',
             'parts.part',
-        ])->find($id);
+        ]);
+
+        if ($user->isBrandRestricted()) {
+            $workOrderQuery->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+        }
+
+        if ($user->isServiceCenterRestricted()) {
+            $workOrderQuery->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+        }
+
+        $workOrder = $workOrderQuery->find($id);
 
         if (! $workOrder) {
             return $this->notFound('Work order not found.');
@@ -104,7 +126,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
@@ -289,7 +311,7 @@ class WorkOrderController extends Controller
                         'Warranty',
                         $existingReplacedWarranty->product_serial,
                         $existingReplacedWarranty->id,
-                        ['old' =>  $previousData, 'old_serial' => $existingReplacedWarranty]
+                        ['old' => $previousData, 'old_serial' => $existingReplacedWarranty]
                     );
                 }
             } else {
@@ -437,7 +459,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {

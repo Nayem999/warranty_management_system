@@ -122,55 +122,6 @@ class SettingController extends Controller
         return $this->success(null, 'Settings saved successfully.');
     }
 
-    /* public function updateAll(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'settings' => 'required|array',
-        ]);
-
-        foreach ($data['settings'] as $item) {
-            $value = $item['value'] ?? '';
-            $inputType = $item['type'] ?? 'text';
-
-            if ($inputType === 'image') {
-                $prev_setting = Setting::where('setting_name', $item['key'])->first();
-                $value = $prev_setting->setting_value;
-                if (isset($item['key']) && isset($item['value'])) {
-
-                    $this->deleteFile($value);
-                    $base64Data = $item['value'];
-                    if (str_starts_with($base64Data, 'data:')) {
-
-                        $ext = 'jpg';
-                        if (preg_match('/data:image\/(\w+);/', $base64Data, $matches)) {
-                            $ext = $matches[1];
-                        }
-
-                        $base64Data = preg_replace('/^data:image\/\w+;base64,/', '', $base64Data);
-                        $base64Data = base64_decode($base64Data);
-
-                        if ($base64Data === false) {
-                            $value = "";
-                        }
-
-                        $filename = Str::uuid() . '.' . $ext;
-                        $value = "uploads/settings/{$filename}";
-                        Storage::disk('public')->put($value, $base64Data);
-                    }
-                }
-            }
-
-            Setting::updateOrCreate(
-                ['setting_name' => $item['key']],
-                [
-                    'setting_value' => $value,
-                    'type' => $inputType
-                ]
-            );
-        }
-
-        return $this->success(null, 'All settings updated successfully.');
-    } */
     public function updateAll(Request $request): JsonResponse
     {
         $data = $request->validate([

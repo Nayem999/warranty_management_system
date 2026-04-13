@@ -15,6 +15,7 @@ use App\Models\Warranty;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
 use App\Traits\EmailHelper;
+use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,11 +25,20 @@ use Illuminate\Support\Str;
 
 class ClaimController extends Controller
 {
-    use ApiResponse, EmailHelper;
+    use ApiResponse, EmailHelper, UserAccessFilter;
 
     public function index(Request $request): JsonResponse
     {
+        $user = $request->user();
         $query = Claim::query()->with(['warranty.brand', 'serviceCenter', 'creator', 'workOrder']);
+
+        if ($user->isBrandRestricted()) {
+            $query->whereHas('warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+        }
+
+        if ($user->isServiceCenterRestricted()) {
+            $query->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+        }
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -86,7 +96,7 @@ class ClaimController extends Controller
             ->first();
 
         if ($existingClaim) {
-            return $this->error('A claim with status Open or Converted already exists for this warranty. Claim Number: ' . $existingClaim->claim_number);
+            return $this->error('A claim with status Open or Converted already exists for this warranty. Claim Number: '.$existingClaim->claim_number);
         }
 
         $customerEmail = $data['customer_email'] ?? null;
@@ -164,7 +174,7 @@ class ClaimController extends Controller
             ->first();
 
         if ($existingClaim) {
-            return $this->error('A claim with status Open or Converted already exists for this warranty. Claim Number: ' . $existingClaim->claim_number);
+            return $this->error('A claim with status Open or Converted already exists for this warranty. Claim Number: '.$existingClaim->claim_number);
         }
 
         $customerEmail = $data['customer_email'];
@@ -234,6 +244,13 @@ class ClaimController extends Controller
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_user_id', $user->id);
+        } else {
+            if ($user->isBrandRestricted()) {
+                $claimQuery->whereHas('warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            }
+            if ($user->isServiceCenterRestricted()) {
+                $claimQuery->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+            }
         }
 
         $claim = $claimQuery->find($id);
