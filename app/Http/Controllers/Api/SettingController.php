@@ -49,8 +49,8 @@ class SettingController extends Controller
             $value = $data['value'];
 
             if ($data['type'] == "image") {
-                $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
-                $value = $backendUrl . '/storage/' . $value;
+                // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+                $value = '/storage/' . $value;
             }
 
 
@@ -75,8 +75,8 @@ class SettingController extends Controller
         $value = $setting->setting_value;
 
         if ($setting->type == "image") {
-            $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
-            $value = $backendUrl . '/storage/' . $setting->setting_value;
+            // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+            $value =  '/storage/' . $setting->setting_value;
         }
 
         return $this->success([
