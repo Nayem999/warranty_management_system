@@ -66,24 +66,29 @@ class SettingController extends Controller
 
     public function show(string $key): JsonResponse
     {
-        $setting = Setting::where('setting_name', $key)->first();
+        $keyArray = explode(",", $key);
+        $settings = Setting::whereIn('setting_name', $keyArray)->get();
 
-        if (! $setting) {
+        if ($settings->isEmpty()) {
             return $this->notFound('Setting not found.');
         }
 
-        $value = $setting->setting_value;
+        $data = $settings->map(function ($setting) {
+            $value = $setting->setting_value;
 
-        if ($setting->type == "image") {
-            // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
-            $value =  '/storage/' . $setting->setting_value;
-        }
+            if ($setting->type === "image") {
+                // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+                $value = '/storage/' . $setting->setting_value;
+            }
 
-        return $this->success([
-            'key' => $setting->setting_name,
-            'value' => $value,
-            'type' => $setting->type,
-        ]);
+            return [
+                'key'   => $setting->setting_name,
+                'value' => $value,
+                'type'  => $setting->type,
+            ];
+        });
+
+        return $this->success($data);
     }
 
     public function upsert(Request $request): JsonResponse
