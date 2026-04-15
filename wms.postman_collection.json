@@ -1570,8 +1570,8 @@
             "url": "{{base_url}}/warranties/1/claims"
           }
         },
-        {
-          "name": "Expiring Soon Warranties",
+{
+          "name": "Expiring Soon",
           "request": {
             "method": "GET",
             "header": [
@@ -1581,6 +1581,29 @@
               }
             ],
             "url": "{{base_url}}/warranties/expiring-soon?days=30"
+          }
+        },
+        {
+          "name": "Import Warranties",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/warranties/import",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
           }
         }
       ]
@@ -1735,7 +1758,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/work-orders?status=Pending&service_center_id=1&courier_in_id=1&courier_out_id=1&engineer_id=1",
+              "raw": "{{base_url}}/work-orders?status=Pending&service_center_id=1&brand_id=1&claim_id=1&warranty_id=1&service_type=In%20Warranty&job_type=Carry%20In&invoice_no=INV001&ref=REF001",
               "host": ["{{base_url}}"],
               "path": ["work-orders"],
               "query": [
@@ -1743,7 +1766,32 @@
                 {"key": "service_center_id", "value": "1", "disabled": true},
                 {"key": "courier_in_id", "value": "1", "disabled": true},
                 {"key": "courier_out_id", "value": "1", "disabled": true},
-                {"key": "engineer_id", "value": "1", "disabled": true}
+                {"key": "engineer_id", "value": "1", "disabled": true},
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "claim_id", "value": "1", "disabled": true},
+                {"key": "claim_status", "value": "Open", "disabled": true},
+                {"key": "warranty_id", "value": "1", "disabled": true},
+                {"key": "service_type", "value": "In Warranty", "disabled": true},
+                {"key": "job_type", "value": "Carry In", "disabled": true},
+                {"key": "doa", "value": "true", "disabled": true},
+                {"key": "invoice_no", "value": "INV001", "disabled": true},
+                {"key": "ref", "value": "REF001", "disabled": true},
+                {"key": "wo_assigned_date_from", "value": "2026-01-01", "disabled": true},
+                {"key": "wo_assigned_date_to", "value": "2026-12-31", "disabled": true},
+                {"key": "wo_closed_date_from", "value": "2026-01-01", "disabled": true},
+                {"key": "wo_closed_date_to", "value": "2026-12-31", "disabled": true},
+                {"key": "wo_delivery_date_from", "value": "2026-01-01", "disabled": true},
+                {"key": "wo_delivery_date_to", "value": "2026-12-31", "disabled": true},
+                {"key": "invoice_date_from", "value": "2026-01-01", "disabled": true},
+                {"key": "invoice_date_to", "value": "2026-12-31", "disabled": true},
+                {"key": "customer_phone", "value": "+880", "disabled": true},
+                {"key": "customer_name", "value": "John", "disabled": true},
+                {"key": "product_serial", "value": "SMG", "disabled": true},
+                {"key": "product_name", "value": "Samsung", "disabled": true},
+                {"key": "date_from", "value": "2026-01-01", "disabled": true},
+                {"key": "date_to", "value": "2026-12-31", "disabled": true},
+                {"key": "search", "value": "WO", "disabled": true},
+                {"key": "limit", "value": "15", "disabled": true}
               ]
             }
           }

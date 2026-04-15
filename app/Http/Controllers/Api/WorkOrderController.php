@@ -33,7 +33,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $query->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $query->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -63,6 +63,101 @@ class WorkOrderController extends Controller
         if ($request->has('brand_id')) {
             $query->whereHas('claim.warranty', function ($q) use ($request) {
                 $q->where('brand_id', $request->brand_id);
+            });
+        }
+
+        if ($request->has('claim_id')) {
+            $query->where('claim_id', $request->claim_id);
+        }
+
+        if ($request->has('claim_status')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where('status', $request->claim_status);
+            });
+        }
+
+        if ($request->has('warranty_id')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where('warranty_id', $request->warranty_id);
+            });
+        }
+
+        if ($request->has('service_type')) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        if ($request->has('job_type')) {
+            $query->where('job_type', $request->job_type);
+        }
+
+        if ($request->has('doa')) {
+            $query->where('doa', $request->doa);
+        }
+
+        if ($request->has('invoice_no')) {
+            $query->where('invoice_no', 'like', "%{$request->invoice_no}%");
+        }
+
+        if ($request->has('ref')) {
+            $query->where('ref', 'like', "%{$request->ref}%");
+        }
+
+        if ($request->has('wo_assigned_date_from')) {
+            $query->where('wo_assigned_date', '>=', Carbon::parse($request->wo_assigned_date_from));
+        }
+
+        if ($request->has('wo_assigned_date_to')) {
+            $query->where('wo_assigned_date', '<=', Carbon::parse($request->wo_assigned_date_to));
+        }
+
+        if ($request->has('wo_closed_date_from')) {
+            $query->where('wo_closed_date', '>=', Carbon::parse($request->wo_closed_date_from));
+        }
+
+        if ($request->has('wo_closed_date_to')) {
+            $query->where('wo_closed_date', '<=', Carbon::parse($request->wo_closed_date_to));
+        }
+
+        if ($request->has('wo_delivery_date_from')) {
+            $query->where('wo_delivery_date', '>=', Carbon::parse($request->wo_delivery_date_from));
+        }
+
+        if ($request->has('wo_delivery_date_to')) {
+            $query->where('wo_delivery_date', '<=', Carbon::parse($request->wo_delivery_date_to));
+        }
+
+        if ($request->has('invoice_date_from')) {
+            $query->where('invoice_date', '>=', Carbon::parse($request->invoice_date_from));
+        }
+
+        if ($request->has('invoice_date_to')) {
+            $query->where('invoice_date', '<=', Carbon::parse($request->invoice_date_to));
+        }
+
+        if ($request->has('customer_phone')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where('customer_phone', 'like', "%{$request->customer_phone}%");
+            });
+        }
+
+        if ($request->has('customer_name')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('customer_firstname', 'like', "%{$request->customer_name}%")
+                        ->orWhere('customer_lastname', 'like', "%{$request->customer_name}%");
+                });
+            });
+        }
+
+        if ($request->has('product_serial')) {
+            $query->whereHas('claim.warranty', function ($q) use ($request) {
+                $q->where('product_serial', 'like', "%{$request->product_serial}%");
+            });
+        }
+
+        if ($request->has('product_name')) {
+            $query->whereHas('claim.warranty', function ($q) use ($request) {
+                $q->where('product_name', 'like', "%{$request->product_name}%");
             });
         }
 
@@ -105,7 +200,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $workOrderQuery->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $workOrderQuery->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -126,7 +221,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
@@ -232,7 +327,7 @@ class WorkOrderController extends Controller
             $workOrder->id,
             ['old' => $oldData, 'new' => $workOrder->toArray()]
         );
-        
+
         if ($workOrder->status != $previousStatus) {
             WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.warranty']), $previousStatus);
         }
@@ -487,7 +582,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {

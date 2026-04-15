@@ -75,6 +75,7 @@ Route::prefix('')->group(function () {
         Route::apiResource('warranties', WarrantyController::class);
         Route::get('/warranties/{id}/claims', [WarrantyController::class, 'claims']);
         Route::get('/warranties/expiring-soon', [WarrantyController::class, 'expiringSoon']);
+        Route::post('/warranties/import', [WarrantyController::class, 'import']);
 
         Route::apiResource('claims', ClaimController::class);
         Route::post('/claims/{id}/convert-to-work-order', [ClaimController::class, 'convertToWorkOrder']);

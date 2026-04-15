@@ -12,6 +12,7 @@ use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class WarrantyController extends Controller
 {
@@ -245,5 +246,73 @@ class WarrantyController extends Controller
             ->paginate($request->limit ?? 15);
 
         return $this->success($warranties);
+    }
+
+    public function import(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->getRealPath();
+
+        $spreadsheet = IOFactory::load($path);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        if (count($rows) < 2) {
+            return $this->error('File is empty or has no data rows.');
+        }
+
+        $headers = array_map('strtolower', array_map('trim', $rows[0]));
+        $dataRows = array_slice($rows, 1);
+
+        $imported = 0;
+        $failed = [];
+        $createdBy = $request->user()->id;
+
+        foreach ($dataRows as $index => $row) {
+            try {
+                $data = array_combine($headers, $row);
+
+                if (empty($data['product_serial']) && empty($data['serial'])) {
+                    continue;
+                }
+
+                $warrantyData = [
+                    'product_serial' => $data['product_serial'] ?? $data['serial'] ?? null,
+                    'product_name' => $data['product_name'] ?? $data['product'] ?? null,
+                    'product_info' => $data['product_info'] ?? $data['product_info'] ?? null,
+                    'brand_id' => $data['brand_id'] ?? $data['brand'] ?? null,
+                    'category_id' => $data['category_id'] ?? $data['category'] ?? null,
+                    'sub_category_id' => $data['sub_category_id'] ?? $data['sub_category'] ?? null,
+                    'start_date' => isset($data['start_date']) ? Carbon::parse($data['start_date'])->format('Y-m-d') : now()->format('Y-m-d'),
+                    'end_date' => isset($data['end_date']) ? Carbon::parse($data['end_date'])->format('Y-m-d') : now()->addYear()->format('Y-m-d'),
+                    'created_by' => $createdBy,
+                ];
+
+                if (! empty($warrantyData['brand_id'])) {
+                    $warrantyData['brand_id'] = is_numeric($warrantyData['brand_id']) ? (int) $warrantyData['brand_id'] : null;
+                }
+                if (! empty($warrantyData['category_id'])) {
+                    $warrantyData['category_id'] = is_numeric($warrantyData['category_id']) ? (int) $warrantyData['category_id'] : null;
+                }
+                if (! empty($warrantyData['sub_category_id'])) {
+                    $warrantyData['sub_category_id'] = is_numeric($warrantyData['sub_category_id']) ? (int) $warrantyData['sub_category_id'] : null;
+                }
+
+                Warranty::create($warrantyData);
+                $imported++;
+            } catch (\Exception $e) {
+                $failed[] = ['row' => $index + 2, 'error' => $e->getMessage()];
+            }
+        }
+
+        return $this->success([
+            'imported' => $imported,
+            'failed' => $failed,
+            'total' => count($dataRows),
+        ], 'Warranty import completed.');
     }
 }
