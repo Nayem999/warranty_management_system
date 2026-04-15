@@ -49,12 +49,7 @@ trait FileUpload
         $filename = Str::uuid().'.'.$extension;
         $path = "uploads/{$folder}/{$filename}";
 
-        $fullPath = storage_path($path);
-        $dir = dirname($fullPath);
-        if (! is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        file_put_contents($fullPath, $base64Data);
+        Storage::disk('public')->put($path, $base64Data);
 
         return $path;
     }
@@ -62,10 +57,7 @@ trait FileUpload
     public function deleteFile(?string $path): void
     {
         if ($path) {
-            $fullPath = storage_path($path);
-            if (file_exists($fullPath)) {
-                unlink($fullPath);
-            }
+            Storage::disk('public')->delete($path);
         }
     }
 
