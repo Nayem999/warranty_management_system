@@ -66,14 +66,29 @@ class WorkOrder extends BaseModel
 
     public function getAttachmentsUrlsAttribute(): ?array
     {
-        if (empty($this->attachments)) {
+        $attachments = $this->attachments;
+
+        if (empty($attachments)) {
+            return null;
+        }
+
+        if (is_string($attachments)) {
+            $decoded = json_decode($attachments, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $attachments = $decoded;
+            } else {
+                $attachments = [$attachments];
+            }
+        }
+
+        if (! is_array($attachments)) {
             return null;
         }
 
         $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
 
         $urls = [];
-        foreach ($this->attachments as $attachment) {
+        foreach ($attachments as $attachment) {
             if (filter_var($attachment, FILTER_VALIDATE_URL)) {
                 $urls[] = $attachment;
             } else {

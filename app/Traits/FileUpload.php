@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 trait FileUpload
 {
@@ -13,9 +13,12 @@ trait FileUpload
             return '';
         }
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
+        $path = "uploads/{$folder}";
 
-        return $file->storeAs("uploads/{$folder}", $filename);
+        Storage::disk('public')->putFileAs($path, $file, $filename);
+
+        return $path.'/'.$filename;
     }
 
     public function uploadFiles(array $files, string $folder): array
@@ -43,7 +46,7 @@ trait FileUpload
             return '';
         }
 
-        $filename = Str::uuid() . '.' . $extension;
+        $filename = Str::uuid().'.'.$extension;
         $path = "uploads/{$folder}/{$filename}";
 
         $fullPath = storage_path($path);
@@ -73,7 +76,7 @@ trait FileUpload
         }
     }
 
-    public function handleAttachments(?string $attachments, string $folder = 'work-orders'): ?string
+    public function handleAttachments($attachments, string $folder = 'work-orders'): ?string
     {
         if (empty($attachments)) {
             return null;
@@ -88,12 +91,12 @@ trait FileUpload
                         if (preg_match('/data:image\/(\w+);/', $attachment, $matches)) {
                             $ext = $matches[1];
                         }
-                        $uploadedPaths[] = $this->uploadBase64File($attachment, $folder, $ext);
+                        $uploadedPaths[] = 'storage/'.$this->uploadBase64File($attachment, $folder, $ext);
                     } else {
                         $uploadedPaths[] = $attachment;
                     }
                 } elseif (is_object($attachment) && method_exists($attachment, 'getClientOriginalName')) {
-                    $uploadedPaths[] = $this->uploadFile($attachment, $folder);
+                    $uploadedPaths[] = 'storage/'.$this->uploadFile($attachment, $folder);
                 }
             }
 
@@ -137,7 +140,7 @@ trait FileUpload
                 return '';
             }
 
-            $filename = Str::uuid() . '.' . $ext;
+            $filename = Str::uuid().'.'.$ext;
             $path = "uploads/{$folder}/{$filename}";
             Storage::disk('public')->put($path, $base64Data);
 
