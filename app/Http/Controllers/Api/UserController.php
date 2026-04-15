@@ -83,7 +83,7 @@ class UserController extends Controller
             }
         }
 
-        return $this->created($user, 'User created successfully. Password: '.$password);
+        return $this->created($user, 'User created successfully. Password: ' . $password);
     }
 
     public function show(int $id): JsonResponse
@@ -106,6 +106,10 @@ class UserController extends Controller
         }
 
         $data = $request->validated();
+
+        if (!isset($data['image']) || empty($data['image'])) {
+            unset($data['image']);
+        }
 
         if ($request->hasFile('image')) {
             $this->deleteFile($user->image);
@@ -343,7 +347,7 @@ class UserController extends Controller
                 return '';
             }
 
-            $filename = Str::uuid().'.'.$ext;
+            $filename = Str::uuid() . '.' . $ext;
             $path = "uploads/{$folder}/{$filename}";
             Storage::disk('public')->put($path, $base64Data);
 

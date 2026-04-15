@@ -30,7 +30,7 @@ class ServiceCenterController extends Controller
             $query->where('is_active', $request->is_active);
         }
 
-        $serviceCenters = $query->orderBy('display_order', 'asc')->paginate($request->limit ?? 15);
+        $serviceCenters = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success(ServiceCenterResource::collection($serviceCenters));
     }
@@ -49,6 +49,7 @@ class ServiceCenterController extends Controller
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
+
 
         if ($request->hasFile('logo')) {
             $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
@@ -92,6 +93,10 @@ class ServiceCenterController extends Controller
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
+
+        if (!isset($data['logo']) || empty($data['logo'])) {
+            unset($data['logo']);
+        }
 
         if ($request->hasFile('logo')) {
             $this->deleteFile($serviceCenter->logo);

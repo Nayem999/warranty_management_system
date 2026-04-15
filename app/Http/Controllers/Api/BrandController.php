@@ -31,7 +31,7 @@ class BrandController extends Controller
             $query->where('status', $request->status);
         }
 
-        $brands = $query->orderBy('display_order', 'asc')->paginate($request->limit ?? 15);
+        $brands = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
 
         return $this->success($brands);
     }
@@ -71,6 +71,9 @@ class BrandController extends Controller
         }
 
         $data = $request->validated();
+        if (!isset($data['logo']) || empty($data['logo'])) {
+            unset($data['logo']);
+        }
 
         if ($request->hasFile('logo')) {
             $this->deleteFile($brand->logo);
