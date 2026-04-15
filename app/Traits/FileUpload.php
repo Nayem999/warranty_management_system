@@ -39,7 +39,7 @@ trait FileUpload
             return '';
         }
 
-        $base64Data = preg_replace('/^data:image\/\w+;base64,/', '', $base64Data);
+        $base64Data = preg_replace('/^data:[^;]+;base64,/', '', $base64Data);
         $base64Data = base64_decode($base64Data);
 
         if ($base64Data === false) {
@@ -68,6 +68,28 @@ trait FileUpload
         }
     }
 
+    private function getExtensionFromBase64(string $base64Data): string
+    {
+        if (preg_match('/^data:([^;]+);/', $base64Data, $matches)) {
+            $mime = $matches[1];
+
+            return match ($mime) {
+                'image/png' => 'png',
+                'image/jpeg', 'image/jpg' => 'jpg',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+                'application/pdf' => 'pdf',
+                'application/msword' => 'doc',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+                'application/vnd.ms-excel' => 'xls',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+                default => 'jpg',
+            };
+        }
+
+        return 'jpg';
+    }
+
     public function handleAttachments($attachments, string $folder = 'work-orders'): ?string
     {
         if (empty($attachments)) {
@@ -79,10 +101,7 @@ trait FileUpload
             foreach ($attachments as $attachment) {
                 if (is_string($attachment)) {
                     if (str_starts_with($attachment, 'data:')) {
-                        $ext = 'jpg';
-                        if (preg_match('/data:image\/(\w+);/', $attachment, $matches)) {
-                            $ext = $matches[1];
-                        }
+                        $ext = $this->getExtensionFromBase64($attachment);
                         $uploadedPaths[] = $this->uploadBase64File($attachment, $folder, $ext);
                     } else {
                         $uploadedPaths[] = $attachment;
@@ -96,10 +115,7 @@ trait FileUpload
         }
 
         if (str_starts_with($attachments, 'data:')) {
-            $ext = 'jpg';
-            if (preg_match('/data:image\/(\w+);/', $attachments, $matches)) {
-                $ext = $matches[1];
-            }
+            $ext = $this->getExtensionFromBase64($attachments);
 
             return $this->uploadBase64File($attachments, $folder, $ext);
         }

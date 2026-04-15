@@ -33,7 +33,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $query->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $query->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -200,7 +200,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $workOrderQuery->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $workOrderQuery->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -221,7 +221,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
@@ -286,7 +286,7 @@ class WorkOrderController extends Controller
             }
         }
 
-        if (!isset($data['attachments']) || empty($data['attachments'])) {
+        if (! isset($data['attachments']) || empty($data['attachments'])) {
             unset($data['attachments']);
         }
 
@@ -300,7 +300,22 @@ class WorkOrderController extends Controller
                 $data['attachments'] = json_encode($paths);
             }
         } elseif (isset($data['attachments']) && $data['attachments']) {
-            $data['attachments'] = $this->handleAttachments($data['attachments'], 'work-orders');
+            $newAttachments = $this->handleAttachments($data['attachments'], 'work-orders');
+            $existingAttachments = $workOrder->attachments ?? [];
+
+            if (is_string($existingAttachments) && ! empty($existingAttachments)) {
+                $existingAttachments = json_decode($existingAttachments, true) ?? [];
+            }
+
+            if (! empty($existingAttachments) && $newAttachments) {
+                $decodedNew = json_decode($newAttachments, true);
+                if ($decodedNew === null) {
+                    $decodedNew = [$newAttachments];
+                }
+                $data['attachments'] = json_encode(array_merge($existingAttachments, $decodedNew));
+            } else {
+                $data['attachments'] = $newAttachments;
+            }
         }
 
         if (isset($data['wo_closed_date']) && $data['wo_closed_date']) {
@@ -586,7 +601,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
