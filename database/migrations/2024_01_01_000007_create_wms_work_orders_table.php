@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('customer_feedback')->nullable();
             $table->integer('customer_rating')->nullable();
             $table->string('feedback_token')->unique()->nullable();
-            $table->enum('status', ['Pending', 'In Progress', 'Completed', 'Delivered'])->default('Pending');
+            $table->enum('status', ['Progress', 'Closed', 'Delivered'])->default('Pending');
             $table->string('part1_used')->nullable();
             $table->string('part2_used')->nullable();
             $table->string('part3_used')->nullable();
