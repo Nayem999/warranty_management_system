@@ -31,6 +31,7 @@ class WorkOrder extends BaseModel
         'tat',
         'doa',
         'replace_serial',
+        'replace_ref',
         'replaced_warranty_id',
         'additional_comment',
         'work_done_comment',
@@ -38,6 +39,7 @@ class WorkOrder extends BaseModel
         'customer_rating',
         'feedback_token',
         'status',
+        'status_comment',
         'service_type',
         'job_type',
         'created_by',
@@ -75,7 +77,7 @@ class WorkOrder extends BaseModel
             if (filter_var($attachment, FILTER_VALIDATE_URL)) {
                 $urls[] = $attachment;
             } else {
-                $urls[] = $backendUrl . '/storage/' . $attachment;
+                $urls[] = $backendUrl.'/storage/'.$attachment;
             }
         }
 
@@ -171,7 +173,7 @@ class WorkOrder extends BaseModel
 
             $seq = $lastWo ? (intval(substr($lastWo->wo_number, -5)) + 1) : 1;
 
-            return 'WO-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+            return 'WO-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
         });
     }
 

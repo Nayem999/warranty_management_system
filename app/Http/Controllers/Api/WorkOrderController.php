@@ -33,7 +33,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $query->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $query->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -105,7 +105,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $workOrderQuery->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $workOrderQuery->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -126,7 +126,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
@@ -166,6 +166,30 @@ class WorkOrderController extends Controller
         $data = $request->validated();
 
         $oldData = $workOrder->toArray();
+
+        $previousStatus = $workOrder->status;
+        if ($data['status'] != $previousStatus) {
+
+            $statusFlow = ['Progress', 'Closed', 'Delivered'];
+            $currentIndex = array_search($workOrder->status, $statusFlow);
+            $newIndex = array_search($data['status'], $statusFlow);
+
+            if ($newIndex < $currentIndex && $workOrder->status !== $data['status']) {
+                return $this->error('Invalid status transition. Cannot go back to previous status.');
+            }
+
+            if ($data['status'] === 'Closed') {
+                $data['wo_closed_date'] = now();
+                $data['tat'] = $workOrder->wo_assigned_date
+                    ? Carbon::parse($workOrder->wo_assigned_date)->diffInDays(now())
+                    : null;
+            }
+
+            if ($data['status'] === 'Delivered') {
+                $data['wo_delivery_date'] = now();
+                $data['delivered_date_time'] = now();
+            }
+        }
 
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
@@ -208,6 +232,10 @@ class WorkOrderController extends Controller
             $workOrder->id,
             ['old' => $oldData, 'new' => $workOrder->toArray()]
         );
+        
+        if ($workOrder->status != $previousStatus) {
+            WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.warranty']), $previousStatus);
+        }
 
         return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter', 'courierIn', 'courierOut', 'engineer', 'parts.part']), 'Work order updated successfully.');
     }
@@ -459,7 +487,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
