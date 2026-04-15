@@ -53,9 +53,9 @@ class User extends Authenticatable
         'personal_permissions' => 'array',
     ];
 
-    protected $appends = [
-        'image_url',
-    ];
+    // protected $appends = [
+    //     'image_url',
+    // ];
 
     public function getImageUrlAttribute(): ?string
     {
@@ -67,9 +67,9 @@ class User extends Authenticatable
             return $this->image;
         }
 
-        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+        // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
 
-        return $backendUrl.'/storage/'.$this->image;
+        return $this->image;
     }
 
     public function role(): BelongsTo

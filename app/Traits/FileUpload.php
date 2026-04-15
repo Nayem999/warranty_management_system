@@ -18,7 +18,7 @@ trait FileUpload
 
         Storage::disk('public')->putFileAs($path, $file, $filename);
 
-        return $path.'/'.$filename;
+        return 'storage/'.$path.'/'.$filename;
     }
 
     public function uploadFiles(array $files, string $folder): array
@@ -51,7 +51,7 @@ trait FileUpload
 
         Storage::disk('public')->put($path, $base64Data);
 
-        return $path;
+        return 'storage/'.$path;
     }
 
     public function deleteFile(?string $path): void
@@ -83,12 +83,12 @@ trait FileUpload
                         if (preg_match('/data:image\/(\w+);/', $attachment, $matches)) {
                             $ext = $matches[1];
                         }
-                        $uploadedPaths[] = 'storage/'.$this->uploadBase64File($attachment, $folder, $ext);
+                        $uploadedPaths[] = $this->uploadBase64File($attachment, $folder, $ext);
                     } else {
                         $uploadedPaths[] = $attachment;
                     }
                 } elseif (is_object($attachment) && method_exists($attachment, 'getClientOriginalName')) {
-                    $uploadedPaths[] = 'storage/'.$this->uploadFile($attachment, $folder);
+                    $uploadedPaths[] = $this->uploadFile($attachment, $folder);
                 }
             }
 
@@ -136,7 +136,7 @@ trait FileUpload
             $path = "uploads/{$folder}/{$filename}";
             Storage::disk('public')->put($path, $base64Data);
 
-            return $path;
+            return 'storage/'.$path;
         }
 
         return $base64Data;

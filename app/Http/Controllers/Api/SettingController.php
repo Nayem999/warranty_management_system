@@ -46,17 +46,10 @@ class SettingController extends Controller
         $merged = array_merge($defaultSettings, $dbSettings->toArray());
 
         $result = collect($merged)->map(function ($data, $key) {
-            $value = $data['value'];
-
-            if ($data['type'] == "image") {
-                // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
-                $value = '/storage/' . $value;
-            }
-
-
+            // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
             return [
                 'key' => $key,
-                'value' => $value,
+                'value' => $data['value'],
                 'type' => $data['type'],
             ];
         })->values();
@@ -76,10 +69,7 @@ class SettingController extends Controller
         $data = $settings->map(function ($setting) {
             $value = $setting->setting_value;
 
-            if ($setting->type === "image") {
-                // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
-                $value = '/storage/' . $setting->setting_value;
-            }
+            // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
 
             return [
                 'key'   => $setting->setting_name,

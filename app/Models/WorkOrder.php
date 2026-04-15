@@ -68,9 +68,9 @@ class WorkOrder extends BaseModel
         'attachments' => 'array',
     ];
 
-    protected $appends = [
-        'attachments_urls',
-    ];
+    // protected $appends = [
+    //     'attachments_urls',
+    // ];
 
     public function getAttachmentsUrlsAttribute(): ?array
     {
@@ -93,14 +93,14 @@ class WorkOrder extends BaseModel
             return null;
         }
 
-        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+        // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
 
         $urls = [];
         foreach ($attachments as $attachment) {
             if (filter_var($attachment, FILTER_VALIDATE_URL)) {
                 $urls[] = $attachment;
             } else {
-                $urls[] = $backendUrl.'/storage/'.$attachment;
+                // $urls[] = $backendUrl.'/storage/'.$attachment;
             }
         }
 

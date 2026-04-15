@@ -27,9 +27,9 @@ class ServiceCenter extends BaseModel
         'brand_ids' => 'array',
     ];
 
-    protected $appends = [
-        'logo_url',
-    ];
+    // protected $appends = [
+    //     'logo_url',
+    // ];
 
     public function getLogoUrlAttribute(): ?string
     {
@@ -41,9 +41,9 @@ class ServiceCenter extends BaseModel
             return $this->logo;
         }
 
-        $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
+        // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
 
-        return $backendUrl.'/storage/uploads/'.$this->logo;
+        return $this->logo;
     }
 
     public function claims(): HasMany
