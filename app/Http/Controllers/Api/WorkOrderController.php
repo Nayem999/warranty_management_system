@@ -32,6 +32,7 @@ class WorkOrderController extends Controller
             'courierOut',
             'engineer',
             'creator',
+            'parts.part',
         ]);
 
         if ($user->isBrandRestricted()) {
@@ -116,36 +117,32 @@ class WorkOrderController extends Controller
             $query->where('ref', 'like', "%{$request->ref}%");
         }
 
-        if ($request->has('wo_assigned_date_from')) {
-            $query->where('wo_assigned_date', '>=', Carbon::parse($request->wo_assigned_date_from));
+        if ($request->has('wo_assigned_date')) {
+            $query->whereDate('wo_assigned_date', Carbon::parse($request->wo_assigned_date));
         }
 
-        if ($request->has('wo_assigned_date_to')) {
-            $query->where('wo_assigned_date', '<=', Carbon::parse($request->wo_assigned_date_to));
+        if ($request->has('wo_closed_date')) {
+            $query->whereDate('wo_closed_date', Carbon::parse($request->wo_closed_date));
         }
 
-        if ($request->has('wo_closed_date_from')) {
-            $query->where('wo_closed_date', '>=', Carbon::parse($request->wo_closed_date_from));
+        if ($request->has('wo_delivery_date')) {
+            $query->whereDate('wo_delivery_date', Carbon::parse($request->wo_delivery_date));
         }
 
-        if ($request->has('wo_closed_date_to')) {
-            $query->where('wo_closed_date', '<=', Carbon::parse($request->wo_closed_date_to));
+        if ($request->has('invoice_date')) {
+            $query->whereDate('invoice_date', Carbon::parse($request->invoice_date));
         }
 
-        if ($request->has('wo_delivery_date_from')) {
-            $query->where('wo_delivery_date', '>=', Carbon::parse($request->wo_delivery_date_from));
+        if ($request->has('part_id')) {
+            $query->whereHas('parts.part', function ($q) use ($request) {
+                $q->where('part_id', 'like', "%{$request->part_id}%");
+            });
         }
 
-        if ($request->has('wo_delivery_date_to')) {
-            $query->where('wo_delivery_date', '<=', Carbon::parse($request->wo_delivery_date_to));
-        }
-
-        if ($request->has('invoice_date_from')) {
-            $query->where('invoice_date', '>=', Carbon::parse($request->invoice_date_from));
-        }
-
-        if ($request->has('invoice_date_to')) {
-            $query->where('invoice_date', '<=', Carbon::parse($request->invoice_date_to));
+        if ($request->has('part_description')) {
+            $query->whereHas('parts.part', function ($q) use ($request) {
+                $q->where('part_description', 'like', "%{$request->part_description}%");
+            });
         }
 
         if ($request->has('customer_phone')) {
@@ -175,20 +172,13 @@ class WorkOrderController extends Controller
             });
         }
 
-        if ($request->has('date_from')) {
-            $query->where('wo_assigned_date', '>=', Carbon::parse($request->date_from));
+        if ($request->has('wo_number')) {
+            $query->where('wo_number', 'like', "%{$request->wo_number}%");
         }
 
-        if ($request->has('date_to')) {
-            $query->where('wo_assigned_date', '<=', Carbon::parse($request->date_to));
-        }
-
-        if ($request->has('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('wo_number', 'like', "%{$request->search}%")
-                    ->orWhereHas('claim', function ($q2) use ($request) {
-                        $q2->where('claim_number', 'like', "%{$request->search}%");
-                    });
+        if ($request->has('claim_number')) {
+            $query->where('claim', function ($q2) use ($request) {
+                $q2->where('claim_number', 'like', "%{$request->search}%");
             });
         }
 
