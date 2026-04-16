@@ -27,12 +27,17 @@ class UpdateBrandRequest extends FormRequest
     {
         return [
             'name' => [
-                'sometimes',
+                'required',
                 'string',
                 'max:255',
                 Rule::unique('wms_brands', 'name')->ignore($this->brandId),
             ],
-            'short_name' => 'nullable|string|max:50',
+            'short_name' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('wms_brands', 'short_name')->ignore($this->brandId),
+            ],
             'logo' => 'nullable|string',
             'description' => 'nullable|string',
             'status' => 'sometimes|in:active,inactive',

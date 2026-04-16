@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Warranty\StoreWarrantyRequest;
 use App\Http\Requests\Warranty\UpdateWarrantyRequest;
 use App\Models\ActivityLog;
+use App\Models\Brand;
+use App\Models\ProductCategory;
 use App\Models\Warranty;
 use App\Traits\ApiResponse;
 use App\Traits\UserAccessFilter;
@@ -13,6 +15,9 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class WarrantyController extends Controller
 {
@@ -276,31 +281,48 @@ class WarrantyController extends Controller
             try {
                 $data = array_combine($headers, $row);
 
-                if (empty($data['product_serial']) && empty($data['serial'])) {
+                if (empty($data['serial number']) && empty($data['product_serial'])) {
                     continue;
                 }
 
+                $productSerial = $data['serial number'] ?? $data['product_serial'] ?? null;
+                $productName = $data['product name'] ?? $data['product_name'] ?? null;
+                $productInfo = $data['product description'] ?? $data['product_info'] ?? null;
+                $brandShortName = $data['brand short name'] ?? $data['brand_short_name'] ?? null;
+                $categoryShortName = $data['category short name'] ?? $data['category_short_name'] ?? null;
+                $subCategoryShortName = $data['sub-category short name'] ?? $data['sub_category_short_name'] ?? null;
+                $startDate = $data['start date'] ?? $data['start_date'] ?? null;
+                $endDate = $data['end date'] ?? $data['end_date'] ?? null;
+
+                $brandId = null;
+                if (! empty($brandShortName)) {
+                    $brand = Brand::where('short_name', $brandShortName)->first();
+                    $brandId = $brand?->id;
+                }
+
+                $categoryId = null;
+                if (! empty($categoryShortName)) {
+                    $category = ProductCategory::where('short_name', $categoryShortName)->first();
+                    $categoryId = $category?->id;
+                }
+
+                $subCategoryId = null;
+                if (! empty($subCategoryShortName)) {
+                    $subCategory = ProductCategory::where('short_name', $subCategoryShortName)->first();
+                    $subCategoryId = $subCategory?->id;
+                }
+
                 $warrantyData = [
-                    'product_serial' => $data['product_serial'] ?? $data['serial'] ?? null,
-                    'product_name' => $data['product_name'] ?? $data['product'] ?? null,
-                    'product_info' => $data['product_info'] ?? $data['product_info'] ?? null,
-                    'brand_id' => $data['brand_id'] ?? $data['brand'] ?? null,
-                    'category_id' => $data['category_id'] ?? $data['category'] ?? null,
-                    'sub_category_id' => $data['sub_category_id'] ?? $data['sub_category'] ?? null,
-                    'start_date' => isset($data['start_date']) ? Carbon::parse($data['start_date'])->format('Y-m-d') : now()->format('Y-m-d'),
-                    'end_date' => isset($data['end_date']) ? Carbon::parse($data['end_date'])->format('Y-m-d') : now()->addYear()->format('Y-m-d'),
+                    'product_serial' => $productSerial,
+                    'product_name' => $productName,
+                    'product_info' => $productInfo,
+                    'brand_id' => $brandId,
+                    'category_id' => $categoryId,
+                    'sub_category_id' => $subCategoryId,
+                    'start_date' => $startDate ? Carbon::parse($startDate)->format('Y-m-d') : now()->format('Y-m-d'),
+                    'end_date' => $endDate ? Carbon::parse($endDate)->format('Y-m-d') : now()->addYear()->format('Y-m-d'),
                     'created_by' => $createdBy,
                 ];
-
-                if (! empty($warrantyData['brand_id'])) {
-                    $warrantyData['brand_id'] = is_numeric($warrantyData['brand_id']) ? (int) $warrantyData['brand_id'] : null;
-                }
-                if (! empty($warrantyData['category_id'])) {
-                    $warrantyData['category_id'] = is_numeric($warrantyData['category_id']) ? (int) $warrantyData['category_id'] : null;
-                }
-                if (! empty($warrantyData['sub_category_id'])) {
-                    $warrantyData['sub_category_id'] = is_numeric($warrantyData['sub_category_id']) ? (int) $warrantyData['sub_category_id'] : null;
-                }
 
                 Warranty::create($warrantyData);
                 $imported++;
@@ -314,5 +336,55 @@ class WarrantyController extends Controller
             'failed' => $failed,
             'total' => count($dataRows),
         ], 'Warranty import completed.');
+    }
+
+    public function importSample(Request $request): BinaryFileResponse
+    {
+        $spreadsheet = new Spreadsheet;
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $headers = [
+            'Serial Number',
+            'Product Name',
+            'Product Description',
+            'Brand Short Name',
+            'Category Short Name',
+            'Sub-Category Short Name',
+            'Start Date',
+            'End Date',
+        ];
+        $sheet->fromArray($headers, null, 'A1');
+                // 'SERIAL123',
+                // 'Sample Product',
+                // 'Product Description',
+                // 'BrandName',
+                // 'CategoryName',
+                // 'SubCategoryName',
+        $sampleData = [
+            [
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                now()->format('Y-m-d'),
+                now()->addYear()->format('Y-m-d'),
+            ],
+        ];
+        $sheet->fromArray($sampleData, null, 'A2');
+
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'warranty_import_sample.xlsx';
+        $path = storage_path('app/'.$filename);
+        $writer->save($path);
+
+        return response()->download($path, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
     }
 }

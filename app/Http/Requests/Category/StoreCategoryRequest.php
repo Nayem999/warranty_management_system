@@ -14,8 +14,8 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'short_name' => 'nullable|string|max:50',
+            'name' => 'required|string|unique:wms_product_categories,name|max:255',
+            'short_name' => 'required|string|unique:wms_product_categories,short_name|max:50',
             'parent_id' => 'nullable|exists:wms_product_categories,id',
             'brand_id' => 'required|exists:wms_brands,id',
             'status' => 'sometimes|in:active,inactive',

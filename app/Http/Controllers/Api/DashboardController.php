@@ -77,8 +77,8 @@ class DashboardController extends Controller
             'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
             'total_service_centers' => ServiceCenter::when($brandId, fn ($q) => $q->whereJsonContains('brand_ids', (int) $brandId))->where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
-            'avg_customer_rating' => (clone $workOrderQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
-            'avg_tat_days' => (clone $workOrderQuery)->whereNotNull('tat')->avg('tat') ?? 0,
+            'avg_customer_rating' => (int) (clone $workOrderQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
+            'avg_tat_days' => (int) (clone $workOrderQuery)->whereNotNull('tat')->avg('tat') ?? 0,
         ];
 
         $recentClaims = Claim::with(['warranty.brand', 'serviceCenter'])
@@ -206,8 +206,8 @@ class DashboardController extends Controller
             'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
             'total_service_centers' => ServiceCenter::where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
-            'avg_customer_rating' => (clone $workOrderQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
-            'avg_tat_days' => (clone $workOrderQuery)->whereNotNull('tat')->avg('tat') ?? 0,
+            'avg_customer_rating' => (int) (clone $workOrderQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
+            'avg_tat_days' => (int) (clone $workOrderQuery)->whereNotNull('tat')->avg('tat') ?? 0,
         ];
 
         return $this->success($stats);
@@ -277,7 +277,7 @@ class DashboardController extends Controller
             'in_progress' => (clone $query)->inProgress()->count(),
             'completed' => (clone $query)->completed()->count(),
             'delivered' => (clone $query)->delivered()->count(),
-            'avg_tat_days' => (clone $query)->whereNotNull('tat')->avg('tat') ?? 0,
+            'avg_tat_days' => (int) (clone $query)->whereNotNull('tat')->avg('tat') ?? 0,
         ];
 
         return $this->success($stats);
@@ -377,8 +377,8 @@ class DashboardController extends Controller
                 'assigned_count' => $center->workOrders()->count(),
                 'completed_count' => $center->workOrders()->completed()->count(),
                 'delivered_count' => $center->workOrders()->delivered()->count(),
-                'avg_rating' => $center->workOrders()->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
-                'avg_tat' => $center->workOrders()->whereNotNull('tat')->avg('tat') ?? 0,
+                'avg_rating' => (int) $center->workOrders()->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
+                'avg_tat' => (int) $center->workOrders()->whereNotNull('tat')->avg('tat') ?? 0,
             ];
         });
 

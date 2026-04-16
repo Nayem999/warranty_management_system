@@ -1605,6 +1605,19 @@
               ]
             }
           }
+        },
+        {
+          "name": "Download Import Sample",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/warranties/import/sample"
+          }
         }
       ]
     },

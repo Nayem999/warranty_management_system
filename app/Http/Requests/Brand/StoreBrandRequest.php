@@ -15,7 +15,7 @@ class StoreBrandRequest extends FormRequest
     {
         return [
             'name' => 'required|string|unique:wms_brands,name|max:255',
-            'short_name' => 'nullable|string|max:50',
+            'short_name' => 'required|string|unique:wms_brands,short_name|max:50',
             'logo' => 'nullable|string',
             'description' => 'nullable|string',
             'status' => 'sometimes|in:active,inactive',
