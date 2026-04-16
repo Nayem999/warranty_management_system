@@ -25,6 +25,8 @@ class WorkOrderController extends Controller
         $user = $request->user();
         $query = WorkOrder::query()->with([
             'claim.warranty.brand',
+            'claim.warranty.category',
+            'claim.warranty.subCategory',
             'serviceCenter',
             'courierIn',
             'courierOut',
@@ -63,6 +65,18 @@ class WorkOrderController extends Controller
         if ($request->has('brand_id')) {
             $query->whereHas('claim.warranty', function ($q) use ($request) {
                 $q->where('brand_id', $request->brand_id);
+            });
+        }
+
+        if ($request->has('category_id')) {
+            $query->whereHas('claim.warranty', function ($q) use ($request) {
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->has('sub_category_id')) {
+            $query->whereHas('claim.warranty', function ($q) use ($request) {
+                $q->where('sub_category_id', $request->sub_category_id);
             });
         }
 
