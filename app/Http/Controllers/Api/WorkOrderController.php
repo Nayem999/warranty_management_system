@@ -178,7 +178,7 @@ class WorkOrderController extends Controller
 
         if ($request->has('claim_number')) {
             $query->where('claim', function ($q2) use ($request) {
-                $q2->where('claim_number', 'like', "%{$request->search}%");
+                $q2->where('claim_number', 'like', "%{$request->claim_number}%");
             });
         }
 

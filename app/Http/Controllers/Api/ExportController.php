@@ -47,13 +47,7 @@ class ExportController extends Controller
     public function downloadWorkOrders(Request $request)
     {
         $filters = $request->only([
-            'status',
-            'service_center_id',
-            'engineer_id',
-            'brand_id',
-            'date_from',
-            'date_to',
-            'search',
+            'status', 'service_center_id', 'courier_in_id', 'courier_out_id', 'engineer_id', 'brand_id', 'category_id', 'sub_category_id', 'claim_id', 'claim_status', 'warranty_id', 'service_type', 'job_type', 'invoice_no', 'ref', 'wo_assigned_date', 'wo_closed_date',  'wo_delivery_date', 'invoice_date', 'customer_phone', 'customer_name', 'product_serial', 'product_name',  'wo_number', 'claim_number', 'part_id', 'part_description'
         ]);
 
         $filename = 'work-orders-'.now()->format('Y-m-d-H-i-s').'.xlsx';
