@@ -128,10 +128,10 @@ class SettingController extends Controller
             $inputType = $item['type'] ?? 'text';
             $value     = $item['value'] ?? '';
 
-            if ($inputType === 'image' && !empty($value)) {
+            $prevSetting = Setting::where('setting_name', $key)->first();
+            $oldFilePath = $prevSetting->setting_value ?? null;
 
-                $prevSetting = Setting::where('setting_name', $key)->first();
-                $oldFilePath = $prevSetting->setting_value ?? null;
+            if ($inputType === 'image' && !empty($value)) {
 
                 if (str_starts_with($value, 'data:image')) {
 
@@ -154,10 +154,12 @@ class SettingController extends Controller
                     $filePath = "uploads/settings/{$filename}";
                     Storage::disk('public')->put($filePath, $decoded);
 
-                    $value = 'storage/'.$filePath;
+                    $value = 'storage/' . $filePath;
                 } else {
                     $value = $oldFilePath;
                 }
+            } else {
+                $value = $oldFilePath;
             }
 
             Setting::updateOrCreate(
