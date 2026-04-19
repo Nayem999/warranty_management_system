@@ -87,7 +87,7 @@ class SettingController extends Controller
             'settings.*.input_type' => 'nullable|string',
         ]);
 
-        foreach ($data['settings'] as $setting) {
+        /*  foreach ($data['settings'] as $setting) {
             $value = $setting['value'] ?? '';
             $inputType = $setting['type'] ?? 'text';
 
@@ -108,7 +108,7 @@ class SettingController extends Controller
                     'type' => $setting['type'] ?? 'app'
                 ]
             );
-        }
+        } */
 
         return $this->success(null, 'Settings saved successfully.');
     }
@@ -154,7 +154,7 @@ class SettingController extends Controller
                     $filePath = "uploads/settings/{$filename}";
                     Storage::disk('public')->put($filePath, $decoded);
 
-                    $value = $filePath;
+                    $value = 'storage/'.$filePath;
                 } else {
                     $value = $oldFilePath;
                 }
