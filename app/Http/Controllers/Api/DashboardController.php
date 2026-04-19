@@ -122,6 +122,64 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        $serviceCenterQuery = ServiceCenter::query();
+        if ($user->isBrandRestricted()) {
+            $brandIds = $user->accessibleBrandIds();
+            $serviceCenterQuery->where(function ($q) use ($brandIds) {
+                foreach ($brandIds as $brandId) {
+                    $q->orWhereJsonContains('brand_ids', $brandId);
+                }
+            });
+        }
+        if ($user->isServiceCenterRestricted()) {
+            $serviceCenterQuery->whereIn('id', $user->accessibleServiceCenterIds());
+        }
+
+        $serviceCenterComparison = $serviceCenterQuery->get()->map(function ($center) use ($brandId) {
+            $query = WorkOrder::query()
+                ->where('service_center_id', $center->id);
+
+            if ($brandId) {
+                $query->whereHas('claim.warranty', fn ($q) => $q->where('brand_id', $brandId));
+            }
+
+            $total = $query->count();
+            $progress = (clone $query)->where('status', 'Progress')->count();
+            $closed = (clone $query)->where('status', 'Closed')->count();
+            $delivered = (clone $query)->where('status', 'Delivered')->count();
+            $completed = $closed + $delivered;
+            $completionRate = $total > 0 ? round(($completed / $total) * 100, 2) : 0;
+
+            return [
+                'id' => $center->id,
+                'name' => $center->title,
+                'total' => $total,
+                'progress' => $progress,
+                'closed' => $closed,
+                'delivered' => $delivered,
+                'completion_rate' => $completionRate,
+            ];
+        });
+
+        $customerRatings = WorkOrder::query()
+            ->select('customer_rating', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('customer_rating')
+            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($user->isServiceCenterRestricted(), fn ($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+            ->when($brandId, fn ($q) => $q->whereHas('claim.warranty', fn ($q) => $q->where('brand_id', $brandId)))
+            ->when($serviceCenterId, fn ($q) => $q->where('service_center_id', $serviceCenterId))
+            ->groupBy('customer_rating')
+            ->get()
+            ->mapWithKeys(fn ($item) => [(int) $item->customer_rating => $item->count]);
+
+        $ratingDistribution = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $ratingDistribution[] = [
+                'rating' => $i,
+                'count' => $customerRatings[$i] ?? 0,
+            ];
+        }
+
         $data = [
             'stats' => $stats,
             'warranty' => [
@@ -148,6 +206,7 @@ class DashboardController extends Controller
             ],
             'service_center' => [
                 'total' => $stats['total_service_centers'],
+                'comparison' => $serviceCenterComparison,
             ],
             'brand' => [
                 'total' => $stats['total_brands'],
@@ -155,6 +214,7 @@ class DashboardController extends Controller
             'metrics' => [
                 'avg_customer_rating' => $stats['avg_customer_rating'],
                 'avg_tat_days' => $stats['avg_tat_days'],
+                'customer_rating_distribution' => $ratingDistribution,
             ],
         ];
 
