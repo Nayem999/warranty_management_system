@@ -36,7 +36,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $query->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $query->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -90,10 +90,30 @@ class WorkOrderController extends Controller
                 $q->where('status', $request->claim_status);
             });
         }
+        if ($request->has('problem')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where('problem_description', $request->problem);
+            });
+        }
 
         if ($request->has('warranty_id')) {
             $query->whereHas('claim', function ($q) use ($request) {
                 $q->where('warranty_id', $request->warranty_id);
+            });
+        }
+        if ($request->has('product_id')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where('warranty_id', $request->product_id);
+            });
+        }
+        if ($request->has('product_description')) {
+            $query->whereHas('claim.warranty', function ($q) use ($request) {
+                $q->where('product_description', 'like', "%{$request->product_description}%");
+            });
+        }
+        if ($request->has('product_serial')) {
+            $query->whereHas('claim.warranty', function ($q) use ($request) {
+                $q->where('product_serial', 'like', "%{$request->product_serial}%");
             });
         }
 
@@ -115,6 +135,17 @@ class WorkOrderController extends Controller
 
         if ($request->has('ref')) {
             $query->where('ref', 'like', "%{$request->ref}%");
+        }
+        if ($request->has('attachment')) {
+            if ($request->attachment === 'yes') {
+                $query->whereNotNull('attachment')
+                    ->where('attachment', '!=', '');
+            } elseif ($request->attachment === 'no') {
+                $query->where(function ($q) {
+                    $q->whereNull('attachment')
+                        ->orWhere('attachment', '');
+                });
+            }
         }
 
         if ($request->has('wo_assigned_date')) {
@@ -138,11 +169,78 @@ class WorkOrderController extends Controller
                 $q->where('part_id', 'like', "%{$request->part_id}%");
             });
         }
-
+        if ($request->has('part_id')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('part_id', $request->part_id);
+            });
+        }
         if ($request->has('part_description')) {
             $query->whereHas('parts.part', function ($q) use ($request) {
                 $q->where('part_description', 'like', "%{$request->part_description}%");
             });
+        }
+
+        if ($request->has('case_id')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('case_id', 'like', "%{$request->case_id}%");
+            });
+        }
+        if ($request->has('case_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('case_date', Carbon::parse($request->case_date));
+            });
+        }
+        if ($request->has('order_id')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('order_id', 'like', "%{$request->order_id}%");
+            });
+        }
+        if ($request->has('order_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('order_date', Carbon::parse($request->order_date));
+            });
+        }
+        if ($request->has('received_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('received_date', Carbon::parse($request->received_date));
+            });
+        }
+        if ($request->has('install_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('install_date', Carbon::parse($request->install_date));
+            });
+        }
+        if ($request->has('return_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('return_date', Carbon::parse($request->return_date));
+            });
+        }
+        if ($request->has('part_status')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('part_status', 'like', "%{$request->part_status}%");
+            });
+        }
+        if ($request->has('part_return_comment')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('part_return_comment', 'like', "%{$request->part_return_comment}%");
+            });
+        }
+
+
+        if ($request->has('replacement_item_serial')) {
+            $query->where('replace_serial', 'like', "%{$request->replacement_item_serial}%");
+        }
+        if ($request->has('replace_product_name')) {
+            $query->where('replace_serial', 'like', "%{$request->replace_product_name}%");
+        }
+        if ($request->has('replace_product_info')) {
+            $query->where('replace_product_info', 'like', "%{$request->replace_product_info}%");
+        }
+        if ($request->has('work_done_comment')) {
+            $query->where('work_done_comment', 'like', "%{$request->work_done_comment}%");
+        }
+        if ($request->has('customer_rating')) {
+            $query->where('customer_rating', 'like', "%{$request->customer_rating}%");
         }
 
         if ($request->has('customer_phone')) {
@@ -156,6 +254,20 @@ class WorkOrderController extends Controller
                 $q->where(function ($q2) use ($request) {
                     $q2->where('customer_firstname', 'like', "%{$request->customer_name}%")
                         ->orWhere('customer_lastname', 'like', "%{$request->customer_name}%");
+                });
+            });
+        }
+        if ($request->has('customer_email')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('customer_email', 'like', "%{$request->customer_email}%");
+                });
+            });
+        }
+        if ($request->has('customer_phone')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('customer_phone', 'like', "%{$request->customer_phone}%");
                 });
             });
         }
@@ -174,6 +286,9 @@ class WorkOrderController extends Controller
 
         if ($request->has('wo_number')) {
             $query->where('wo_number', 'like', "%{$request->wo_number}%");
+        }
+        if ($request->has('wo_date')) {
+            $query->whereDate('wo_assigned_date', Carbon::parse($request->wo_date));
         }
 
         if ($request->has('claim_number')) {
@@ -204,7 +319,7 @@ class WorkOrderController extends Controller
         ]);
 
         if ($user->isBrandRestricted()) {
-            $workOrderQuery->whereHas('claim.warranty', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $workOrderQuery->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -225,7 +340,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
@@ -605,7 +720,7 @@ class WorkOrderController extends Controller
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {

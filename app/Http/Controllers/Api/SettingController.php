@@ -59,7 +59,7 @@ class SettingController extends Controller
 
     public function show(string $key): JsonResponse
     {
-        $keyArray = explode(",", $key);
+        $keyArray = array_map('trim', explode(',', $key));
         $settings = Setting::whereIn('setting_name', $keyArray)->get();
 
         if ($settings->isEmpty()) {
@@ -67,13 +67,9 @@ class SettingController extends Controller
         }
 
         $data = $settings->map(function ($setting) {
-            $value = $setting->setting_value;
-
-            // $backendUrl = rtrim(config('app.backend_url', env('BACKEND_URL', '')), '/');
-
             return [
                 'key'   => $setting->setting_name,
-                'value' => $value,
+                'value' => $setting->setting_value,
                 'type'  => $setting->type,
             ];
         });
