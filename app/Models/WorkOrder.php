@@ -32,6 +32,8 @@ class WorkOrder extends BaseModel
         'doa',
         'replace_serial',
         'replace_ref',
+        'replace_product_name',
+        'replace_product_info',
         'replaced_warranty_id',
         'additional_comment',
         'work_done_comment',

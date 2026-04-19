@@ -31,6 +31,8 @@ class UpdateWorkOrderRequest extends FormRequest
             'doa' => 'nullable|boolean',
             'replace_serial' => 'nullable|string',
             'replace_ref' => 'nullable|string',
+            'replace_product_name' => 'nullable|string|max:255',
+            'replace_product_info' => 'nullable|string',
             'additional_comment' => 'nullable|string',
             'work_done_comment' => 'nullable|string',
             'status' => 'required|in:Progress,Closed,Delivered',

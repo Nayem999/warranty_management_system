@@ -231,7 +231,7 @@ class WorkOrderController extends Controller
             $query->where('replace_serial', 'like', "%{$request->replacement_item_serial}%");
         }
         if ($request->has('replace_product_name')) {
-            $query->where('replace_serial', 'like', "%{$request->replace_product_name}%");
+            $query->where('replace_product_name', 'like', "%{$request->replace_product_name}%");
         }
         if ($request->has('replace_product_info')) {
             $query->where('replace_product_info', 'like', "%{$request->replace_product_info}%");
