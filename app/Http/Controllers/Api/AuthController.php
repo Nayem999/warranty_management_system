@@ -229,7 +229,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $request->user()->load(['role']);
 
         return $this->success([
             'user' => $user,
