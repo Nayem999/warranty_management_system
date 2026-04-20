@@ -158,7 +158,7 @@ class SettingController extends Controller
                 } else {
                     $value = $oldFilePath;
                 }
-            } else {
+            } else if ($inputType === 'image') {
                 $value = $oldFilePath;
             }
 
