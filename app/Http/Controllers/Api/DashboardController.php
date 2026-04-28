@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Claim;
+use App\Models\Product;
 use App\Models\ServiceCenter;
 use App\Models\Warranty;
 use App\Models\WorkOrder;

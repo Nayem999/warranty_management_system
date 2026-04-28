@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exports\ClaimsExport;
-use App\Exports\WarrantiesExport;
+use App\Exports\ProductsExport;
 use App\Exports\WorkOrdersExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -27,21 +27,20 @@ class ExportController extends Controller
         return Excel::download(new ClaimsExport($filters), $filename);
     }
 
-    public function downloadWarranties(Request $request)
+    public function downloadProducts(Request $request)
     {
         $filters = $request->only([
             'brand_id',
             'category_id',
             'status',
-            'is_active',
             'date_from',
             'date_to',
             'search',
         ]);
 
-        $filename = 'warranties-'.now()->format('Y-m-d-H-i-s').'.xlsx';
+        $filename = 'products-'.now()->format('Y-m-d-H-i-s').'.xlsx';
 
-        return Excel::download(new WarrantiesExport($filters), $filename);
+        return Excel::download(new ProductsExport($filters), $filename);
     }
 
     public function downloadWorkOrders(Request $request)

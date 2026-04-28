@@ -7,17 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-class Warranty extends BaseModel
+class Product extends BaseModel
 {
-    protected $table = 'wms_warranties';
+    protected $table = 'wms_products';
 
     protected $fillable = [
-        'product_serial',
-        'product_name',
-        'product_info',
+        'model_no',
+        'serial_number',
+        'item_description',
         'brand_id',
         'category_id',
         'sub_category_id',
+        'is_countable',
         'start_date',
         'end_date',
         'created_by',
@@ -26,6 +27,7 @@ class Warranty extends BaseModel
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'is_countable' => 'boolean',
     ];
 
     public function brand(): BelongsTo
@@ -50,7 +52,7 @@ class Warranty extends BaseModel
 
     public function claims(): HasMany
     {
-        return $this->hasMany(Claim::class, 'warranty_id');
+        return $this->hasMany(Claim::class, 'product_id');
     }
 
     public function workOrders(): HasManyThrough
@@ -58,8 +60,12 @@ class Warranty extends BaseModel
         return $this->hasManyThrough(WorkOrder::class, Claim::class);
     }
 
-    public function getWarrantyStatusAttribute(): string
+    public function getProductStatusAttribute(): string
     {
+        if (! $this->end_date) {
+            return 'No Warranty';
+        }
+
         $today = Carbon::today();
 
         if ($this->end_date->lt($today)) {
@@ -71,17 +77,21 @@ class Warranty extends BaseModel
 
     public function isActive(): bool
     {
+        if (! $this->end_date) {
+            return false;
+        }
+
         return $this->end_date->gte(Carbon::today());
     }
 
     public function scopeActive($query)
     {
-        return $query->where('end_date', '>=', Carbon::today());
+        return $query->whereNotNull('end_date')->where('end_date', '>=', Carbon::today());
     }
 
     public function scopeExpired($query)
     {
-        return $query->where('end_date', '<', Carbon::today());
+        return $query->whereNotNull('end_date')->where('end_date', '<', Carbon::today());
     }
 
     public function scopeExpiringSoon($query, int $days = 30)

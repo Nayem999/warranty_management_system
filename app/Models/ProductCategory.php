@@ -14,17 +14,11 @@ class ProductCategory extends BaseModel
         'short_name',
         'status',
         'parent_id',
-        'brand_id',
     ];
 
     protected $casts = [
         'status' => 'string',
     ];
-
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(Brand::class);
-    }
 
     public function parent(): BelongsTo
     {
@@ -36,9 +30,9 @@ class ProductCategory extends BaseModel
         return $this->hasMany(ProductCategory::class, 'parent_id');
     }
 
-    public function warranties(): HasMany
+    public function products(): HasMany
     {
-        return $this->hasMany(Warranty::class, 'category_id');
+        return $this->hasMany(Product::class, 'category_id');
     }
 
     public function scopeParents($query)

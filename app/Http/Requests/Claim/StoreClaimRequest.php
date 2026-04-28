@@ -13,17 +13,65 @@ class StoreClaimRequest extends FormRequest
 
     public function rules(): array
     {
+        $statuses = implode(',', [
+            'Not Assigned',
+            'Open',
+            'In Progress',
+            'Closed(Repaired)',
+            'Closed-(Without Repaired)',
+            'Closed-(Replaced)',
+            'Closed-(Reimbursed)',
+            'Delivered',
+        ]);
+
+        $serviceTypes = implode(',', [
+            'In Warranty',
+            'Warranty Void',
+            'DOA',
+            'OOW/Expired',
+        ]);
+
+        $jobTypes = implode(',', [
+            'Carry In',
+            'On Site',
+            'Pick Up',
+        ]);
+
         return [
-            'warranty_id' => 'required|exists:wms_warranties,id',
+            'product_id' => 'required|exists:wms_products,id',
+            'customer_id' => 'required|exists:wms_customers,id',
             'problem_description' => 'required|string',
-            'customer_firstname' => 'required|string|max:255',
-            'customer_lastname' => 'required|string|max:255',
-            'customer_email' => 'nullable|email',
-            'customer_phone' => 'required|string|max:20',
-            'customer_city' => 'nullable|string|max:255',
-            'customer_address' => 'nullable|string',
-            'service_center_id' => 'nullable|exists:wms_service_centers,id',
+            'service_center_id' => 'required|exists:wms_service_centers,id',
             'claim_date' => 'nullable|date',
+            'status' => "nullable|in:{$statuses}",
+            'engineer_id' => 'nullable|exists:users,id',
+            'courier_in_id' => 'nullable|exists:wms_couriers,id',
+            'courier_slip_inward' => 'nullable|string|max:255',
+            'courier_out_id' => 'nullable|exists:wms_couriers,id',
+            'courier_slip_outward' => 'nullable|string|max:255',
+            'received_date_time' => 'nullable|date',
+            'delivered_date_time' => 'nullable|date',
+            'counter' => 'nullable|integer|min:0',
+            'wo_assigned_date' => 'nullable|date',
+            'wo_closed_date' => 'nullable|date',
+            'wo_delivery_date' => 'nullable|date',
+            'tat' => 'nullable|integer|min:0',
+            'doa' => 'nullable|boolean',
+            'replace_serial' => 'nullable|string|max:255',
+            'replace_product_name' => 'nullable|string|max:255',
+            'replace_product_info' => 'nullable|string',
+            'replace_ref' => 'nullable|string|max:255',
+            'invoice_no' => 'nullable|string|max:255',
+            'invoice_date' => 'nullable|date',
+            'purchase_price' => 'nullable|numeric|min:0',
+            'ref' => 'nullable|string|max:255',
+            'web_wty_date' => 'nullable|date',
+            'additional_comment' => 'nullable|string',
+            'work_done_comment' => 'nullable|string',
+            'status_comment' => 'nullable|string',
+            'service_type' => "nullable|in:{$serviceTypes}",
+            'job_type' => "nullable|in:{$jobTypes}",
+            'assigned_by' => 'nullable|exists:users,id',
         ];
     }
 }

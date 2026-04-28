@@ -10,6 +10,8 @@ class WorkOrderPart extends BaseModel
 
     protected $fillable = [
         'work_order_id',
+        'claim_id',
+        'claim_date_time',
         'part_id',
         'case_id',
         'case_date_time',
@@ -26,6 +28,7 @@ class WorkOrderPart extends BaseModel
     ];
 
     protected $casts = [
+        'claim_date_time' => 'datetime',
         'case_date_time' => 'datetime',
         'order_date_time' => 'datetime',
         'received_date_time' => 'datetime',

@@ -39,7 +39,6 @@ class UpdateCategoryRequest extends FormRequest
                 Rule::unique('wms_product_categories', 'short_name')->ignore($this->categoryId),
             ],
             'parent_id' => 'nullable|exists:wms_product_categories,id',
-            'brand_id' => 'sometimes|required|exists:wms_brands,id',
             'status' => 'sometimes|in:active,inactive',
         ];
     }

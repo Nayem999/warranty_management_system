@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkOrder\SubmitFeedbackRequest;
 use App\Http\Requests\WorkOrder\UpdateWorkOrderRequest;
 use App\Models\ActivityLog;
-use App\Models\Warranty;
+use App\Models\Product;
 use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
 use App\Traits\FileUpload;
@@ -24,19 +24,18 @@ class WorkOrderController extends Controller
     {
         $user = $request->user();
         $query = WorkOrder::query()->with([
-            'claim.warranty.brand',
-            'claim.warranty.category',
-            'claim.warranty.subCategory',
+            'claim.product.brand',
+            'claim.product.category',
+            'claim.customer',
             'serviceCenter',
-            'courierIn',
-            'courierOut',
-            'engineer',
             'creator',
             'parts.part',
         ]);
 
         if ($user->isBrandRestricted()) {
-            $query->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $query->where(function ($q) use ($user) {
+                $q->whereHas('claim.product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            });
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -51,33 +50,27 @@ class WorkOrderController extends Controller
             $query->where('service_center_id', $request->service_center_id);
         }
 
-        if ($request->has('courier_in_id')) {
-            $query->where('courier_in_id', $request->courier_in_id);
-        }
-
-        if ($request->has('courier_out_id')) {
-            $query->where('courier_out_id', $request->courier_out_id);
-        }
-
-        if ($request->has('engineer_id')) {
-            $query->where('engineer_id', $request->engineer_id);
-        }
-
         if ($request->has('brand_id')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
-                $q->where('brand_id', $request->brand_id);
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('claim.product', function ($q) use ($request) {
+                    $q->where('brand_id', $request->brand_id);
+                });
             });
         }
 
         if ($request->has('category_id')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
-                $q->where('category_id', $request->category_id);
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('claim.product', function ($q) use ($request) {
+                    $q->where('category_id', $request->category_id);
+                });
             });
         }
 
         if ($request->has('sub_category_id')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
-                $q->where('sub_category_id', $request->sub_category_id);
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('claim.product', function ($q) use ($request) {
+                    $q->where('sub_category_id', $request->sub_category_id);
+                });
             });
         }
 
@@ -90,52 +83,25 @@ class WorkOrderController extends Controller
                 $q->where('status', $request->claim_status);
             });
         }
-        if ($request->has('problem')) {
+
+        if ($request->has('product_id')) {
             $query->whereHas('claim', function ($q) use ($request) {
-                $q->where('problem_description', $request->problem);
+                $q->where('product_id', $request->product_id);
             });
         }
 
-        if ($request->has('warranty_id')) {
-            $query->whereHas('claim', function ($q) use ($request) {
-                $q->where('warranty_id', $request->warranty_id);
-            });
-        }
-        if ($request->has('product_id')) {
-            $query->whereHas('claim', function ($q) use ($request) {
-                $q->where('warranty_id', $request->product_id);
-            });
-        }
         if ($request->has('product_description')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
+            $query->whereHas('claim.product', function ($q) use ($request) {
                 $q->where('product_description', 'like', "%{$request->product_description}%");
             });
         }
+
         if ($request->has('product_serial')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
+            $query->whereHas('claim.product', function ($q) use ($request) {
                 $q->where('product_serial', 'like', "%{$request->product_serial}%");
             });
         }
 
-        if ($request->has('service_type')) {
-            $query->where('service_type', $request->service_type);
-        }
-
-        if ($request->has('job_type')) {
-            $query->where('job_type', $request->job_type);
-        }
-
-        if ($request->has('doa')) {
-            $query->where('doa', $request->doa);
-        }
-
-        if ($request->has('invoice_no')) {
-            $query->where('invoice_no', 'like', "%{$request->invoice_no}%");
-        }
-
-        if ($request->has('ref')) {
-            $query->where('ref', 'like', "%{$request->ref}%");
-        }
         if ($request->has('attachment')) {
             if ($request->attachment === 'yes') {
                 $query->whereNotNull('attachment')
@@ -148,32 +114,12 @@ class WorkOrderController extends Controller
             }
         }
 
-        if ($request->has('wo_assigned_date')) {
-            $query->whereDate('wo_assigned_date', Carbon::parse($request->wo_assigned_date));
-        }
-
-        if ($request->has('wo_closed_date')) {
-            $query->whereDate('wo_closed_date', Carbon::parse($request->wo_closed_date));
-        }
-
-        if ($request->has('wo_delivery_date')) {
-            $query->whereDate('wo_delivery_date', Carbon::parse($request->wo_delivery_date));
-        }
-
-        if ($request->has('invoice_date')) {
-            $query->whereDate('invoice_date', Carbon::parse($request->invoice_date));
-        }
-
-        if ($request->has('part_id')) {
-            $query->whereHas('parts.part', function ($q) use ($request) {
-                $q->where('part_id', 'like', "%{$request->part_id}%");
-            });
-        }
         if ($request->has('part_id')) {
             $query->whereHas('parts', function ($q) use ($request) {
                 $q->where('part_id', $request->part_id);
             });
         }
+
         if ($request->has('part_description')) {
             $query->whereHas('parts.part', function ($q) use ($request) {
                 $q->where('part_description', 'like', "%{$request->part_description}%");
@@ -185,115 +131,32 @@ class WorkOrderController extends Controller
                 $q->where('case_id', 'like', "%{$request->case_id}%");
             });
         }
-        if ($request->has('case_date')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->whereDate('case_date', Carbon::parse($request->case_date));
-            });
-        }
-        if ($request->has('order_id')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->where('order_id', 'like', "%{$request->order_id}%");
-            });
-        }
-        if ($request->has('order_date')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->whereDate('order_date', Carbon::parse($request->order_date));
-            });
-        }
-        if ($request->has('received_date')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->whereDate('received_date', Carbon::parse($request->received_date));
-            });
-        }
-        if ($request->has('install_date')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->whereDate('install_date', Carbon::parse($request->install_date));
-            });
-        }
-        if ($request->has('return_date')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->whereDate('return_date', Carbon::parse($request->return_date));
-            });
-        }
-        if ($request->has('part_status')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->where('part_status', 'like', "%{$request->part_status}%");
-            });
-        }
-        if ($request->has('part_return_comment')) {
-            $query->whereHas('parts', function ($q) use ($request) {
-                $q->where('part_return_comment', 'like', "%{$request->part_return_comment}%");
-            });
-        }
 
-
-        if ($request->has('replacement_item_serial')) {
-            $query->where('replace_serial', 'like', "%{$request->replacement_item_serial}%");
-        }
-        if ($request->has('replace_product_name')) {
-            $query->where('replace_product_name', 'like', "%{$request->replace_product_name}%");
-        }
-        if ($request->has('replace_product_info')) {
-            $query->where('replace_product_info', 'like', "%{$request->replace_product_info}%");
-        }
-        if ($request->has('work_done_comment')) {
-            $query->where('work_done_comment', 'like', "%{$request->work_done_comment}%");
-        }
-        if ($request->has('customer_rating')) {
-            $query->where('customer_rating', 'like', "%{$request->customer_rating}%");
-        }
-
-        if ($request->has('customer_phone')) {
+        if ($request->has('customer_id')) {
             $query->whereHas('claim', function ($q) use ($request) {
-                $q->where('customer_phone', 'like', "%{$request->customer_phone}%");
+                $q->where('customer_id', $request->customer_id);
             });
         }
 
         if ($request->has('customer_name')) {
-            $query->whereHas('claim', function ($q) use ($request) {
-                $q->where(function ($q2) use ($request) {
-                    $q2->where('customer_firstname', 'like', "%{$request->customer_name}%")
-                        ->orWhere('customer_lastname', 'like', "%{$request->customer_name}%");
-                });
+            $query->whereHas('claim.customer', function ($q) use ($request) {
+                $q->where('customer_name', 'like', "%{$request->customer_name}%");
             });
         }
-        if ($request->has('customer_email')) {
-            $query->whereHas('claim', function ($q) use ($request) {
-                $q->where(function ($q2) use ($request) {
-                    $q2->where('customer_email', 'like', "%{$request->customer_email}%");
-                });
-            });
-        }
+
         if ($request->has('customer_phone')) {
-            $query->whereHas('claim', function ($q) use ($request) {
-                $q->where(function ($q2) use ($request) {
-                    $q2->where('customer_phone', 'like', "%{$request->customer_phone}%");
-                });
-            });
-        }
-
-        if ($request->has('product_serial')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
-                $q->where('product_serial', 'like', "%{$request->product_serial}%");
-            });
-        }
-
-        if ($request->has('product_name')) {
-            $query->whereHas('claim.warranty', function ($q) use ($request) {
-                $q->where('product_name', 'like', "%{$request->product_name}%");
+            $query->whereHas('claim.customer', function ($q) use ($request) {
+                $q->where('phone', 'like', "%{$request->customer_phone}%");
             });
         }
 
         if ($request->has('wo_number')) {
             $query->where('wo_number', 'like', "%{$request->wo_number}%");
         }
-        if ($request->has('wo_date')) {
-            $query->whereDate('wo_assigned_date', Carbon::parse($request->wo_date));
-        }
 
         if ($request->has('claim_number')) {
-            $query->where('claim', function ($q2) use ($request) {
-                $q2->where('claim_number', 'like', "%{$request->claim_number}%");
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where('claim_number', 'like', "%{$request->claim_number}%");
             });
         }
 
@@ -307,19 +170,16 @@ class WorkOrderController extends Controller
         $user = request()->user();
 
         $workOrderQuery = WorkOrder::with([
-            'claim.warranty.brand',
-            'claim.warranty.category',
+            'claim.product.brand',
+            'claim.product.category',
+            'claim.customer',
             'serviceCenter',
-            'courierIn',
-            'courierOut',
-            'engineer',
             'creator',
-            'assignedBy',
             'parts.part',
         ]);
 
         if ($user->isBrandRestricted()) {
-            $workOrderQuery->whereHas('claim.warranty', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $workOrderQuery->whereHas('claim.product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
         }
 
         if ($user->isServiceCenterRestricted()) {
@@ -383,25 +243,12 @@ class WorkOrderController extends Controller
 
         $previousStatus = $workOrder->status;
         if ($data['status'] != $previousStatus) {
-
             $statusFlow = ['Progress', 'Closed', 'Delivered'];
             $currentIndex = array_search($workOrder->status, $statusFlow);
             $newIndex = array_search($data['status'], $statusFlow);
 
             if ($newIndex < $currentIndex && $workOrder->status !== $data['status']) {
                 return $this->error('Invalid status transition. Cannot go back to previous status.');
-            }
-
-            if ($data['status'] === 'Closed') {
-                $data['wo_closed_date'] = now();
-                $data['tat'] = $workOrder->wo_assigned_date
-                    ? Carbon::parse($workOrder->wo_assigned_date)->diffInDays(now())
-                    : null;
-            }
-
-            if ($data['status'] === 'Delivered') {
-                $data['wo_delivery_date'] = now();
-                $data['delivered_date_time'] = now();
             }
         }
 
@@ -437,10 +284,6 @@ class WorkOrderController extends Controller
             }
         }
 
-        if (isset($data['wo_closed_date']) && $data['wo_closed_date']) {
-            $data['tat'] = Carbon::parse($workOrder->wo_assigned_date)->diffInDays(Carbon::parse($data['wo_closed_date']));
-        }
-
         $parts = null;
         if (isset($data['parts'])) {
             $parts = $data['parts'];
@@ -467,10 +310,14 @@ class WorkOrderController extends Controller
         );
 
         if ($workOrder->status != $previousStatus) {
-            WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.warranty']), $previousStatus);
+            WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.product']), $previousStatus);
         }
 
-        return $this->success($workOrder->load(['claim.warranty.brand', 'serviceCenter', 'courierIn', 'courierOut', 'engineer', 'parts.part']), 'Work order updated successfully.');
+        return $this->success($workOrder->load([
+            'claim.product.brand',
+            'serviceCenter',
+            'parts.part',
+        ]), 'Work order updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
@@ -492,153 +339,6 @@ class WorkOrderController extends Controller
         $workOrder->delete();
 
         return $this->deleted('Work order deleted successfully.');
-    }
-
-    public function assignServiceCenter(Request $request, int $id): JsonResponse
-    {
-        $workOrder = WorkOrder::find($id);
-
-        if (! $workOrder) {
-            return $this->notFound('Work order not found.');
-        }
-        $previousData = $workOrder;
-        $data = $request->validate([
-            'service_center_id' => 'required|exists:wms_service_centers,id',
-        ]);
-
-        $workOrder->update([
-            'service_center_id' => $data['service_center_id'],
-            'wo_assigned_date' => $workOrder->wo_assigned_date ?? now(),
-            'assigned_by' => $request->user()->id,
-        ]);
-
-        ActivityLog::log(
-            $request->user()->id,
-            'assigned_service_center',
-            'WorkOrder',
-            $workOrder->wo_number,
-            $workOrder->id,
-            ['old' => $previousData, 'new' => $workOrder]
-        );
-
-        return $this->success($workOrder->load(['serviceCenter']), 'Service center assigned successfully.');
-    }
-
-    public function updateStatus(Request $request, int $id): JsonResponse
-    {
-        $workOrder = WorkOrder::with('claim.warranty', 'replacedWarranty')->find($id);
-
-        if (! $workOrder) {
-            return $this->notFound('Work order not found.');
-        }
-
-        $data = $request->validate([
-            'status' => 'required|in:Progress,Closed,Delivered',
-            'replace_serial' => 'nullable|string|max:255',
-        ]);
-
-        $previousData = $workOrder;
-        $previousStatus = $workOrder->status;
-
-        $statusFlow = ['Progress', 'Closed', 'Delivered'];
-        $currentIndex = array_search($workOrder->status, $statusFlow);
-        $newIndex = array_search($data['status'], $statusFlow);
-
-        if ($newIndex < $currentIndex && $workOrder->status !== $data['status']) {
-            return $this->error('Invalid status transition. Cannot go back to previous status.');
-        }
-
-        $updateData = ['status' => $data['status']];
-
-        if ($data['status'] === 'Closed') {
-            $updateData['wo_closed_date'] = now();
-            $updateData['tat'] = $workOrder->wo_assigned_date
-                ? Carbon::parse($workOrder->wo_assigned_date)->diffInDays(now())
-                : null;
-        }
-
-        $replaceSerial = $data['replace_serial'] ?? null;
-        $existingReplacedWarranty = $workOrder->replacedWarranty;
-
-        if (! empty($replaceSerial) && $workOrder->claim?->warranty) {
-            if ($existingReplacedWarranty) {
-                if ($existingReplacedWarranty->product_serial !== $replaceSerial) {
-                    $oldSerial = $existingReplacedWarranty->product_serial;
-                    $existingReplacedWarranty->update(['product_serial' => $replaceSerial]);
-
-                    ActivityLog::log(
-                        $request->user()->id,
-                        'serial_updated',
-                        'Warranty',
-                        $existingReplacedWarranty->product_serial,
-                        $existingReplacedWarranty->id,
-                        ['old' => $previousData, 'old_serial' => $existingReplacedWarranty]
-                    );
-                }
-            } else {
-                $originalWarranty = $workOrder->claim->warranty;
-
-                $newWarranty = Warranty::create([
-                    'product_serial' => $replaceSerial,
-                    'product_name' => $originalWarranty->product_name,
-                    'product_info' => $originalWarranty->product_info,
-                    'brand_id' => $originalWarranty->brand_id,
-                    'category_id' => $originalWarranty->category_id,
-                    'sub_category_id' => $originalWarranty->sub_category_id,
-                    'start_date' => $originalWarranty->start_date,
-                    'end_date' => $originalWarranty->end_date,
-                    'created_by' => $request->user()->id,
-                ]);
-
-                ActivityLog::log(
-                    $request->user()->id,
-                    'create',
-                    'Warranty',
-                    $newWarranty->product_serial,
-                    $newWarranty->id
-                );
-
-                $updateData['replaced_warranty_id'] = $newWarranty->id;
-            }
-
-            $updateData['replace_serial'] = $replaceSerial;
-        } elseif (empty($replaceSerial) && $existingReplacedWarranty) {
-            $deletedWarrantySerial = $existingReplacedWarranty->product_serial;
-            $deletedWarrantyId = $existingReplacedWarranty->id;
-            $existingReplacedWarranty->delete();
-
-            ActivityLog::log(
-                $request->user()->id,
-                'deleted',
-                'Warranty',
-                $deletedWarrantySerial,
-                $deletedWarrantyId,
-                ['action' => 'replaced_warranty_removed']
-            );
-
-            $updateData['replace_serial'] = null;
-            $updateData['replaced_warranty_id'] = null;
-        }
-
-        if ($data['status'] === 'Delivered') {
-            $updateData['wo_delivery_date'] = now();
-            $updateData['delivered_date_time'] = now();
-        }
-
-        $workOrder->update($updateData);
-
-        ActivityLog::log(
-            $request->user()->id,
-            'status_changed',
-            'WorkOrder',
-            $workOrder->wo_number,
-            $workOrder->id,
-            ['old' => $previousData, 'new' => $workOrder]
-        );
-
-        WorkOrderStatusUpdated::dispatch($workOrder->load(['claim', 'claim.warranty']), $previousStatus);
-
-        return $this->success($workOrder->load(['claim.warranty.brand', 'claim.warranty.category', 'serviceCenter', 'replacedWarranty']), 'Work order status updated successfully.');
     }
 
     public function getFeedbackLink(int $id): JsonResponse
@@ -676,32 +376,20 @@ class WorkOrderController extends Controller
 
         $data = $request->validated();
 
+        $claim = $workOrder->claim;
+        if ($claim) {
+            $claim->update([
+                'customer_feedback' => $data['customer_feedback'],
+                'customer_rating' => $data['customer_rating'],
+            ]);
+        }
+
         $workOrder->update([
             'customer_feedback' => $data['customer_feedback'],
             'customer_rating' => $data['customer_rating'],
         ]);
 
         return $this->success($workOrder, 'Feedback submitted successfully.');
-    }
-
-    public function pending(Request $request): JsonResponse
-    {
-        $workOrders = WorkOrder::with(['claim.warranty.brand', 'serviceCenter'])
-            ->pending()
-            ->orderBy('wo_assigned_date', 'asc')
-            ->paginate($request->limit ?? 15);
-
-        return $this->success($workOrders);
-    }
-
-    public function overdue(Request $request): JsonResponse
-    {
-        $workOrders = WorkOrder::with(['claim.warranty.brand', 'serviceCenter'])
-            ->overdue()
-            ->orderBy('wo_assigned_date', 'asc')
-            ->paginate($request->limit ?? 15);
-
-        return $this->success($workOrders);
     }
 
     public function activityTimeline(int $id): JsonResponse

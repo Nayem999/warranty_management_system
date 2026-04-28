@@ -6,35 +6,31 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
-use App\Http\Controllers\Api\CustomerRegistrationController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\MemorizeReportController;
 use App\Http\Controllers\Api\PartController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\WarrantyController;
 use App\Http\Controllers\Api\WorkOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('')->group(function () {
 
     Route::post('/auth/login', [AuthController::class, 'login']);
-    Route::post('/auth/send-otp', [AuthController::class, 'sendOtp']);
-    Route::post('/auth/login-with-otp', [AuthController::class, 'loginWithOtp']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
-    Route::post('/auth/register', [CustomerRegistrationController::class, 'register']);
 
     Route::get('/brands/list', [BrandController::class, 'brands_list']);
     Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
     Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
-    Route::get('/warranties/check/{serial}', [WarrantyController::class, 'checkSerial']);
-    Route::post('/claims/public', [ClaimController::class, 'publicStore']);
     Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
-    Route::post('/work-orders/feedback/{token}', [WorkOrderController::class, 'submitFeedback']);
+    Route::post('/claims/feedback/{token}', [ClaimController::class, 'submitFeedback']);
+    Route::get('/claims/{id}/feedback-link', [ClaimController::class, 'getFeedbackLink']);
     Route::get('/settings/{key}', [SettingController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -62,8 +58,6 @@ Route::prefix('')->group(function () {
         Route::get('/roles/permissions/list', [RoleController::class, 'permissionsList']);
 
         Route::apiResource('brands', BrandController::class);
-        Route::get('/brands/{id}/categories', [BrandController::class, 'categories']);
-        Route::get('/brands/{id}/warranties', [BrandController::class, 'warranties']);
         Route::get('/brands/{id}/stats', [BrandController::class, 'stats']);
         Route::put('/brands/{id}/toggle-status', [BrandController::class, 'toggleStatus']);
 
@@ -72,30 +66,23 @@ Route::prefix('')->group(function () {
         Route::get('/categories/{id}/subcategories', [CategoryController::class, 'subcategories']);
         Route::put('/categories/{id}/toggle-status', [CategoryController::class, 'toggleStatus']);
 
-        Route::apiResource('warranties', WarrantyController::class);
-        Route::get('/warranties/{id}/claims', [WarrantyController::class, 'claims']);
-        Route::get('/warranties/expiring-soon', [WarrantyController::class, 'expiringSoon']);
-        Route::post('/warranties/import', [WarrantyController::class, 'import']);
-        Route::get('/warranties/import/sample', [WarrantyController::class, 'importSample']);
+        Route::apiResource('customers', CustomerController::class);
+
+        Route::apiResource('products', ProductController::class);
+        Route::get('/products/check/{serial}', [ProductController::class, 'checkSerial']);
+        Route::post('/products/import', [ProductController::class, 'import']);
+        Route::get('/products/import/sample', [ProductController::class, 'importSample']);
 
         Route::apiResource('claims', ClaimController::class);
-        Route::post('/claims/{id}/convert-to-work-order', [ClaimController::class, 'convertToWorkOrder']);
+        Route::post('/claims/public', [ClaimController::class, 'publicStore']);
+        Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
         Route::put('/claims/{id}/close', [ClaimController::class, 'close']);
-        Route::get('/claims/{id}/work-order', [ClaimController::class, 'workOrder']);
-        Route::get('/my-claims', [ClaimController::class, 'myClaims']);
+        Route::get('/claims/{id}/activity-timeline', [ClaimController::class, 'activityTimeline']);
 
-        Route::get('/work-orders/pending', [WorkOrderController::class, 'pending']);
-        Route::get('/work-orders/overdue', [WorkOrderController::class, 'overdue']);
-        Route::apiResource('work-orders', WorkOrderController::class)->except(['store']);
-        Route::post('/work-orders/{id}/assign', [WorkOrderController::class, 'assignServiceCenter']);
-        Route::put('/work-orders/{id}/status', [WorkOrderController::class, 'updateStatus']);
-        Route::get('/work-orders/{id}/feedback-link', [WorkOrderController::class, 'getFeedbackLink']);
-        Route::get('/work-orders/{id}/activity-timeline', [WorkOrderController::class, 'activityTimeline']);
+        // Route::apiResource('work-orders', WorkOrderController::class)->except(['store']);
 
         Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
-        Route::get('/service-centers/{id}/work-orders', [ServiceCenterController::class, 'workOrders']);
-        Route::get('/service-centers/{id}/stats', [ServiceCenterController::class, 'stats']);
 
         Route::apiResource('couriers', CourierController::class);
         Route::put('/couriers/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
@@ -113,7 +100,7 @@ Route::prefix('')->group(function () {
         Route::get('/client-dashboard', [DashboardController::class, 'clientDashboard']);
 
         Route::get('/exports/claims', [ExportController::class, 'downloadClaims']);
-        Route::get('/exports/warranties', [ExportController::class, 'downloadWarranties']);
+        Route::get('/exports/products', [ExportController::class, 'downloadProducts']);
         Route::get('/exports/work-orders', [ExportController::class, 'downloadWorkOrders']);
 
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);

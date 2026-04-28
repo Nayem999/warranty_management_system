@@ -98,17 +98,13 @@ class BrandController extends Controller
             return $this->notFound('Brand not found.');
         }
 
-        if ($brand->warranties()->count() > 0) {
-            return $this->error('Cannot delete brand with associated warranties.');
-        }
-
         $this->deleteFile($brand->logo);
         $brand->delete();
 
         return $this->deleted('Brand deleted successfully.');
     }
 
-    public function categories(Request $request, int $id): JsonResponse
+    public function products(Request $request, int $id): JsonResponse
     {
         $brand = Brand::find($id);
 
@@ -116,47 +112,12 @@ class BrandController extends Controller
             return $this->notFound('Brand not found.');
         }
 
-        $categories = $brand->categories()
-            ->with(['parent', 'children']);
-
-        if ($request->has('parent_id')) {
-            if ($request->parent_id === 'null') {
-                $categories->whereNull('parent_id');
-            } else {
-                $categories->where('parent_id', $request->parent_id);
-            }
-        }
-
-        if ($request->has('search')) {
-            $categories->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('short_name', 'like', "%{$request->search}%");
-            });
-        }
-
-        if ($request->has('status')) {
-            $categories->where('status', $request->status);
-        }
-
-        $categories = $categories->orderBy('name')->paginate($request->limit ?? 15);
-
-        return $this->success($categories);
-    }
-
-    public function warranties(Request $request, int $id): JsonResponse
-    {
-        $brand = Brand::find($id);
-
-        if (! $brand) {
-            return $this->notFound('Brand not found.');
-        }
-
-        $warranties = $brand->warranties()
+        $products = \App\Models\Product::where('brand_id', $id)
             ->with(['category', 'creator'])
             ->orderBy('id', 'desc')
             ->paginate($request->limit ?? 15);
 
-        return $this->success($warranties);
+        return $this->success($products);
     }
 
     public function stats(int $id): JsonResponse
@@ -167,21 +128,20 @@ class BrandController extends Controller
             return $this->notFound('Brand not found.');
         }
 
-        $totalWarranties = $brand->warranties()->count();
-        $activeWarranties = $brand->warranties()->active()->count();
-        $totalClaims = $brand->warranties()
-            ->withCount('claims')
-            ->get()
-            ->sum('claims_count');
-        $openWorkOrders = WorkOrder::whereHas('claim.warranty', function ($query) use ($id) {
+        $totalProducts = \App\Models\Product::where('brand_id', $id)->count();
+        $activeProducts = \App\Models\Product::where('brand_id', $id)->active()->count();
+        $totalClaims = \App\Models\Claim::whereHas('product', function ($query) use ($id) {
             $query->where('brand_id', $id);
-        })->where('status', '!=', 'Delivered')->count();
+        })->count();
+        // $openWorkOrders = \App\Models\WorkOrder::whereHas('claim.product', function ($query) use ($id) {
+        //     $query->where('brand_id', $id);
+        // })->where('status', '!=', 'Delivered')->count();
 
         return $this->success([
-            'total_warranties' => $totalWarranties,
-            'active_warranties' => $activeWarranties,
+            'total_products' => $totalProducts,
+            'active_products' => $activeProducts,
             'total_claims' => $totalClaims,
-            'open_work_orders' => $openWorkOrders,
+            // 'open_work_orders' => $openWorkOrders,
         ]);
     }
 

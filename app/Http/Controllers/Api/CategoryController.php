@@ -16,11 +16,7 @@ class CategoryController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = ProductCategory::query()->with(['parent', 'children', 'brand']);
-
-        if ($request->has('brand_id')) {
-            $query->where('brand_id', $request->brand_id);
-        }
+        $query = ProductCategory::query()->with(['parent', 'children']);
 
         if ($request->has('parent_id')) {
             if ($request->parent_id === 'null') {
@@ -57,7 +53,7 @@ class CategoryController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $category = ProductCategory::with(['parent', 'children', 'brand'])->find($id);
+        $category = ProductCategory::with(['parent', 'children'])->find($id);
 
         if (! $category) {
             return $this->notFound('Category not found.');
@@ -91,10 +87,6 @@ class CategoryController extends Controller
 
         if (! $category) {
             return $this->notFound('Category not found.');
-        }
-
-        if ($category->warranties()->count() > 0) {
-            return $this->error('Cannot delete category with associated warranties.');
         }
 
         if ($category->children()->count() > 0) {

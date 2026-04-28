@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "SNP Distribution",
+    "name": "SNP Distribution v2",
     "description": "SNP Distribution - Warranty Management System RESTful API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -78,28 +78,6 @@
           ]
         },
         {
-          "name": "Customer Registration",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/auth/register",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+8801234567890\",\n    \"password\": \"Password123\",\n    \"password_confirmation\": \"Password123\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
           "name": "Logout",
           "request": {
             "method": "POST",
@@ -111,102 +89,6 @@
             ],
             "url": "{{base_url}}/auth/logout"
           }
-        },
-        {
-          "name": "Send OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/auth/send-otp",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"login\": \"admin@snpdist.com\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"login\": \"admin@snpdist.com\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"message\": \"OTP sent successfully. Use this OTP to login.\",\n    \"data\": {\n        \"otp\": \"123456\",\n        \"user_id\": 1,\n        \"login\": \"admin@snpdist.com\"\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "Login with OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/auth/login-with-otp",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"otp\": \"123456\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"otp\": \"123456\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-03-29 04:30 PM\",\n        \"expires_in\": 259200,\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
-            }
-          ]
         },
         {
           "name": "Forgot Password",
@@ -443,44 +325,6 @@
           ]
         },
         {
-          "name": "My Claims",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": "{{base_url}}/my-claims"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{token}}"
-                  }
-                ]
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"claim_number\": \"CLM-2026-00001\",\n                \"status\": \"Open\"\n            }\n        ]\n    }\n}"
-            }
-          ]
-        },
-        {
           "name": "Client Dashboard",
           "request": {
             "method": "GET",
@@ -515,257 +359,6 @@
               "status": "OK",
               "code": 200,
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"total_claims\": 10,\n        \"status_wise\": [\n            {\"status\": \"Open\", \"count\": 5},\n            {\"status\": \"Converted\", \"count\": 3},\n            {\"status\": \"Closed\", \"count\": 2}\n        ],\n        \"recent_claims\": []\n    }\n}"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Public",
-      "item": [
-        {
-          "name": "Check Warranty by Serial",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/warranties/check/SMG-12345"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ]
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"product_serial\": \"SMG-12345\",\n        \"product_name\": \"Samsung Galaxy S21\",\n        \"brand\": {},\n        \"status\": \"active\",\n        \"start_date\": \"2024-01-01\",\n        \"end_date\": \"2025-01-01\",\n        \"is_active\": true\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "Create Claim (Public)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/claims/public",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"service_center_id\": \"1\",\n    \"customer_address\": \"123 Main Street\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n     \"service_center_id\": \"1\",\n   \"customer_address\": \"123 Main Street\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "OK",
-              "code": 201,
-              "body": "{\n    \"success\": true,\n    \"message\": \"Claim created successfully. Please check your email for login credentials.\",\n    \"data\": {}\n}"
-            }
-          ]
-        },
-        {
-          "name": "Track Claim by Number",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/claims/track/CLM-2026-00001"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ]
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"claim_number\": \"CLM-2026-00001\",\n        \"status\": \"Open\",\n        \"claim_date\": \"2026-04-01\",\n        \"problem_description\": \"Screen not responding\",\n        \"warranty\": {},\n        \"service_center\": {},\n        \"work_order\": {}\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "Submit Work Order Feedback",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/feedback/{token}",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"customer_feedback\": \"Great service!\",\n    \"customer_rating\": 5\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"customer_feedback\": \"Great service!\",\n    \"customer_rating\": 5\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"message\": \"Feedback submitted successfully.\",\n    \"data\": {}\n}"
-            }
-          ]
-        },
-        {
-          "name": "List Brands",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/brands/list"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ]
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"name\": \"Samsung\"\n            }\n        ]\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "List Service Centers",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/service-centers/list"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ]
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"title\": \"Service Center 1\"\n            }\n        ]\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "Get Service Centers by Brand",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/service-centers/by-brand?brand_id=1"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ]
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n    \"success\": true,\n    \"data\": []\n}"
             }
           ]
         }
@@ -1180,7 +773,7 @@
             "url": "{{base_url}}/brands",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Apple\",\n    \"short_name\": \"APL\",\n    \"description\": \"Apple Inc. products\",\n    \"status\": \"active\"\n}",
+              "raw": "{\n    \"name\": \"Apple\",\n    \"short_name\": \"APL\",\n    \"description\": \"Apple Inc. products\",\n    \"logo\": \"\",\n    \"status\": \"active\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1238,7 +831,7 @@
           }
         },
         {
-          "name": "Get Brand Categories",
+          "name": "Get Brand Products",
           "request": {
             "method": "GET",
             "header": [
@@ -1247,28 +840,7 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{base_url}}/brands/1/categories?parent_id=null&status=active",
-              "host": ["{{base_url}}"],
-              "path": ["brands", "1", "categories"],
-              "query": [
-                {"key": "parent_id", "value": "null", "description": "null for parent categories, or category ID for subcategories", "disabled": true},
-                {"key": "status", "value": "active", "disabled": true}
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Brand Warranties",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/brands/1/warranties"
+            "url": "{{base_url}}/brands/1/products"
           }
         },
         {
@@ -1309,6 +881,19 @@
             ],
             "url": "{{base_url}}/service-centers/by-brand?brand_id=1"
           }
+        },
+        {
+          "name": "Get Products by Brand",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/brands/1/products"
+          }
         }
       ]
     },
@@ -1326,11 +911,10 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/categories?brand_id=1&parent_id=null&status=active",
+              "raw": "{{base_url}}/categories?parent_id=null&status=active",
               "host": ["{{base_url}}"],
               "path": ["categories"],
               "query": [
-                {"key": "brand_id", "value": "1", "disabled": true},
                 {"key": "parent_id", "value": "null", "disabled": true},
                 {"key": "status", "value": "active", "disabled": true}
               ]
@@ -1350,7 +934,7 @@
             "url": "{{base_url}}/categories",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Electronics\",\n    \"short_name\": \"ELE\",\n    \"brand_id\": 1,\n    \"parent_id\": null,\n    \"status\": \"active\"\n}",
+              "raw": "{\n    \"name\": \"Electronics\",\n    \"short_name\": \"ELE\",\n    \"parent_id\": null,\n    \"status\": \"active\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1385,7 +969,7 @@
             "url": "{{base_url}}/categories/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Smartphones\",\n    \"brand_id\": 1\n}",
+              "raw": "{\n    \"name\": \"Smartphones\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1449,10 +1033,10 @@
       ]
     },
     {
-      "name": "Warranties",
+      "name": "Customers",
       "item": [
         {
-          "name": "List Warranties",
+          "name": "List Customers",
           "request": {
             "method": "GET",
             "header": [
@@ -1462,20 +1046,18 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/warranties?brand_id=1&category_id=1&sub_category_id=2",
+              "raw": "{{base_url}}/customers?search=&city=",
               "host": ["{{base_url}}"],
-              "path": ["warranties"],
+              "path": ["customers"],
               "query": [
-                {"key": "brand_id", "value": "1", "disabled": true},
-                {"key": "category_id", "value": "1", "disabled": true},
-                {"key": "sub_category_id", "value": "2", "disabled": true},
-                {"key": "status", "value": "active", "disabled": true}
+                {"key": "search", "value": "", "disabled": true},
+                {"key": "city", "value": "", "disabled": true}
               ]
             }
           }
         },
         {
-          "name": "Create Warranty",
+          "name": "Create Customer",
           "request": {
             "method": "POST",
             "header": [
@@ -1484,10 +1066,10 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties",
+            "url": "{{base_url}}/customers",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_serial\": \"SMG-12345\",\n    \"product_name\": \"Samsung Galaxy S21\",\n    \"product_info\": \"64GB, Black\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": null,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2025-01-01\",\n    \"is_void\": \"NO\"\n}",
+              "raw": "{\n    \"customer_name\": \"ABC Corporation\",\n    \"contact_person\": \"John Doe\",\n    \"email\": \"contact@abccorp.com\",\n    \"phone\": \"+8801234567890\",\n    \"landline\": \"02-12345678\",\n    \"address\": \"123 Business Street, Dhaka\",\n    \"city\": \"Dhaka\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1497,7 +1079,7 @@
           }
         },
         {
-          "name": "Get Warranty",
+          "name": "Get Customer",
           "request": {
             "method": "GET",
             "header": [
@@ -1506,11 +1088,11 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties/1"
+            "url": "{{base_url}}/customers/1"
           }
         },
         {
-          "name": "Update Warranty",
+          "name": "Update Customer",
           "request": {
             "method": "PUT",
             "header": [
@@ -1519,10 +1101,10 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties/1",
+            "url": "{{base_url}}/customers/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_name\": \"Samsung Galaxy S21 Ultra\"\n}",
+              "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"Jane Doe\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1532,7 +1114,7 @@
           }
         },
         {
-          "name": "Delete Warranty",
+          "name": "Delete Customer",
           "request": {
             "method": "DELETE",
             "header": [
@@ -1541,11 +1123,16 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties/1"
+            "url": "{{base_url}}/customers/1"
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
         {
-          "name": "Check Warranty by Serial",
+          "name": "List Products",
           "request": {
             "method": "GET",
             "header": [
@@ -1554,37 +1141,21 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties/check/SMG-12345"
+            "url": {
+              "raw": "{{base_url}}/products?brand_id=1&category_id=1&status=active&search=",
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true},
+                {"key": "category_id", "value": "1", "disabled": true},
+                {"key": "status", "value": "active", "disabled": true},
+                {"key": "search", "value": "", "disabled": true}
+              ]
+            }
           }
         },
         {
-          "name": "Get Warranty Claims",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/warranties/1/claims"
-          }
-        },
-{
-          "name": "Expiring Soon",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/warranties/expiring-soon?days=30"
-          }
-        },
-        {
-          "name": "Import Warranties",
+          "name": "Create Product",
           "request": {
             "method": "POST",
             "header": [
@@ -1593,7 +1164,97 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties/import",
+            "url": "{{base_url}}/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"model_no\": \"SMG-S24-ULTRA\",\n    \"serial_number\": \"SN123456789\",\n    \"item_description\": \"Samsung Galaxy S24 Ultra 256GB\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"is_countable\": true,\n    \"start_date\": \"2026-01-01\",\n    \"end_date\": \"2027-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Product",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/1"
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"item_description\": \"Samsung Galaxy S24 Ultra 512GB\",\n    \"end_date\": \"2027-06-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/1"
+          }
+        },
+        {
+          "name": "Check Serial",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/check/SN123456789?model_no=SMG-S24-ULTRA",
+              "host": ["{{base_url}}"],
+              "path": ["products", "check", "SN123456789"],
+              "query": [
+                {"key": "model_no", "value": "SMG-S24-ULTRA", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Import Products",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/products/import",
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -1616,7 +1277,7 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/warranties/import/sample"
+            "url": "{{base_url}}/products/import/sample"
           }
         }
       ]
@@ -1650,7 +1311,7 @@
             "url": "{{base_url}}/claims",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"warranty_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"customer_firstname\": \"John\",\n    \"customer_lastname\": \"Doe\",\n    \"customer_email\": \"john@example.com\",\n    \"customer_phone\": \"+8801234567890\",\n    \"customer_city\": \"Dhaka\",\n    \"customer_address\": \"123 Main Street\",\n    \"service_center_id\": \"1\",\n    \"claim_date\": \"2024-06-01\"\n}",
+              "raw": "{\n    \"product_id\": 1,\n    \"customer_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"service_center_id\": 1,\n    \"claim_date\": \"2024-06-01\",\n\n    \"status\": \"Not Assigned\",\n    \"engineer_id\": 2,\n\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"IN123456\",\n    \"courier_out_id\": 2,\n    \"courier_slip_outward\": \"OUT654321\",\n\n    \"received_date_time\": \"2024-06-01 10:30:00\",\n    \"delivered_date_time\": \"2024-06-05 15:45:00\",\n\n    \"counter\": 1,\n    \"wo_assigned_date\": \"2024-06-02\",\n    \"wo_closed_date\": \"2024-06-04\",\n    \"wo_delivery_date\": \"2024-06-05\",\n\n    \"tat\": 3,\n    \"doa\": false,\n\n    \"replace_serial\": \"RS-12345\",\n    \"replace_product_name\": \"Display Panel\",\n    \"replace_product_info\": \"OEM replacement display\",\n    \"replace_ref\": \"REF-98765\",\n\n    \"invoice_no\": \"INV-2024-001\",\n    \"invoice_date\": \"2024-05-20\",\n    \"purchase_price\": 15000,\n\n    \"ref\": \"Internal Note\",\n    \"web_wty_date\": \"2025-05-20\",\n\n    \"additional_comment\": \"Handle with care\",\n    \"work_done_comment\": \"Display replaced successfully\",\n    \"status_comment\": \"Work completed\",\n\n    \"service_type\": \"In Warranty\",\n    \"job_type\": \"Carry In\",\n\n    \"assigned_by\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1685,7 +1346,7 @@
             "url": "{{base_url}}/claims/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"problem_description\": \"Screen not responding - updated\"\n}",
+               "raw": "{\n    \"product_id\": 1,\n    \"customer_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"service_center_id\": 1,\n    \"claim_date\": \"2024-06-01\",\n\n    \"status\": \"Not Assigned\",\n    \"engineer_id\": 2,\n\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"IN123456\",\n    \"courier_out_id\": 2,\n    \"courier_slip_outward\": \"OUT654321\",\n\n    \"received_date_time\": \"2024-06-01 10:30:00\",\n    \"delivered_date_time\": \"2024-06-05 15:45:00\",\n\n    \"counter\": 1,\n    \"wo_assigned_date\": \"2024-06-02\",\n    \"wo_closed_date\": \"2024-06-04\",\n    \"wo_delivery_date\": \"2024-06-05\",\n\n    \"tat\": 3,\n    \"doa\": false,\n\n    \"replace_serial\": \"RS-12345\",\n    \"replace_product_name\": \"Display Panel\",\n    \"replace_product_info\": \"OEM replacement display\",\n    \"replace_ref\": \"REF-98765\",\n\n    \"invoice_no\": \"INV-2024-001\",\n    \"invoice_date\": \"2024-05-20\",\n    \"purchase_price\": 15000,\n\n    \"ref\": \"Internal Note\",\n    \"web_wty_date\": \"2025-05-20\",\n\n    \"additional_comment\": \"Handle with care\",\n    \"work_done_comment\": \"Display replaced successfully\",\n    \"status_comment\": \"Work completed\",\n\n    \"service_type\": \"In Warranty\",\n    \"job_type\": \"Carry In\",\n\n    \"assigned_by\": 1,\n\n    \"parts\": [\n        {\n            \"part_id\": 1,\n            \"claim_id\": \"CASE-001\",\n            \"claim_date_time\": \"2024-06-01 10:00:00\",\n            \"case_id\": \"CASE-001\",\n            \"case_date_time\": \"2024-06-01 11:00:00\",\n            \"order_id\": \"ORD-001\",\n            \"order_date_time\": \"2024-06-01 12:00:00\",\n            \"received_date_time\": \"2024-06-02 09:30:00\",\n            \"install_date_time\": \"2024-06-02 11:00:00\",\n            \"good_part_serial\": \"GPS-12345\",\n            \"faulty_part_serial\": \"FPS-54321\",\n            \"return_date_time\": \"2024-06-03 15:00:00\",\n            \"part_returned\": \"No\",\n            \"part_status\": \"DOA Part\",\n            \"part_return_comment\": \"Returned to vendor\"\n        },\n        {\n            \"part_id\": 2,\n            \"claim_id\": \"CASE-002\",\n            \"claim_date_time\": \"2024-06-01 10:15:00\",\n            \"case_id\": \"CASE-002\",\n            \"case_date_time\": \"2024-06-01 11:30:00\",\n            \"order_id\": \"ORD-002\",\n            \"order_date_time\": \"2024-06-01 13:00:00\",\n            \"received_date_time\": \"2024-06-02 10:00:00\",\n            \"install_date_time\": \"2024-06-02 12:30:00\",\n            \"good_part_serial\": \"GPS-67890\",\n            \"faulty_part_serial\": \"FPS-09876\",\n            \"return_date_time\": null,\n            \"part_returned\": \"Yes\",\n            \"part_status\": \"DOA Part\",\n            \"part_return_comment\": null\n        }\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1708,28 +1369,6 @@
           }
         },
         {
-          "name": "Convert to Work Order",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/claims/1/convert-to-work-order",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"feedback_preference\": true,\n    \"additional_comment\": \"Urgent repair needed\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
           "name": "Close Claim",
           "request": {
             "method": "PUT",
@@ -1740,224 +1379,6 @@
               }
             ],
             "url": "{{base_url}}/claims/1/close"
-          }
-        },
-        {
-          "name": "Get Claim Work Order",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/claims/1/work-order"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Work Orders",
-      "item": [
-        {
-          "name": "List Work Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/work-orders?status=Pending&service_center_id=1&brand_id=1&claim_id=1&warranty_id=1&service_type=In%20Warranty&job_type=Carry%20In&invoice_no=INV001&ref=REF001",
-              "host": ["{{base_url}}"],
-              "path": ["work-orders"],
-              "query": [
-                {"key": "status", "value": "Pending", "disabled": true},
-                {"key": "service_center_id", "value": "1", "disabled": true},
-                {"key": "courier_in_id", "value": "1", "disabled": true},
-                {"key": "courier_out_id", "value": "1", "disabled": true},
-                {"key": "engineer_id", "value": "1", "disabled": true},
-                {"key": "brand_id", "value": "1", "disabled": true},
-                {"key": "claim_id", "value": "1", "disabled": true},
-                {"key": "claim_status", "value": "Open", "disabled": true},
-                {"key": "warranty_id", "value": "1", "disabled": true},
-                {"key": "service_type", "value": "In Warranty", "disabled": true},
-                {"key": "job_type", "value": "Carry In", "disabled": true},
-                {"key": "doa", "value": "true", "disabled": true},
-                {"key": "invoice_no", "value": "INV001", "disabled": true},
-                {"key": "ref", "value": "REF001", "disabled": true},
-                {"key": "wo_assigned_date_from", "value": "2026-01-01", "disabled": true},
-                {"key": "wo_assigned_date_to", "value": "2026-12-31", "disabled": true},
-                {"key": "wo_closed_date_from", "value": "2026-01-01", "disabled": true},
-                {"key": "wo_closed_date_to", "value": "2026-12-31", "disabled": true},
-                {"key": "wo_delivery_date_from", "value": "2026-01-01", "disabled": true},
-                {"key": "wo_delivery_date_to", "value": "2026-12-31", "disabled": true},
-                {"key": "invoice_date_from", "value": "2026-01-01", "disabled": true},
-                {"key": "invoice_date_to", "value": "2026-12-31", "disabled": true},
-                {"key": "customer_phone", "value": "+880", "disabled": true},
-                {"key": "customer_name", "value": "John", "disabled": true},
-                {"key": "product_serial", "value": "SMG", "disabled": true},
-                {"key": "product_name", "value": "Samsung", "disabled": true},
-                {"key": "date_from", "value": "2026-01-01", "disabled": true},
-                {"key": "date_to", "value": "2026-12-31", "disabled": true},
-                {"key": "search", "value": "WO", "disabled": true},
-                {"key": "limit", "value": "15", "disabled": true}
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Work Order",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1"
-          }
-        },
-        {
-          "name": "Update Work Order",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 1,\n    \"engineer_id\": 1,\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"SLIP-IN-12345\",\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"SLIP-OUT-67890\",\n    \"received_date_time\": \"2026-04-05 10:00:00\",\n    \"delivered_date_time\": \"2026-04-06 14:00:00\",\n    \"feedback_preference\": true,\n    \"work_done_comment\": \"Screen replaced successfully\",\n    \"service_type\": \"warranty void\",\n    \"job_type\": \"Carry In\",\n     \"parts\": [\n        {\"part_id\": 1, \"case_id\": \"\", \"case_date_time\": \"\", \"order_id\": \"\", \"order_date_time\": \"\", \"received_date_time\": \"\", \"install_date_time\": \"\", \"good_part_serial\": \"\", \"faulty_part_serial\": \"\", \"return_date_time\": \"\", \"part_returned\": \"\", \"part_status\": \"\", \"part_return_comment\": \"\"},\n        {\"part_id\": 1, \"case_id\": \"\", \"case_date_time\": \"\", \"order_id\": \"\", \"order_date_time\": \"\", \"received_date_time\": \"\", \"install_date_time\": \"\", \"good_part_serial\": \"\", \"faulty_part_serial\": \"\", \"return_date_time\": \"\", \"part_returned\": \"\", \"part_status\": \"\", \"part_return_comment\": \"\"}\n    ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Delete Work Order",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1"
-          }
-        },
-        {
-          "name": "Assign Service Center",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1/assign",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"service_center_id\": 2\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Update Status",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1/status",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"status\": \"Completed\",\n    \"replace_serial\": \"SMG-NEW-12345\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Get Feedback Link",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/1/feedback-link"
-          }
-        },
-        {
-          "name": "Activity Timeline",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/work-orders/1/activity-timeline?limit=15",
-              "host": ["{{base_url}}"],
-              "path": ["work-orders", "1", "activity-timeline"],
-              "query": [
-                {"key": "limit", "value": "15", "disabled": true, "description": "Items per page"}
-              ]
-            }
-          }
-        },
-        {
-          "name": "Pending Work Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/pending"
-          }
-        },
-        {
-          "name": "Overdue Work Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/work-orders/overdue"
           }
         }
       ]
@@ -1991,7 +1412,7 @@
             "url": "{{base_url}}/service-centers",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Mirpur Service Center\",\n    \"brand_ids\": [1, 2, 3],\n    \"address\": \"Mirpur, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"mirpur@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}",
+              "raw": "{\n    \"title\": \"Karachi Service Center\",\n    \"brand_ids\": [1, 2, 3],\n    \"address\": \"Karachi, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"karachi@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2026,7 +1447,7 @@
             "url": "{{base_url}}/service-centers/1",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Mirpur Service Center - Updated\",\n    \"brand_ids\": [1, 2, 3],\n}",
+              "raw": "{\n    \"title\": \"Karachi Service Center - Updated\",\n    \"brand_ids\": [1]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2059,32 +1480,6 @@
               }
             ],
             "url": "{{base_url}}/service-centers/1/toggle-status"
-          }
-        },
-        {
-          "name": "Get Service Center Work Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/service-centers/1/work-orders"
-          }
-        },
-        {
-          "name": "Get Service Center Stats",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/service-centers/1/stats"
           }
         }
       ]
@@ -2570,7 +1965,7 @@
               "path": ["exports", "claims"],
               "query": [
                 {"key": "status", "value": "Open", "disabled": true, "description": "Filter by status"},
-                {"key": "warranty_id", "value": "1", "disabled": true, "description": "Filter by warranty ID"},
+                {"key": "product_id", "value": "1", "disabled": true, "description": "Filter by product ID"},
                 {"key": "service_center_id", "value": "1", "disabled": true, "description": "Filter by service center"},
                 {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
                 {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
@@ -2596,11 +1991,35 @@
               "query": [
                 {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
                 {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category"},
-                {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/inactive)"},
-                {"key": "is_active", "value": "true", "disabled": true, "description": "Filter by is_active"},
+                {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/expired)"},
                 {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
                 {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"},
-                {"key": "search", "value": "", "disabled": true, "description": "Search by serial or name"}
+                {"key": "search", "value": "", "disabled": true, "description": "Search by model or serial"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download Products Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?brand_id=1&status=active&date_from=2024-01-01&date_to=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["exports", "products"],
+              "query": [
+                {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
+                {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category"},
+                {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/expired)"},
+                {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
+                {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"},
+                {"key": "search", "value": "", "disabled": true, "description": "Search by model or serial"}
               ]
             }
           }
