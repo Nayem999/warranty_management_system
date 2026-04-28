@@ -8,35 +8,28 @@ use App\Models\WorkOrder;
 class NotificationService
 {
     protected EmailService $emailService;
-
-    protected SmsService $smsService;
-
     protected WhatsAppService $whatsAppService;
-
     protected array $channels = [];
 
     public function __construct(
         EmailService $emailService,
-        SmsService $smsService,
         WhatsAppService $whatsAppService
     ) {
         $this->emailService = $emailService;
-        $this->smsService = $smsService;
         $this->whatsAppService = $whatsAppService;
 
         $this->channels = array_filter([
             'email' => config('services.notifications.channels.email', false),
-            'sms' => config('services.notifications.channels.sms', false),
             'whatsapp' => config('services.notifications.channels.whatsapp', false),
         ]);
     }
 
     public function sendClaimCreatedNotification(Claim $claim): void
     {
-        $warranty = $claim->warranty;
-        $customerName = trim(($claim->customer_firstname ?? '') . ' ' . ($claim->customer_lastname ?? ''));
-        $productName = $warranty ? ($warranty->product_name ?? 'N/A') : 'N/A';
-        $productSerial = $warranty ? ($warranty->product_serial ?? 'N/A') : 'N/A';
+        $product = $claim->product;
+        $customerName = trim(($claim->customer->customer_name ?? ''));
+        $productName = $product->model_no ;
+        $productSerial = $product->serial_number;
         $claimDate = $claim->claim_date ? $claim->claim_date->format('Y-m-d') : 'N/A';
 
         $data = [
@@ -52,15 +45,11 @@ class NotificationService
         ];
 
         if ($this->channels['email'] ?? false) {
-            $this->sendClaimCreatedEmail($claim->customer_email, $data);
+            $this->sendClaimCreatedEmail($claim->customer->email, $data);
         }
 
-        if ($this->channels['sms'] ?? false) {
-            $this->sendClaimCreatedSms($claim->customer_phone, $data);
-        }
-
-        if ($this->channels['whatsapp'] ?? false) {
-            $this->sendClaimCreatedWhatsApp($claim->customer_phone, $data);
+        if ($this->channels['whatsapp'] ?? false && $claim->customer->phone) {
+            $this->sendClaimCreatedWhatsApp($claim->customer->phone, $data);
         }
     }
 
@@ -90,10 +79,6 @@ class NotificationService
 
         if ($this->channels['email'] ?? false) {
             $this->sendWorkOrderCreatedEmail($claim?->customer_email, $data);
-        }
-
-        if ($this->channels['sms'] ?? false) {
-            $this->sendWorkOrderCreatedSms($claim?->customer_phone, $data);
         }
 
         if ($this->channels['whatsapp'] ?? false) {
@@ -139,10 +124,6 @@ class NotificationService
             $this->sendWorkOrderStatusEmail($claim?->customer_email, $data);
         }
 
-        if ($this->channels['sms'] ?? false) {
-            $this->sendWorkOrderStatusSms($claim?->customer_phone, $data);
-        }
-
         if ($this->channels['whatsapp'] ?? false) {
             $this->sendWorkOrderStatusWhatsApp($claim?->customer_phone, $data);
         }
@@ -159,19 +140,6 @@ class NotificationService
             'Claim Created Successfully - ' . $data['claimNumber'],
             view('emails.claim.created', $data)->render()
         );
-    }
-
-    protected function sendClaimCreatedSms(string $phone, array $data): bool
-    {
-        if (empty($phone)) {
-            return false;
-        }
-
-        $message = "Dear {$data['customerName']}, your claim {$data['claimNumber']} has been created successfully. "
-            . "Product: {$data['productName']}. Issue: {$data['problemDescription']}. "
-            . 'We will keep you updated on the progress. Thank you!';
-
-        return $this->smsService->send($phone, 'Claim Created', $message);
     }
 
     protected function sendClaimCreatedWhatsApp(string $phone, array $data): bool
@@ -205,19 +173,6 @@ class NotificationService
         );
     }
 
-    protected function sendWorkOrderCreatedSms(string $phone, array $data): bool
-    {
-        if (empty($phone)) {
-            return false;
-        }
-
-        $message = "Dear {$data['customerName']}, your work order {$data['workOrderNumber']} has been created. "
-            . "Status: {$data['status']}. "
-            . 'Our service team will contact you soon. Thank you!';
-
-        return $this->smsService->send($phone, 'Work Order Created', $message);
-    }
-
     protected function sendWorkOrderCreatedWhatsApp(string $phone, array $data): bool
     {
         if (empty($phone)) {
@@ -247,19 +202,6 @@ class NotificationService
             'Work Order Status Update - ' . $data['workOrderNumber'],
             view('emails.work-order.status-updated', $data)->render()
         );
-    }
-
-    protected function sendWorkOrderStatusSms(string $phone, array $data): bool
-    {
-        if (empty($phone)) {
-            return false;
-        }
-
-        $message = "Dear {$data['customerName']}, your work order {$data['workOrderNumber']} status changed from "
-            . "{$data['previousStatus']} to {$data['currentStatus']}. "
-            . "{$data['statusMessage']} Thank you!";
-
-        return $this->smsService->send($phone, 'WO Status Update', $message);
     }
 
     protected function sendWorkOrderStatusWhatsApp(string $phone, array $data): bool

@@ -28,6 +28,7 @@ class WorkOrderPart extends BaseModel
     ];
 
     protected $casts = [
+        'claim_id' => 'string',
         'claim_date_time' => 'datetime',
         'case_date_time' => 'datetime',
         'order_date_time' => 'datetime',

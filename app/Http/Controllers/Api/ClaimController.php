@@ -131,7 +131,7 @@ class ClaimController extends Controller
         $data['counter'] = $counter;
         $data['created_by'] = $request->user()->id;
         $data['claim_date'] = $data['claim_date'] ?? Carbon::today();
-        $data['status'] = $data['Not Assigned'] ?? "";
+        $data['status'] = $data['status'] ?? 'Not Assigned';
 
         $claim = Claim::create($data);
 
