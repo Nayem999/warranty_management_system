@@ -1380,6 +1380,19 @@
             ],
             "url": "{{base_url}}/claims/1/close"
           }
+        },
+        {
+          "name": "Delete Claim Attachment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/claims/1/attachment"
+          }
         }
       ]
     },

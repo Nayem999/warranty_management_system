@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\ServiceCenterController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\WorkOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('')->group(function () {
@@ -74,13 +73,10 @@ Route::prefix('')->group(function () {
         Route::get('/products/import/sample', [ProductController::class, 'importSample']);
 
         Route::apiResource('claims', ClaimController::class);
-        Route::post('/claims/public', [ClaimController::class, 'publicStore']);
         Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
         Route::put('/claims/{id}/close', [ClaimController::class, 'close']);
         Route::delete('/claims/{id}/attachment', [ClaimController::class, 'deleteAttachment']);
         Route::get('/claims/{id}/activity-timeline', [ClaimController::class, 'activityTimeline']);
-
-        // Route::apiResource('work-orders', WorkOrderController::class)->except(['store']);
 
         Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
