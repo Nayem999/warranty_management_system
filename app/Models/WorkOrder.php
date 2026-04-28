@@ -11,19 +11,25 @@ class WorkOrder extends BaseModel
 {
     protected $table = 'wms_work_orders';
 
-    protected $fillable = [
+protected $fillable = [
         'wo_number',
         'claim_id',
-        'service_center_id',
-        'attachments',
-        'feedback_preference',
         'product_id',
-        'replaced_warranty_id',
+        'service_center_id',
         'replace_serial',
         'replace_product_name',
         'replace_product_info',
         'replace_ref',
         'created_by',
+    ];
+
+    protected $casts = [
+        'feedback_preference' => 'boolean',
+        'attachments' => 'array',
+    ];
+
+    protected $appends = [
+        'attachments_urls',
     ];
 
     protected $casts = [

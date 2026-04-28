@@ -45,6 +45,8 @@ class Claim extends BaseModel
         'service_type',
         'job_type',
         'assigned_by',
+        'attachments',
+        'is_feedback_taken',
     ];
 
     protected $casts = [
@@ -59,6 +61,8 @@ class Claim extends BaseModel
         'purchase_price' => 'decimal:2',
         'doa' => 'boolean',
         'status' => 'string',
+        'attachments' => 'array',
+        'is_feedback_taken' => 'boolean',
     ];
 
     public function product(): BelongsTo

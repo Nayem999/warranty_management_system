@@ -269,6 +269,8 @@ class ClaimController extends Controller
                 $workOrder = WorkOrder::create([
                     'wo_number' => WorkOrder::generateWoNumber(),
                     'claim_id' => $claim->id,
+                    'product_id' => $claim->product_id,
+                    'service_center_id' => $claim->service_center_id,
                     'status' => 'Closed',
                     'created_by' => $request->user()->id,
                 ]);
@@ -411,6 +413,37 @@ class ClaimController extends Controller
         ]);
 
         return $this->success($claim, 'Feedback submitted successfully.');
+    }
+
+    public function deleteAttachment(Request $request, int $id): JsonResponse
+    {
+        $claim = Claim::find($id);
+
+        if (! $claim) {
+            return $this->notFound('Claim not found.');
+        }
+
+        $fileName = $request->input('file_name');
+
+        if (! $fileName) {
+            return $this->error('File name is required.');
+        }
+
+        $attachments = $claim->attachments ?? [];
+
+        if (! in_array($fileName, $attachments)) {
+            return $this->error('File not found in attachments.');
+        }
+
+        $claim->attachments = array_values(array_filter($attachments, fn($file) => $file !== $fileName));
+        $claim->save();
+
+        $filePath = storage_path('app/public/claims/' . $fileName);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        return $this->success($claim, 'Attachment deleted successfully.');
     }
 
     public function activityTimeline(int $id): JsonResponse

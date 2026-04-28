@@ -7,6 +7,7 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\ActivityLog;
 use App\Models\Brand;
+use App\Models\Claim;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Traits\ApiResponse;
@@ -94,7 +95,7 @@ class ProductController extends Controller
     {
         $user = request()->user();
         $product = Product::with(['brand', 'category', 'subCategory', 'creator', 'claims'])
-            ->when(! $user->is_admin, fn ($q) => $q->whereIn('brand_id', $this->getAccessibleBrandIds($user)))
+            ->when(! $user->is_admin, fn($q) => $q->whereIn('brand_id', $this->getAccessibleBrandIds($user)))
             ->find($id);
 
         if (! $product) {
@@ -159,18 +160,24 @@ class ProductController extends Controller
         $modelNo = $request->model_no ?? null;
 
         $product = Product::with(['brand', 'category', 'subCategory'])
-            ->when($modelNo, fn ($q) => $q->where('model_no', $modelNo))
+            ->withCount('claims')
+            ->when($modelNo, fn($q) => $q->where('model_no', $modelNo))
             ->where('serial_number', $serial)
             ->first();
 
         if (! $product) {
             return $this->error('Product not found for this serial number.', 404);
         }
+        $claimList = [];
+        if ($product->is_countable) {
+            $claimList = Claim::where("product_id", $product->id)->orderBy('id', 'asc')->get();
+        }
 
         return $this->success([
             'product' => $product,
             'product_status' => $product->product_status,
-            'claim_count' => $product->claims()->count(),
+            'claim_count' => $product->claims_count,
+            'claim_list' => $claimList,
         ]);
     }
 
@@ -300,7 +307,7 @@ class ProductController extends Controller
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'product_import_sample.xlsx';
-        $path = storage_path('app/'.$filename);
+        $path = storage_path('app/' . $filename);
         $writer->save($path);
 
         return response()->download($path, $filename, [
