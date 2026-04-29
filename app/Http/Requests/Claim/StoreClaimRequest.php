@@ -72,6 +72,8 @@ class StoreClaimRequest extends FormRequest
             'service_type' => "nullable|in:{$serviceTypes}",
             'job_type' => "nullable|in:{$jobTypes}",
             'assigned_by' => 'nullable|exists:users,id',
+            'job_remarks' => 'nullable|string',
+            'accessories' => 'nullable|string|max:500',
         ];
     }
 }

@@ -47,6 +47,8 @@ class Claim extends BaseModel
         'assigned_by',
         'attachments',
         'is_feedback_taken',
+        'job_remarks',
+        'accessories',
     ];
 
     protected $casts = [

@@ -251,6 +251,8 @@ class ClaimController extends Controller
             'replace_product_info' => 'nullable|string',
             'replace_ref' => 'nullable|string',
             'parts' => 'nullable|array',
+            'job_remarks' => 'nullable|string',
+            'accessories' => 'nullable|string|max:500',
         ]);
 
         $oldData = $claim->toArray();
