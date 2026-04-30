@@ -38,6 +38,8 @@ class ClaimController extends Controller
         $user = $request->user();
         $query = Claim::query()->with([
             'product.brand',
+            'product.category',
+            'product.subCategory',
             'customer',
             'serviceCenter',
             'engineer',
@@ -69,6 +71,20 @@ class ClaimController extends Controller
                 });
             });
         }
+        if ($request->has('category_id')) {
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('product', function ($q) use ($request) {
+                    $q->where('category_id', $request->category_id);
+                });
+            });
+        }
+        if ($request->has('sub_category_id')) {
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('product', function ($q) use ($request) {
+                    $q->where('sub_category_id', $request->sub_category_id);
+                });
+            });
+        }
 
         if ($request->has('service_center_id')) {
             $query->where('service_center_id', $request->service_center_id);
@@ -92,8 +108,180 @@ class ClaimController extends Controller
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('claim_number', 'like', "%{$request->search}%");
+                $q->where('claim_number', 'like', "%{$request->search}%")
+                    ->orWhere('problem_description', 'like', "%{$request->search}%");
             });
+        }
+
+        if ($request->has('service_type')) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        if ($request->has('job_type')) {
+            $query->where('job_type', $request->job_type);
+        }
+
+        if ($request->has('doa')) {
+            $query->where('doa', $request->doa);
+        }
+
+        if ($request->has('invoice_no')) {
+            $query->where('invoice_no', 'like', "%{$request->invoice_no}%");
+        }
+
+        if ($request->has('ref')) {
+            $query->where('ref', 'like', "%{$request->ref}%");
+        }
+
+        if ($request->has('wo_assigned_date')) {
+            $query->whereDate('wo_assigned_date', Carbon::parse($request->wo_assigned_date));
+        }
+
+        if ($request->has('wo_closed_date')) {
+            $query->whereDate('wo_closed_date', Carbon::parse($request->wo_closed_date));
+        }
+
+        if ($request->has('wo_delivery_date')) {
+            $query->whereDate('wo_delivery_date', Carbon::parse($request->wo_delivery_date));
+        }
+
+        if ($request->has('invoice_date')) {
+            $query->whereDate('invoice_date', Carbon::parse($request->invoice_date));
+        }
+
+
+        if ($request->has('part_id')) {
+            $query->whereHas('parts.part', function ($q) use ($request) {
+                $q->where('part_id', 'like', "%{$request->part_id}%");
+            });
+        }
+        if ($request->has('part_id')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('part_id', $request->part_id);
+            });
+        }
+        if ($request->has('part_description')) {
+            $query->whereHas('parts.part', function ($q) use ($request) {
+                $q->where('part_description', 'like', "%{$request->part_description}%");
+            });
+        }
+
+        if ($request->has('case_id')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('case_id', 'like', "%{$request->case_id}%");
+            });
+        }
+        if ($request->has('case_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('case_date', Carbon::parse($request->case_date));
+            });
+        }
+        if ($request->has('order_id')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('order_id', 'like', "%{$request->order_id}%");
+            });
+        }
+        if ($request->has('order_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('order_date', Carbon::parse($request->order_date));
+            });
+        }
+        if ($request->has('received_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('received_date', Carbon::parse($request->received_date));
+            });
+        }
+        if ($request->has('install_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('install_date', Carbon::parse($request->install_date));
+            });
+        }
+        if ($request->has('return_date')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->whereDate('return_date', Carbon::parse($request->return_date));
+            });
+        }
+        if ($request->has('part_status')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('part_status', 'like', "%{$request->part_status}%");
+            });
+        }
+        if ($request->has('part_return_comment')) {
+            $query->whereHas('parts', function ($q) use ($request) {
+                $q->where('part_return_comment', 'like', "%{$request->part_return_comment}%");
+            });
+        }
+
+        if ($request->has('work_done_comment')) {
+            $query->where('work_done_comment', 'like', "%{$request->work_done_comment}%");
+        }
+
+        if ($request->has('customer_phone')) {
+            $query->whereHas('customer', function ($q) use ($request) {
+                $q->where('phone', 'like', "%{$request->customer_phone}%");
+            });
+        }
+        if ($request->has('replace_serial')) {
+            $query->whereHas('workOrder', function ($q) use ($request) {
+                $q->where('replace_serial', 'like', "%{$request->replace_serial}%");
+            });
+        }
+        if ($request->has('replace_product_name')) {
+            $query->whereHas('workOrder', function ($q) use ($request) {
+                $q->where('replace_product_name', 'like', "%{$request->replace_product_name}%");
+            });
+        }
+        if ($request->has('replace_product_info')) {
+            $query->whereHas('workOrder', function ($q) use ($request) {
+                $q->where('replace_product_info', 'like', "%{$request->replace_product_info}%");
+            });
+        }
+
+        if ($request->has('customer_name')) {
+            $query->whereHas('customer', function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('customer_name', 'like', "%{$request->customer_name}%")
+                        ->orWhere('contact_person', 'like', "%{$request->customer_name}%");
+                });
+            });
+        }
+        if ($request->has('customer_email')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('customer_email', 'like', "%{$request->customer_email}%");
+                });
+            });
+        }
+        if ($request->has('customer_phone')) {
+            $query->whereHas('claim', function ($q) use ($request) {
+                $q->where(function ($q2) use ($request) {
+                    $q2->where('customer_phone', 'like', "%{$request->customer_phone}%");
+                });
+            });
+        }
+
+        if ($request->has('product_serial')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('product_serial', 'like', "%{$request->product_serial}%");
+            });
+        }
+
+        if ($request->has('model_no')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('model_no', 'like', "%{$request->model_no}%");
+            });
+        }
+        if ($request->has('item_description')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('item_description', 'like', "%{$request->item_description}%");
+            });
+        }
+
+        if ($request->has('wo_number')) {
+            $query->where('wo_number', 'like', "%{$request->wo_number}%");
+        }
+        if ($request->has('wo_date')) {
+            $query->whereDate('wo_assigned_date', Carbon::parse($request->wo_date));
         }
 
         $claims = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
@@ -178,7 +366,7 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);
