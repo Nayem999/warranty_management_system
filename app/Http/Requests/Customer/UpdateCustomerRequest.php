@@ -7,17 +7,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateCustomerRequest extends FormRequest
 {
-    protected $customerId;
-
-    public function prepareForValidation(): void
-    {
-        $this->customerId = $this->route('Customer');
-
-        if (! $this->customerId && is_numeric($this->route('id'))) {
-            $this->customerId = $this->route('id');
-        }
-    }
-
     public function authorize(): bool
     {
         return true;
@@ -25,6 +14,8 @@ class UpdateCustomerRequest extends FormRequest
 
     public function rules(): array
     {
+        $customerId = $this->route('customer');
+
         return [
             'customer_name' => 'sometimes|required|string|max:255',
             'contact_person' => 'nullable|string|max:255',
@@ -33,7 +24,7 @@ class UpdateCustomerRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('wms_customers', 'email')->ignore($this->customerId),
+                Rule::unique('wms_customers', 'email')->ignore($customerId),
             ],
             'phone' => 'nullable|string|max:20',
             'landline' => 'nullable|string|max:20',

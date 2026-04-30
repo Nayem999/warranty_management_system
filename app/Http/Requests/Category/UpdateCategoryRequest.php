@@ -7,17 +7,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateCategoryRequest extends FormRequest
 {
-    protected $categoryId;
-
-    public function prepareForValidation(): void
-    {
-        $this->categoryId = $this->route('ProductCategory');
-
-        if (! $this->categoryId && is_numeric($this->route('id'))) {
-            $this->categoryId = $this->route('id');
-        }
-    }
-
     public function authorize(): bool
     {
         return true;
@@ -25,18 +14,21 @@ class UpdateCategoryRequest extends FormRequest
 
     public function rules(): array
     {
+        // $categoryId = $this->route('id');
+        $categoryId = $this->route('category');
+
         return [
             'name' => [
-                'sometimes',
+                'required',
                 'string',
                 'max:255',
-                Rule::unique('wms_product_categories', 'name')->ignore($this->categoryId),
+                Rule::unique('wms_product_categories', 'name')->ignore($categoryId),
             ],
             'short_name' => [
                 'nullable',
                 'string',
                 'max:50',
-                Rule::unique('wms_product_categories', 'short_name')->ignore($this->categoryId),
+                Rule::unique('wms_product_categories', 'short_name')->ignore($categoryId),
             ],
             'parent_id' => 'nullable|exists:wms_product_categories,id',
             'status' => 'sometimes|in:active,inactive',
