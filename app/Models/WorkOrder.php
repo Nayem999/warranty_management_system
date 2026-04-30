@@ -11,7 +11,7 @@ class WorkOrder extends BaseModel
 {
     protected $table = 'wms_work_orders';
 
-protected $fillable = [
+    protected $fillable = [
         'wo_number',
         'claim_id',
         'product_id',
@@ -23,51 +23,6 @@ protected $fillable = [
         'created_by',
     ];
 
-    protected $casts = [
-        'feedback_preference' => 'boolean',
-        'attachments' => 'array',
-    ];
-
-    protected $appends = [
-        'attachments_urls',
-    ];
-
-    protected $casts = [
-        'feedback_preference' => 'boolean',
-        'attachments' => 'array',
-    ];
-
-    public function getAttachmentsUrlsAttribute(): ?array
-    {
-        $attachments = $this->attachments;
-
-        if (empty($attachments)) {
-            return null;
-        }
-
-        if (is_string($attachments)) {
-            $decoded = json_decode($attachments, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $attachments = $decoded;
-            } else {
-                $attachments = [$attachments];
-            }
-        }
-
-        if (! is_array($attachments)) {
-            return null;
-        }
-
-        $urls = [];
-        foreach ($attachments as $attachment) {
-            if (filter_var($attachment, FILTER_VALIDATE_URL)) {
-                $urls[] = $attachment;
-            }
-        }
-
-        return $urls;
-    }
-
     public function claim(): BelongsTo
     {
         return $this->belongsTo(Claim::class);
@@ -75,12 +30,7 @@ protected $fillable = [
 
     public function warranty(): BelongsTo
     {
-        return $this->claim()->warranty();
-    }
-
-    public function replacedWarranty(): BelongsTo
-    {
-        return $this->belongsTo(Warranty::class, 'replaced_warranty_id');
+        return $this->claim()->product();
     }
 
     public function product(): BelongsTo
@@ -142,7 +92,7 @@ protected $fillable = [
 
             $seq = $lastWo ? (intval(substr($lastWo->wo_number, -5)) + 1) : 1;
 
-            return 'WO-'.$year.'-'.str_pad($seq, 5, '0', STR_PAD_LEFT);
+            return 'WO-' . $year . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
         });
     }
 
