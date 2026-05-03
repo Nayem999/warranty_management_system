@@ -26,6 +26,8 @@ Route::prefix('')->group(function () {
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::post('/customer/login', [CustomerAuthController::class, 'login']);
+    Route::post('/customer/forgot-password', [CustomerAuthController::class, 'forgotPassword']);
+    Route::post('/customer/reset-password', [CustomerAuthController::class, 'resetPassword']);
 
     Route::get('/brands/list', [BrandController::class, 'brands_list']);
     Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
@@ -72,6 +74,9 @@ Route::prefix('')->group(function () {
 
         Route::prefix('customer')->group(function () {
             Route::post('/logout', [CustomerAuthController::class, 'logout']);
+            Route::post('/change-password', [CustomerAuthController::class, 'changePassword']);
+            Route::get('/profile', [CustomerAuthController::class, 'profile']);
+            Route::put('/profile', [CustomerAuthController::class, 'updateProfile']);
             Route::get('/claims', [CustomerAuthController::class, 'claims']);
             Route::get('/dashboard', [CustomerAuthController::class, 'dashboard']);
         });

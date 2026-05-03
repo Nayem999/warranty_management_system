@@ -416,7 +416,253 @@
               },
               "status": "OK",
               "code": 200,
-              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"customer\": {},\n        \"token\": \"1|abc123...\"\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"customer\": {},\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-05-03 10:00:00\",\n        \"expires_in\": 259200\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/customer/forgot-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"contact@abccorp.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"contact@abccorp.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Password reset OTP has been sent to your email.\",\n    \"data\": {\n        \"email\": \"contact@abccorp.com\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/customer/reset-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"contact@abccorp.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"contact@abccorp.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Password reset successfully.\",\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_token}}"
+              }
+            ],
+            "url": "{{base_url}}/customer/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"current_password\": \"OldPassword@123\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"current_password\": \"OldPassword@123\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Password changed successfully.\",\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_token}}"
+              }
+            ],
+            "url": "{{base_url}}/customer/profile"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customer_token}}"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"customer_name\": \"ABC Corporation\",\n        \"email\": \"contact@abccorp.com\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_token}}"
+              }
+            ],
+            "url": "{{base_url}}/customer/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city\": \"Chittagong\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city\": \"Chittagong\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {}\n}"
             }
           ]
         },
