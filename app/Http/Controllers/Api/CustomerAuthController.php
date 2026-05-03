@@ -32,10 +32,13 @@ class CustomerAuthController extends Controller
         }
 
         $token = $customer->createToken('customer-token')->plainTextToken;
+        $expiresAt = now()->addMinutes(config('sanctum.expiration', 4320));
 
         return $this->success([
             'customer' => $customer,
             'token' => $token,
+            'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
+            'expires_in' => config('sanctum.expiration', 4320) * 60,
         ], 'Login successful.');
     }
 
