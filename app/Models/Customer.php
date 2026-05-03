@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 
-class Customer extends BaseModel
+class Customer extends Authenticatable
 {
+    use HasApiTokens;
     protected $table = 'wms_customers';
 
     protected $fillable = [
@@ -16,6 +20,11 @@ class Customer extends BaseModel
         'landline',
         'address',
         'city',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
     ];
 
     protected $casts = [
@@ -31,5 +40,15 @@ class Customer extends BaseModel
     public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);
+    }
+
+    public function setPasswordAttribute(string $value): void
+    {
+        $this->attributes['password'] = $value ? bcrypt($value) : null;
+    }
+
+    public function checkPassword(string $password): bool
+    {
+        return $this->password && Hash::check($password, $this->password);
     }
 }

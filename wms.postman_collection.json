@@ -14,6 +14,11 @@
       "key": "token",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "customer_token",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -359,6 +364,182 @@
               "status": "OK",
               "code": 200,
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"total_claims\": 10,\n        \"status_wise\": [\n            {\"status\": \"Open\", \"count\": 5},\n            {\"status\": \"Converted\", \"count\": 3},\n            {\"status\": \"Closed\", \"count\": 2}\n        ],\n        \"recent_claims\": []\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customer Auth",
+      "item": [
+        {
+          "name": "Customer Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/customer/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"contact@abccorp.com\",\n    \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"contact@abccorp.com\",\n    \"password\": \"Password@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"customer\": {},\n        \"token\": \"1|abc123...\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_token}}"
+              }
+            ],
+            "url": "{{base_url}}/customer/logout"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customer_token}}"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"message\": \"Logout successful.\",\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Claims List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customer/claims?status=Open&date_from=2024-01-01&date_to=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "claims"],
+              "query": [
+                {"key": "status", "value": "Open", "disabled": true},
+                {"key": "date_from", "value": "2024-01-01", "disabled": true},
+                {"key": "date_to", "value": "2024-12-31", "disabled": true}
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customer_token}}"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"claim_number\": \"CLM-2024-00001\",\n                \"status\": \"Open\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Customer Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customer_token}}"
+              }
+            ],
+            "url": "{{base_url}}/customer/dashboard"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{customer_token}}"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"total_claims\": 10,\n        \"open_claims\": 5,\n        \"in_progress_claims\": 3,\n        \"closed_claims\": 2,\n        \"recent_claims\": []\n    }\n}"
             }
           ]
         }

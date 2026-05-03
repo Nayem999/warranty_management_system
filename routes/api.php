@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\CustomerAuthController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExportController;
@@ -23,6 +24,8 @@ Route::prefix('')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+
+    Route::post('/customer/login', [CustomerAuthController::class, 'login']);
 
     Route::get('/brands/list', [BrandController::class, 'brands_list']);
     Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
@@ -66,6 +69,12 @@ Route::prefix('')->group(function () {
         Route::put('/categories/{id}/toggle-status', [CategoryController::class, 'toggleStatus']);
 
         Route::apiResource('customers', CustomerController::class);
+
+        Route::prefix('customer')->group(function () {
+            Route::post('/logout', [CustomerAuthController::class, 'logout']);
+            Route::get('/claims', [CustomerAuthController::class, 'claims']);
+            Route::get('/dashboard', [CustomerAuthController::class, 'dashboard']);
+        });
 
         Route::apiResource('products', ProductController::class);
         Route::get('/products/check/{serial}', [ProductController::class, 'checkSerial']);

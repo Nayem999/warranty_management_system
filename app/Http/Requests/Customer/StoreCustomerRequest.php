@@ -21,6 +21,7 @@ class StoreCustomerRequest extends FormRequest
             'landline' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
+            'password' => 'required|string|min:6',
         ];
     }
 }

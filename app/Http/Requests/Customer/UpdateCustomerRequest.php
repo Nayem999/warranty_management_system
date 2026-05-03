@@ -30,6 +30,7 @@ class UpdateCustomerRequest extends FormRequest
             'landline' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
+            'password' => 'nullable|string|min:6',
         ];
     }
 }
