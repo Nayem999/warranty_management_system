@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\ClaimCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Claim\StoreClaimRequest;
+use App\Http\Requests\WorkOrder\SubmitFeedbackRequest;
 use App\Models\ActivityLog;
 use App\Models\Claim;
 use App\Models\Product;
@@ -15,8 +16,6 @@ use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\WorkOrder\SubmitFeedbackRequest;
-use Illuminate\Support\Facades\DB;
 
 class ClaimController extends Controller
 {
@@ -52,7 +51,7 @@ class ClaimController extends Controller
 
         if ($user->isBrandRestricted()) {
             $query->where(function ($q) use ($user) {
-                $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+                $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
             });
         }
 
@@ -148,7 +147,6 @@ class ClaimController extends Controller
         if ($request->has('invoice_date')) {
             $query->whereDate('invoice_date', Carbon::parse($request->invoice_date));
         }
-
 
         if ($request->has('part_id')) {
             $query->whereHas('workOrder.parts', function ($q) use ($request) {
@@ -307,7 +305,7 @@ class ClaimController extends Controller
                 ->first();
 
             if ($existingClaim) {
-                return $this->error('A claim with status Open or Converted already exists for this product. Claim Number: ' . $existingClaim->claim_number);
+                return $this->error('A claim with status Open or Converted already exists for this product. Claim Number: '.$existingClaim->claim_number);
             }
         }
 
@@ -364,14 +362,14 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);
         } else {
             if ($user->isBrandRestricted()) {
                 $claimQuery->where(function ($q) use ($user) {
-                    $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+                    $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
                 });
             }
             if ($user->isServiceCenterRestricted()) {
@@ -384,6 +382,38 @@ class ClaimController extends Controller
         if (! $claim) {
             return $this->notFound('Claim not found.');
         }
+
+        $activityTimeline = ActivityLog::with('user:id,first_name,last_name')
+            ->where('log_type', 'Claim')
+            ->where('log_type_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($log) {
+                if ($log->user) {
+                    $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                }
+
+                if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
+                    $oldData = $log->changes['old'];
+                    $newData = $log->changes['new'];
+                    $filteredChanges = [];
+
+                    foreach ($newData as $key => $value) {
+                        if (! array_key_exists($key, $oldData) || $oldData[$key] !== $value) {
+                            $filteredChanges[$key] = [
+                                'old' => array_key_exists($key, $oldData) ? $oldData[$key] : null,
+                                'new' => $value,
+                            ];
+                        }
+                    }
+
+                    $log->changes = $filteredChanges;
+                }
+
+                return $log;
+            });
+
+        $claim->activity_timeline = $activityTimeline;
 
         return $this->success($claim);
     }
@@ -538,7 +568,7 @@ class ClaimController extends Controller
         $status = request()->status ?? 'Closed(Repaired)';
 
         if (! in_array($status, $this->statuses)) {
-            return $this->error('Invalid status. Allowed: ' . $statuses);
+            return $this->error('Invalid status. Allowed: '.$statuses);
         }
 
         $claim->update([
@@ -557,8 +587,6 @@ class ClaimController extends Controller
 
         return $this->success($claim, 'Claim closed successfully.');
     }
-
-
 
     public function getFeedbackLink(int $id): JsonResponse
     {
@@ -623,10 +651,10 @@ class ClaimController extends Controller
             return $this->error('File not found in attachments.');
         }
 
-        $claim->attachments = array_values(array_filter($attachments, fn($file) => $file !== $fileName));
+        $claim->attachments = array_values(array_filter($attachments, fn ($file) => $file !== $fileName));
         $claim->save();
 
-        $filePath = storage_path('app/public/claims/' . $fileName);
+        $filePath = storage_path('app/public/claims/'.$fileName);
         if (file_exists($filePath)) {
             unlink($filePath);
         }
@@ -636,21 +664,21 @@ class ClaimController extends Controller
 
     public function activityTimeline(int $id): JsonResponse
     {
-        $workOrder = WorkOrder::find($id);
+        $claim = Claim::find($id);
 
-        if (! $workOrder) {
-            return $this->notFound('Work order not found.');
+        if (! $claim) {
+            return $this->notFound('Claim not found.');
         }
 
         $activityLogs = ActivityLog::with('user:id,first_name,last_name,email')
-            ->where('log_type', 'WorkOrder')
+            ->where('log_type', 'Claim')
             ->where('log_type_id', $id)
             ->orderBy('created_at', 'desc')
             ->paginate(request('limit', 15));
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
