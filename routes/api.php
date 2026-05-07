@@ -34,7 +34,6 @@ Route::prefix('')->group(function () {
     Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
     Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
     Route::post('/claims/feedback/{token}', [ClaimController::class, 'submitFeedback']);
-    Route::get('/claims/{id}/feedback-link', [ClaimController::class, 'getFeedbackLink']);
     Route::get('/settings/{key}', [SettingController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -86,11 +85,11 @@ Route::prefix('')->group(function () {
         Route::post('/products/import', [ProductController::class, 'import']);
         Route::get('/products/import/sample', [ProductController::class, 'importSample']);
 
-        Route::apiResource('claims', ClaimController::class);
-        Route::get('/claims/track/{claimNumber}', [ClaimController::class, 'track']);
+        Route::get('/claims/{id}/feedback-link', [ClaimController::class, 'getFeedbackLink']);
         Route::put('/claims/{id}/close', [ClaimController::class, 'close']);
         Route::delete('/claims/{id}/attachment', [ClaimController::class, 'deleteAttachment']);
         Route::get('/claims/{id}/activity-timeline', [ClaimController::class, 'activityTimeline']);
+        Route::apiResource('claims', ClaimController::class);
 
         Route::apiResource('service-centers', ServiceCenterController::class);
         Route::put('/service-centers/{id}/toggle-status', [ServiceCenterController::class, 'toggleStatus']);
@@ -100,7 +99,7 @@ Route::prefix('')->group(function () {
 
         Route::apiResource('parts', PartController::class);
         Route::put('/parts/{id}/toggle-status', [PartController::class, 'toggleStatus']);
-        Route::get('/work-order-history', [PartController::class, 'workOrderUsageHistory']);
+        Route::get('/parts/{part}/usage-history', [PartController::class, 'usageHistory']);
 
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/settings', [SettingController::class, 'upsert']);

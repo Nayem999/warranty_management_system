@@ -351,8 +351,8 @@ class ClaimController extends Controller
             'status' => $claim->status,
             'claim_date' => $claim->claim_date,
             'problem_description' => $claim->problem_description,
-            'product' => $claim->whenLoaded('product'),
-            'customer' => $claim->whenLoaded('customer'),
+            'product' => $claim->product,
+            'customer' => $claim->customer,
             'service_center' => $claim->serviceCenter,
             'work_order' => $claim->workOrder,
         ]);

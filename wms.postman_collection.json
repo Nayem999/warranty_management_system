@@ -368,9 +368,142 @@
           ]
         }
       ]
-    },
-    {
-      "name": "Customer Auth",
+     },
+     {
+       "name": "Public",
+       "item": [
+         {
+           "name": "List Brands (Public)",
+           "request": {
+             "method": "GET",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": "{{base_url}}/brands/list",
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         },
+         {
+           "name": "List Service Centers (Public)",
+           "request": {
+             "method": "GET",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": "{{base_url}}/service-centers/list",
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         },
+         {
+           "name": "Get Service Centers by Brand (Public)",
+           "request": {
+             "method": "GET",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": {
+               "raw": "{{base_url}}/service-centers/by-brand?brand_id=1",
+               "host": ["{{base_url}}"],
+               "path": ["service-centers", "by-brand"],
+               "query": [
+                 {"key": "brand_id", "value": "1"}
+               ]
+             },
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         },
+         {
+           "name": "Track Claim (Public)",
+           "request": {
+             "method": "GET",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": "{{base_url}}/claims/track/CLM-2024-00001",
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         },
+         {
+           "name": "Submit Feedback (Public)",
+           "request": {
+             "method": "POST",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": "{{base_url}}/claims/feedback/abc123token",
+             "body": {
+               "mode": "raw",
+               "raw": "{\n    \"rating\": 5,\n    \"feedback\": \"Great service!\"\n}",
+               "options": {
+                 "raw": {
+                   "language": "json"
+                 }
+               }
+             },
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         },
+         {
+           "name": "Get Feedback Link (Public)",
+           "request": {
+             "method": "GET",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": "{{base_url}}/claims/1/feedback-link",
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         },
+         {
+           "name": "Get Setting (Public)",
+           "request": {
+             "method": "GET",
+             "header": [
+               {
+                 "key": "Accept",
+                 "value": "application/json"
+               }
+             ],
+             "url": "{{base_url}}/settings/company_name",
+             "auth": {
+               "type": "noauth"
+             }
+           }
+         }
+       ]
+     },
+     {
+       "name": "Customer Auth",
       "item": [
         {
           "name": "Customer Login",
@@ -2142,7 +2275,7 @@
           }
         },
         {
-          "name": "Work Order Usage History",
+          "name": "Part Usage History",
           "request": {
             "method": "GET",
             "header": [
@@ -2152,13 +2285,10 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/work-order-history?brand_id=1&category_id=1&part_id=1&limit=15",
+              "raw": "{{base_url}}/parts/1/usage-history?limit=15",
               "host": ["{{base_url}}"],
-              "path": ["work-order-history"],
+              "path": ["parts", "1", "usage-history"],
               "query": [
-                {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand ID"},
-                {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category ID"},
-                {"key": "part_id", "value": "1", "disabled": true, "description": "Filter by part ID"},
                 {"key": "limit", "value": "15", "disabled": true, "description": "Items per page"}
               ]
             }

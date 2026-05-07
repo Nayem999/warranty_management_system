@@ -121,28 +121,23 @@ class PartController extends Controller
         return $this->success($part, 'Part status updated successfully.');
     }
 
-    public function workOrderUsageHistory(Request $request): JsonResponse
+    public function usageHistory(Request $request, int $id): JsonResponse
     {
-        $query = WorkOrderPart::with([
-            'workOrder.claim:id,claim_number,customer_firstname,customer_lastname',
-            'workOrder.serviceCenter:id,title',
-            'part.brand',
-            'part.category',
-            'part.subCategory',
-            'workOrder.assignedBy:id,first_name,last_name,email',
-        ])
-            ->when($request->filled('created_at'), function ($q) use ($request) {
-                $q->where('brand_id', $request->brand_id);
-            })
-            ->when($request->filled('category_id'), function ($q) use ($request) {
-                $q->where('category_id', $request->category_id);
-            })
-            ->when($request->filled('part_id'), function ($q) use ($request) {
-                $q->where('part_id', $request->part_id);
-            })
-            ->orderBy('install_date_time', 'desc');
+        $part = Part::find($id);
 
-        $history = $query->paginate($request->limit ?? 15);
+        if (!$part) {
+            return $this->notFound('Part not found.');
+        }
+
+        $history = WorkOrderPart::with([
+            'workOrder.claim.customer',
+            'workOrder.claim.product.category',
+            'workOrder.claim.product.subCategory',
+            'workOrder.serviceCenter:id,title',
+        ])
+            ->where('part_id', $id)
+            ->orderBy('install_date_time', 'desc')
+            ->paginate($request->limit ?? 15);
 
         return $this->success($history);
     }
