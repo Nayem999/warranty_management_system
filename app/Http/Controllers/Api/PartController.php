@@ -131,7 +131,12 @@ class PartController extends Controller
 
         $history = WorkOrderPart::with([
             'workOrder.claim.customer',
+            'workOrder.claim.engineer',
+            'workOrder.claim.creator',
+            'workOrder.claim.courierIn',
+            'workOrder.claim.courierOut',
             'workOrder.claim.product.category',
+            'workOrder.claim.product.brand',
             'workOrder.claim.product.subCategory',
             'workOrder.serviceCenter:id,title',
         ])
