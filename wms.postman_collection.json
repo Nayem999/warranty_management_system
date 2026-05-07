@@ -1855,7 +1855,43 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims"
+            "url": {
+              "raw": "{{base_url}}/claims?status=Open&brand_id=1&service_center_id=1&date_from=2024-01-01&date_to=2024-12-31&search=&service_type=In Warranty&job_type=Carry In&customer_name=&customer_phone=&engineer_id=&doa=&invoice_no=&ref=&part_id=&part_description=&customer_email=",
+              "host": ["{{base_url}}"],
+              "path": ["claims"],
+              "query": [
+                {"key": "status", "value": "Open", "description": "Open, Converted, Closed, Not Assigned, In Progress"},
+                {"key": "brand_id", "value": "1", "description": "Filter by brand"},
+                {"key": "category_id", "value": "", "description": "Filter by product category"},
+                {"key": "sub_category_id", "value": "", "description": "Filter by product sub category"},
+                {"key": "service_center_id", "value": "1", "description": "Filter by service center"},
+                {"key": "date_from", "value": "2024-01-01", "description": "Claim date from"},
+                {"key": "date_to", "value": "2024-12-31", "description": "Claim date to"},
+                {"key": "search", "value": "", "description": "Search claim number or problem"},
+                {"key": "service_type", "value": "In Warranty", "description": "In Warranty, Out of Warranty"},
+                {"key": "job_type", "value": "Carry In", "description": "Carry In, On Site, Replace"},
+                {"key": "customer_name", "value": "", "description": "Search by customer name"},
+                {"key": "customer_email", "value": "", "description": "Search by customer email"},
+                {"key": "customer_phone", "value": "", "description": "Search by customer phone"},
+                {"key": "engineer_id", "value": "", "description": "Filter by assigned engineer"},
+                {"key": "doa", "value": "", "description": "Dead on arrival (0 or 1)"},
+                {"key": "invoice_no", "value": "", "description": "Search by invoice number"},
+                {"key": "ref", "value": "", "description": "Search by reference"},
+                {"key": "part_id", "value": "", "description": "Filter by part ID"},
+                {"key": "part_description", "value": "", "description": "Filter by part description"},
+                {"key": "part_status", "value": "", "description": "Part status"},
+                {"key": "customer_id", "value": "", "description": "Filter by customer ID"},
+                {"key": "wo_assigned_date", "value": "", "description": "WO assigned date"},
+                {"key": "wo_closed_date", "value": "", "description": "WO closed date"},
+                {"key": "wo_delivery_date", "value": "", "description": "WO delivery date"},
+                {"key": "invoice_date", "value": "", "description": "Invoice date"},
+                {"key": "replace_serial", "value": "", "description": "Search by replace serial"},
+                {"key": "replace_product_name", "value": "", "description": "Search by replace product"},
+                {"key": "work_done_comment", "value": "", "description": "Search by work done comment"},
+                {"key": "case_id", "value": "", "description": "Filter by case ID"},
+                {"key": "order_id", "value": "", "description": "Filter by order ID"}
+              ]
+            }
           }
         },
         {
@@ -2517,7 +2553,7 @@
       ]
     },
     {
-      "name": "Excel Download",
+      "name": "Export Download",
       "item": [
         {
           "name": "Download Claims Excel",
@@ -2534,6 +2570,7 @@
               "host": ["{{base_url}}"],
               "path": ["exports", "claims"],
               "query": [
+                {"key": "format", "value": "excel", "description": "Download format: excel or pdf"},
                 {"key": "status", "value": "Open", "disabled": true, "description": "Filter by status"},
                 {"key": "product_id", "value": "1", "disabled": true, "description": "Filter by product ID"},
                 {"key": "service_center_id", "value": "1", "disabled": true, "description": "Filter by service center"},
@@ -2545,7 +2582,7 @@
           }
         },
         {
-          "name": "Download Warranties Excel",
+          "name": "Download Claims PDF",
           "request": {
             "method": "GET",
             "header": [
@@ -2555,16 +2592,17 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/exports/warranties?brand_id=1&status=active&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/exports/claims?format=pdf&status=Open&brand_id=1&date_from=2024-01-01&date_to=2024-12-31",
               "host": ["{{base_url}}"],
-              "path": ["exports", "warranties"],
+              "path": ["exports", "claims"],
               "query": [
+                {"key": "format", "value": "pdf", "description": "Download format: excel or pdf"},
+                {"key": "status", "value": "Open", "disabled": true, "description": "Filter by status"},
+                {"key": "product_id", "value": "1", "disabled": true, "description": "Filter by product ID"},
+                {"key": "service_center_id", "value": "1", "disabled": true, "description": "Filter by service center"},
                 {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
-                {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category"},
-                {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/expired)"},
                 {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
-                {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"},
-                {"key": "search", "value": "", "disabled": true, "description": "Search by model or serial"}
+                {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"}
               ]
             }
           }
@@ -2584,6 +2622,7 @@
               "host": ["{{base_url}}"],
               "path": ["exports", "products"],
               "query": [
+                {"key": "format", "value": "excel", "description": "Download format: excel or pdf"},
                 {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
                 {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category"},
                 {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/expired)"},
@@ -2595,7 +2634,7 @@
           }
         },
         {
-          "name": "Download Work Orders Excel",
+          "name": "Download Products PDF",
           "request": {
             "method": "GET",
             "header": [
@@ -2605,17 +2644,17 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/exports/work-orders?status=Progress&service_center_id=1&brand_id=1&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/exports/products?format=pdf&brand_id=1&status=active&date_from=2024-01-01&date_to=2024-12-31",
               "host": ["{{base_url}}"],
-              "path": ["exports", "work-orders"],
+              "path": ["exports", "products"],
               "query": [
-                {"key": "status", "value": "Progress", "disabled": true, "description": "Filter by status"},
-                {"key": "service_center_id", "value": "1", "disabled": true, "description": "Filter by service center"},
-                {"key": "engineer_id", "value": "1", "disabled": true, "description": "Filter by engineer"},
+                {"key": "format", "value": "pdf", "description": "Download format: excel or pdf"},
                 {"key": "brand_id", "value": "1", "disabled": true, "description": "Filter by brand"},
+                {"key": "category_id", "value": "1", "disabled": true, "description": "Filter by category"},
+                {"key": "status", "value": "active", "disabled": true, "description": "Filter by status (active/expired)"},
                 {"key": "date_from", "value": "2024-01-01", "disabled": true, "description": "From date"},
                 {"key": "date_to", "value": "2024-12-31", "disabled": true, "description": "To date"},
-                {"key": "search", "value": "", "disabled": true, "description": "Search by WO or claim number"}
+                {"key": "search", "value": "", "disabled": true, "description": "Search by model or serial"}
               ]
             }
           }

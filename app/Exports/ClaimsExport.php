@@ -17,7 +17,7 @@ class ClaimsExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $query = Claim::with(['warranty.brand', 'serviceCenter', 'creator']);
+        $query = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
 
         if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
@@ -52,13 +52,13 @@ class ClaimsExport implements FromCollection, WithHeadings
                 'Claim Number' => $claim->claim_number,
                 'Status' => $claim->status,
                 'Claim Date' => $claim->claim_date,
-                'Customer Name' => $claim->customer_firstname.' '.$claim->customer_lastname,
-                'Customer Email' => $claim->customer_email,
-                'Customer Phone' => $claim->customer_phone,
-                'Customer City' => $claim->customer_city,
-                'Product Serial' => $claim->warranty?->product_serial,
-                'Product Name' => $claim->warranty?->product_name,
-                'Brand' => $claim->warranty?->brand?->name,
+                'Customer Name' => $claim->customer->customer_name,
+                'Customer Email' => $claim->customer->email,
+                'Customer Phone' => $claim->customer->phone,
+                'Customer City' => $claim->customer->city,
+                'Product Serial' => $claim->product?->product_serial,
+                'Product Name' => $claim->product?->product_name,
+                'Brand' => $claim->product?->brand?->name,
                 'Service Center' => $claim->serviceCenter?->title,
                 'Problem Description' => $claim->problem_description,
                 'Created By' => $claim->creator?->first_name.' '.$claim->creator?->last_name,

@@ -111,7 +111,7 @@ Route::prefix('')->group(function () {
 
         Route::get('/exports/claims', [ExportController::class, 'downloadClaims']);
         Route::get('/exports/products', [ExportController::class, 'downloadProducts']);
-        Route::get('/exports/work-orders', [ExportController::class, 'downloadWorkOrders']);
+        // Route::get('/exports/work-orders', [ExportController::class, 'downloadWorkOrders']);
 
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 
