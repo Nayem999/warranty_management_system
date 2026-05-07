@@ -14,8 +14,8 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'model_no' => 'required|string|unique:wms_products,model_no|max:255',
-            'serial_number' => 'nullable|string|max:255',
+            'model_no' => 'required|string|max:255',
+            'serial_number' => 'required|string|unique:wms_products,serial_number|max:255',
             'item_description' => 'nullable|string',
             'brand_id' => 'nullable|exists:wms_brands,id',
             'category_id' => 'nullable|exists:wms_product_categories,id',
