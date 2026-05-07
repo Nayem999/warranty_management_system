@@ -11,7 +11,7 @@ class UpdateProductRequest extends FormRequest
 
     public function prepareForValidation(): void
     {
-        $this->productId = $this->route('Product');
+        $this->productId = $this->route('product');
 
         if (! $this->productId && is_numeric($this->route('id'))) {
             $this->productId = $this->route('id');
@@ -28,7 +28,6 @@ class UpdateProductRequest extends FormRequest
         return [
             'model_no' => 'required|string|max:255',
             'serial_number' => [
-                'sometimes',
                 'required',
                 'string',
                 'max:255',
