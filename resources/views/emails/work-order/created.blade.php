@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Work Order Created</title>
+    <title>Work Order -- Created</title>
 </head>
 
 <body style="margin:0; padding:0; background:#f3f4f6; font-family: Arial, sans-serif;">
