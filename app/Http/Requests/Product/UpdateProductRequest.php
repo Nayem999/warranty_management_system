@@ -26,12 +26,11 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'model_no' => 'required|string|max:255',
-            'serial_number' => [
+            'model_no' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('wms_products', 'serial_number')->ignore($this->productId),
+                Rule::unique('wms_products', 'model_no')->ignore($this->productId),
             ],
             'item_description' => 'nullable|string',
             'brand_id' => 'nullable|exists:wms_brands,id',

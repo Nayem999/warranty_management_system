@@ -39,6 +39,7 @@ class StoreClaimRequest extends FormRequest
 
         return [
             'product_id' => 'required|exists:wms_products,id',
+            'serial_number' => 'nullable|string|max:255',
             'customer_id' => 'required|exists:wms_customers,id',
             'problem_description' => 'required|string',
             'service_center_id' => 'required|exists:wms_service_centers,id',

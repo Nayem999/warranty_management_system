@@ -63,7 +63,6 @@ class ProductController extends Controller
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('model_no', 'like', "%{$request->search}%")
-                    ->orWhere('serial_number', 'like', "%{$request->search}%")
                     ->orWhere('item_description', 'like', "%{$request->search}%");
             });
         }
@@ -155,28 +154,19 @@ class ProductController extends Controller
         return $this->deleted('Product deleted successfully.');
     }
 
-    public function checkSerial(Request $request, string $serial): JsonResponse
+    public function checkSerial(string $serial): JsonResponse
     {
-        $modelNo = $request->model_no ?? null;
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory'])
+            ->where('serial_number', $serial);
 
-        $product = Product::with(['brand', 'category', 'subCategory'])
-            ->withCount('claims')
-            ->when($modelNo, fn($q) => $q->where('model_no', $modelNo))
-            ->where('serial_number', $serial)
-            ->first();
+        $claimList = $claimQuery->orderBy('id', 'asc')->get();
 
-        if (! $product) {
-            return $this->error('Product not found for this serial number.', 404);
-        }
-        $claimList = [];
-        if ($product->is_countable) {
-            $claimList = Claim::where("product_id", $product->id)->orderBy('id', 'asc')->get();
-        }
+        $hasNonOpenClaim = $claimList->contains(function ($claim) {
+            return $claim->status !== 'Open';
+        });
 
         return $this->success([
-            'product' => $product,
-            'product_status' => $product->product_status,
-            'claim_count' => $product->claims_count,
+            'claim_status' => $hasNonOpenClaim,
             'claim_list' => $claimList,
         ]);
     }
@@ -214,7 +204,6 @@ class ProductController extends Controller
                 }
 
                 $modelNo = $data['model_no'] ?? $data['model_number'] ?? null;
-                $serialNumber = $data['serial_number'] ?? $data['serial_no'] ?? null;
                 $itemDescription = $data['item_description'] ?? $data['description'] ?? null;
                 $brandShortName = $data['brand short name'] ?? $data['brand_short_name'] ?? null;
                 $categoryShortName = $data['category short name'] ?? $data['category_short_name'] ?? null;
@@ -243,7 +232,6 @@ class ProductController extends Controller
 
                 $productData = [
                     'model_no' => $modelNo,
-                    'serial_number' => $serialNumber,
                     'item_description' => $itemDescription,
                     'brand_id' => $brandId,
                     'category_id' => $categoryId,
@@ -275,7 +263,6 @@ class ProductController extends Controller
 
         $headers = [
             'Model No',
-            'Serial Number',
             'Item Description',
             'Brand Short Name',
             'Category Short Name',
@@ -289,7 +276,6 @@ class ProductController extends Controller
         $sampleData = [
             [
                 'SMG-S24-ULTRA',
-                'SN123456789',
                 'Samsung Galaxy S24 Ultra',
                 'Samsung',
                 'Mobile',
@@ -301,7 +287,7 @@ class ProductController extends Controller
         ];
         $sheet->fromArray($sampleData, null, 'A2');
 
-        foreach (range('A', 'I') as $col) {
+        foreach (range('A', 'H') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

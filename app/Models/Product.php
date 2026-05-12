@@ -13,7 +13,6 @@ class Product extends BaseModel
 
     protected $fillable = [
         'model_no',
-        'serial_number',
         'item_description',
         'brand_id',
         'category_id',

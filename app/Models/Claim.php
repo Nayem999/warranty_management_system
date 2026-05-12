@@ -9,9 +9,10 @@ class Claim extends BaseModel
 {
     protected $table = 'wms_claims';
 
-    protected $fillable = [
+protected $fillable = [
         'claim_number',
         'product_id',
+        'serial_number',
         'customer_id',
         'problem_description',
         'service_center_id',

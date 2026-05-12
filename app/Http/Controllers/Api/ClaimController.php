@@ -51,7 +51,7 @@ class ClaimController extends Controller
 
         if ($user->isBrandRestricted()) {
             $query->where(function ($q) use ($user) {
-                $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+                $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
             });
         }
 
@@ -290,6 +290,7 @@ class ClaimController extends Controller
         $data = $request->validated();
 
         $product = isset($data['product_id']) ? Product::find($data['product_id']) : null;
+        $serialNumber = $data['serial_number'] ?? null;
 
         if (! $product) {
             return $this->error('Product not found.');
@@ -298,21 +299,27 @@ class ClaimController extends Controller
         if (! $product->isActive()) {
             return $this->error('Product is not active or has expired.');
         }
+        if ($product->is_countable && !$serialNumber) {
+            return $this->error('Serial Number Required For Claim Countable Product');
+        }
+        $existingClaim = 0;
+        if ($product->is_countable && $serialNumber) {
+            $existingClaim = Claim::where('serial_number', $serialNumber)
+                ->count();
 
-        if ($product->is_countable) {
-            $existingClaim = Claim::where('product_id', $data['product_id'])
+            $prev_Claim = Claim::where('serial_number', $serialNumber)
                 ->where('status', '!=', 'Delivered')
                 ->first();
 
-            if ($existingClaim) {
-                return $this->error('A claim with status Open or Converted already exists for this product. Claim Number: '.$existingClaim->claim_number);
+            if ($prev_Claim) {
+                return $this->error("A claim with status " . $prev_Claim->status . " already exists for this product. Claim Number: " . $prev_Claim->claim_number);
             }
+
+            $existingClaim = $existingClaim + 1;
         }
 
-        $counter = Claim::where('product_id', $data['product_id'])->count() + 1;
-
         $data['claim_number'] = Claim::generateClaimNumber();
-        $data['counter'] = $counter;
+        $data['counter'] = $existingClaim;
         $data['created_by'] = $request->user()->id;
         $data['claim_date'] = $data['claim_date'] ?? Carbon::today();
         $data['status'] = $data['status'] ?? 'Not Assigned';
@@ -369,7 +376,7 @@ class ClaimController extends Controller
         } else {
             if ($user->isBrandRestricted()) {
                 $claimQuery->where(function ($q) use ($user) {
-                    $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+                    $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
                 });
             }
             if ($user->isServiceCenterRestricted()) {
@@ -390,7 +397,7 @@ class ClaimController extends Controller
             ->get()
             ->map(function ($log) {
                 if ($log->user) {
-                    $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                    $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
                 }
 
                 if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
@@ -568,7 +575,7 @@ class ClaimController extends Controller
         $status = request()->status ?? 'Closed(Repaired)';
 
         if (! in_array($status, $this->statuses)) {
-            return $this->error('Invalid status. Allowed: '.$statuses);
+            return $this->error('Invalid status. Allowed: ' . $statuses);
         }
 
         $claim->update([
@@ -651,10 +658,10 @@ class ClaimController extends Controller
             return $this->error('File not found in attachments.');
         }
 
-        $claim->attachments = array_values(array_filter($attachments, fn ($file) => $file !== $fileName));
+        $claim->attachments = array_values(array_filter($attachments, fn($file) => $file !== $fileName));
         $claim->save();
 
-        $filePath = storage_path('app/public/claims/'.$fileName);
+        $filePath = storage_path('app/public/claims/' . $fileName);
         if (file_exists($filePath)) {
             unlink($filePath);
         }
@@ -678,7 +685,7 @@ class ClaimController extends Controller
 
         $activityLogs->getCollection()->transform(function ($log) {
             if ($log->user) {
-                $log->user->name = $log->user->first_name.' '.$log->user->last_name;
+                $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
             }
 
             if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {

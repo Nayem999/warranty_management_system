@@ -95,7 +95,6 @@ class ExportController extends Controller
             if (!empty($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
                     $q->where('model_no', 'like', '%'.$filters['search'].'%')
-                        ->orWhere('serial_number', 'like', '%'.$filters['search'].'%')
                         ->orWhere('item_description', 'like', '%'.$filters['search'].'%');
                 });
             }
