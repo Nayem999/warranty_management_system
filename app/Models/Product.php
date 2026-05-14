@@ -77,7 +77,7 @@ class Product extends BaseModel
     public function isActive(): bool
     {
         if (! $this->end_date) {
-            return false;
+            return true;
         }
 
         return $this->end_date->gte(Carbon::today());
