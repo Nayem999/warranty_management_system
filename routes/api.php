@@ -190,8 +190,8 @@ Route::prefix('')->group(function () {
             Route::get('/profile', [CustomerAuthController::class, 'profile']);
             Route::put('/profile', [CustomerAuthController::class, 'updateProfile']);
             Route::get('/claims', [CustomerAuthController::class, 'claims']);
+            Route::get('/dashboard', [CustomerAuthController::class, 'dashboard']);
         });
-        Route::get('/dashboard', [CustomerAuthController::class, 'dashboard']);
 
         Route::middleware('permission:products/list')->group(function () {
             Route::get('/products', [ProductController::class, 'index']);
