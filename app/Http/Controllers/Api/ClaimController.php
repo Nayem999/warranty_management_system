@@ -39,7 +39,7 @@ class ClaimController extends Controller
             'product.brand',
             'product.category',
             'product.subCategory',
-            'customer',
+            'customer.city',
             'serviceCenter',
             'engineer',
             'courierIn',
@@ -210,6 +210,11 @@ class ClaimController extends Controller
             $query->where('work_done_comment', 'like', "%{$request->work_done_comment}%");
         }
 
+        if ($request->has('city')) {
+            $query->whereHas('customer.city', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->city}%");
+            });
+        }
         if ($request->has('customer_phone')) {
             $query->whereHas('customer', function ($q) use ($request) {
                 $q->where('phone', 'like', "%{$request->customer_phone}%");
@@ -331,7 +336,8 @@ class ClaimController extends Controller
             'created',
             'Claim',
             $claim->claim_number,
-            $claim->id
+            $claim->id,
+            ['status' => $claim->status, 'comment' => $claim->status_comment]
         );
 
         ClaimCreated::dispatch($claim);
@@ -344,7 +350,7 @@ class ClaimController extends Controller
         $claim = Claim::with([
             'product.brand',
             'product.category',
-            'customer',
+            'customer.city',
             'serviceCenter',
             'workOrder',
         ])->where('claim_number', $claimNumber)->first();
@@ -369,7 +375,7 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);
@@ -393,32 +399,8 @@ class ClaimController extends Controller
         $activityTimeline = ActivityLog::with('user:id,first_name,last_name')
             ->where('log_type', 'Claim')
             ->where('log_type_id', $id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($log) {
-                if ($log->user) {
-                    $log->user->name = $log->user->first_name . ' ' . $log->user->last_name;
-                }
-
-                if ($log->changes && isset($log->changes['old']) && isset($log->changes['new'])) {
-                    $oldData = $log->changes['old'];
-                    $newData = $log->changes['new'];
-                    $filteredChanges = [];
-
-                    foreach ($newData as $key => $value) {
-                        if (! array_key_exists($key, $oldData) || $oldData[$key] !== $value) {
-                            $filteredChanges[$key] = [
-                                'old' => array_key_exists($key, $oldData) ? $oldData[$key] : null,
-                                'new' => $value,
-                            ];
-                        }
-                    }
-
-                    $log->changes = $filteredChanges;
-                }
-
-                return $log;
-            });
+            ->orderBy('id')
+            ->get();
 
         $claim->activity_timeline = $activityTimeline;
 
@@ -523,7 +505,7 @@ class ClaimController extends Controller
             'Claim',
             $claim->claim_number,
             $claim->id,
-            ['old' => $oldData, 'new' => $claim->toArray()]
+            ['status' => $claim->status, 'comment' => $claim->status_comment]
         );
 
         return $this->success($claim->load([
@@ -555,7 +537,8 @@ class ClaimController extends Controller
             'deleted',
             'Claim',
             $claim->claim_number,
-            $claim->id
+            $claim->id,
+            ['status' => $claim->status, 'comment' => $claim->status_comment]
         );
 
         $claim->delete();
@@ -589,7 +572,7 @@ class ClaimController extends Controller
             'Claim',
             $claim->claim_number,
             $claim->id,
-            ['action' => 'closed', 'status' => $status]
+            ['status' => $claim->status, 'comment' => $claim->status_comment]
         );
 
         return $this->success($claim, 'Claim closed successfully.');

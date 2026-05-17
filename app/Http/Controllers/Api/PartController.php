@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\WorkOrderPartResource;
 use App\Models\Part;
 use App\Models\WorkOrderPart;
 use App\Traits\ApiResponse;
@@ -139,11 +140,13 @@ class PartController extends Controller
             'workOrder.claim.product.brand',
             'workOrder.claim.product.subCategory',
             'workOrder.serviceCenter:id,title',
+            'part',
+            'faultyPart',
         ])
             ->where('part_id', $id)
             ->orderBy('install_date_time', 'desc')
             ->paginate($request->limit ?? 15);
 
-        return $this->success($history);
+        return $this->success(WorkOrderPartResource::collection($history));
     }
 }

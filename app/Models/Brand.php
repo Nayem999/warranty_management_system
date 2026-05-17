@@ -50,9 +50,8 @@ class Brand extends BaseModel
     public function getServiceCentersAttribute()
     {
         return ServiceCenter::where('is_active', true)
-            ->where(function ($query) {
-                $query->whereJsonContains('brand_ids', $this->id)
-                    ->orWhereJsonContains('brand_ids', (string) $this->id);
+            ->whereHas('brands', function ($query) {
+                $query->where('wms_brands.id', $this->id);
             })
             ->get();
     }

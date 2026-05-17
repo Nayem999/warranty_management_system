@@ -38,12 +38,10 @@ class ServiceCenterController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'title' => 'required|string|string|unique:wms_service_centers,title|max:255',
+            'title' => 'required|string|unique:wms_service_centers,title|max:255',
             'address' => 'nullable|string',
             'uan' => 'nullable|string|max:20',
             'email' => 'nullable|email',
-            'brand_ids' => 'nullable|array',
-            'brand_ids.*' => 'exists:wms_brands,id',
             'working_hours' => 'nullable|string',
             'logo' => 'nullable|string',
             'display_order' => 'nullable|integer',
@@ -86,8 +84,6 @@ class ServiceCenterController extends Controller
             'address' => 'nullable|string',
             'uan' => 'nullable|string|max:20',
             'email' => 'nullable|email',
-            'brand_ids' => 'nullable|array',
-            'brand_ids.*' => 'exists:wms_brands,id',
             'working_hours' => 'nullable|string',
             'logo' => 'nullable|string',
             'display_order' => 'nullable|integer',
@@ -154,9 +150,8 @@ class ServiceCenterController extends Controller
         }
 
         $serviceCenters = ServiceCenter::where('is_active', true)
-            ->where(function ($query) use ($brandId) {
-                $query->whereJsonContains('brand_ids', (int) $brandId)
-                    ->orWhereJsonContains('brand_ids', (string) $brandId);
+            ->whereHas('brands', function ($query) use ($brandId) {
+                $query->where('wms_brands.id', $brandId);
             })
             ->orderBy('display_order', 'asc')
             ->get();

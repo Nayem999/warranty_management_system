@@ -75,7 +75,7 @@ class DashboardController extends Controller
             'in_progress_work_orders' => (clone $workOrderQuery)->inProgress()->count(),
             'completed_work_orders' => (clone $workOrderQuery)->completed()->count(),
             'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
-            'total_service_centers' => ServiceCenter::when($brandId, fn ($q) => $q->whereJsonContains('brand_ids', (int) $brandId))->where('is_active', true)->count(),
+            'total_service_centers' => ServiceCenter::when($brandId, fn ($q) => $q->whereHas('brands', fn ($q) => $q->where('wms_brands.id', $brandId)))->where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
             'avg_customer_rating' => (int) (clone $claimQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
             'avg_tat_days' => (int) (clone $claimQuery)->whereNotNull('tat')->avg('tat') ?? 0,
@@ -126,11 +126,7 @@ class DashboardController extends Controller
         $serviceCenterQuery = ServiceCenter::query();
         if ($user->isBrandRestricted()) {
             $brandIds = $user->accessibleBrandIds();
-            $serviceCenterQuery->where(function ($q) use ($brandIds) {
-                foreach ($brandIds as $brandId) {
-                    $q->orWhereJsonContains('brand_ids', $brandId);
-                }
-            });
+            $serviceCenterQuery->whereHas('brands', fn ($q) => $q->whereIn('wms_brands.id', $brandIds));
         }
         if ($user->isServiceCenterRestricted()) {
             $serviceCenterQuery->whereIn('id', $user->accessibleServiceCenterIds());
@@ -428,11 +424,7 @@ class DashboardController extends Controller
 
         if ($user->isBrandRestricted()) {
             $brandIds = $user->accessibleBrandIds();
-            $serviceCenterQuery->where(function ($q) use ($brandIds) {
-                foreach ($brandIds as $brandId) {
-                    $q->orWhereJsonContains('brand_ids', $brandId);
-                }
-            });
+            $serviceCenterQuery->whereHas('brands', fn ($q) => $q->whereIn('wms_brands.id', $brandIds));
         }
 
         if ($user->isServiceCenterRestricted()) {

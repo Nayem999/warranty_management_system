@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission
 {
-    public function handle(Request $request, Closure $next, string $module, string $action): Response
+    public function handle(Request $request, Closure $next, string $permission): Response
     {
         $user = $request->user();
 
@@ -17,6 +17,17 @@ class CheckPermission
                 'success' => false,
                 'message' => 'Unauthenticated.',
             ], 401);
+        }
+
+        $parts = explode('/', $permission);
+        $module = $parts[0] ?? '';
+        $action = $parts[1] ?? '';
+
+        if (empty($module) || empty($action)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid permission format.',
+            ], 400);
         }
 
         if (!$user->hasPermission($module, $action)) {

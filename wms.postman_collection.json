@@ -7,7 +7,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "https://localhost/warranty-management-system/api",
+      "value": "https://localhost/warranty_management_system/api",
       "type": "string"
     },
     {
@@ -372,22 +372,38 @@
      {
        "name": "Public",
        "item": [
-         {
-           "name": "List Brands (Public)",
-           "request": {
-             "method": "GET",
-             "header": [
-               {
-                 "key": "Accept",
-                 "value": "application/json"
-               }
-             ],
-             "url": "{{base_url}}/brands/list",
-             "auth": {
-               "type": "noauth"
-             }
-           }
-         },
+{
+          "name": "List Brands (Public)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/brands/list",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "List Cities (Public)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cities/list",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
          {
            "name": "List Service Centers (Public)",
            "request": {
@@ -760,7 +776,7 @@
             "url": "{{base_url}}/customer/profile",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city\": \"Chittagong\"\n}",
+              "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city_id\": 2\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -785,7 +801,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city\": \"Chittagong\"\n}",
+                  "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city_id\": 2\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1593,6 +1609,115 @@
       ]
     },
     {
+      "name": "Cities",
+      "item": [
+        {
+          "name": "List Cities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cities?search=&status=",
+              "host": ["{{base_url}}"],
+              "path": ["cities"],
+              "query": [
+                {"key": "search", "value": "", "disabled": true},
+                {"key": "status", "value": "", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create City",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cities",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Dhaka\",\n    \"code\": \"DHK\",\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get City",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cities/1"
+          }
+        },
+        {
+          "name": "Update City",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cities/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Dhaka Metropolitan\",\n    \"code\": \"DHK\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete City",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cities/1"
+          }
+        },
+        {
+          "name": "Toggle City Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/cities/1/toggle-status"
+          }
+        }
+      ]
+    },
+    {
       "name": "Customers",
       "item": [
         {
@@ -1606,12 +1731,13 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/customers?search=&city=",
+              "raw": "{{base_url}}/customers?search=&city_id=&city=",
               "host": ["{{base_url}}"],
               "path": ["customers"],
               "query": [
                 {"key": "search", "value": "", "disabled": true},
-                {"key": "city", "value": "", "disabled": true}
+                {"key": "city_id", "value": "", "disabled": true, "description": "Filter by city ID"},
+                {"key": "city", "value": "", "disabled": true, "description": "Filter by city name"}
               ]
             }
           }
@@ -1629,7 +1755,7 @@
             "url": "{{base_url}}/customers",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"customer_name\": \"ABC Corporation\",\n    \"contact_person\": \"John Doe\",\n    \"email\": \"contact@abccorp.com\",\n    \"phone\": \"+8801234567890\",\n    \"landline\": \"02-12345678\",\n    \"address\": \"123 Business Street, Dhaka\",\n    \"city\": \"Dhaka\"\n}",
+              "raw": "{\n    \"customer_name\": \"ABC Corporation\",\n    \"contact_person\": \"John Doe\",\n    \"email\": \"contact@abccorp.com\",\n    \"phone\": \"+8801234567890\",\n    \"landline\": \"02-12345678\",\n    \"address\": \"123 Business Street, Dhaka\",\n    \"city_id\": 1,\n    \"password\": \"Password@123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2328,7 +2454,24 @@
                 {"key": "limit", "value": "15", "disabled": true, "description": "Items per page"}
               ]
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ]
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"work_order_id\": 1,\n                \"claim_id\": \"CLM-2024-00001\",\n                \"claim_date_time\": \"2024-06-01T10:00:00+00:00\",\n                \"part_id\": 1,\n                \"case_id\": \"CASE-001\",\n                \"case_date_time\": \"2024-06-02T10:00:00+00:00\",\n                \"order_id\": \"ORD-001\",\n                \"order_date_time\": \"2024-06-03T10:00:00+00:00\",\n                \"received_date_time\": \"2024-06-04T10:00:00+00:00\",\n                \"install_date_time\": \"2024-06-05T10:00:00+00:00\",\n                \"good_part_serial\": \"GPSN-12345\",\n                \"faulty_part_serial\": \"FPSN-67890\",\n                \"return_date_time\": \"2024-06-10T10:00:00+00:00\",\n                \"part_returned\": true,\n                \"part_status\": \"Returned\",\n                \"part_return_comment\": \"Part in good condition\",\n                \"labour_claim_id\": \"LC-2024-001\",\n                \"labour_claim_date\": \"2024-06-15\",\n                \"faulty_part_id\": 2,\n                \"faulty_description\": \"Screen display not working\"\n            }\n        ]\n    }\n}"
+            }
+          ]
         }
       ]
     },

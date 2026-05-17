@@ -26,7 +26,7 @@ class ExportController extends Controller
         ]);
 
         if ($request->input('format') === 'pdf') {
-            $query = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
+            $query = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
 
             if (!empty($filters['status'])) {
                 $query->where('status', $filters['status']);

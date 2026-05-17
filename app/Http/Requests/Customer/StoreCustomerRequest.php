@@ -20,7 +20,7 @@ class StoreCustomerRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'landline' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'city' => 'nullable|string|max:100',
+            'city_id' => 'nullable|integer|exists:wms_cities,id',
             'password' => 'required|string|min:6',
         ];
     }

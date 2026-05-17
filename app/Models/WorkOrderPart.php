@@ -25,6 +25,10 @@ class WorkOrderPart extends BaseModel
         'part_returned',
         'part_status',
         'part_return_comment',
+        'labour_claim_id',
+        'labour_claim_date',
+        'faulty_part_id',
+        'faulty_description',
     ];
 
     protected $casts = [
@@ -35,6 +39,7 @@ class WorkOrderPart extends BaseModel
         'received_date_time' => 'datetime',
         'install_date_time' => 'datetime',
         'return_date_time' => 'datetime',
+        'labour_claim_date' => 'date',
     ];
 
     public function workOrder(): BelongsTo
@@ -45,5 +50,10 @@ class WorkOrderPart extends BaseModel
     public function part(): BelongsTo
     {
         return $this->belongsTo(Part::class);
+    }
+
+    public function faultyPart(): BelongsTo
+    {
+        return $this->belongsTo(Part::class, 'faulty_part_id');
     }
 }

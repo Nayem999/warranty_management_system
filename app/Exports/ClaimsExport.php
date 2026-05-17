@@ -17,7 +17,7 @@ class ClaimsExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $query = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
+        $query = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'workOrder.parts.part', 'engineer', 'courierIn', 'courierOut']);
 
         if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);

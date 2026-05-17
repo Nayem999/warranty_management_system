@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -19,7 +20,7 @@ class Customer extends Authenticatable
         'phone',
         'landline',
         'address',
-        'city',
+        'city_id',
         'password',
     ];
 
@@ -34,12 +35,17 @@ class Customer extends Authenticatable
         'phone' => 'string',
         'landline' => 'string',
         'address' => 'string',
-        'city' => 'string',
+        'city_id' => 'integer',
     ];
 
     public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 
     public function setPasswordAttribute(string $value): void

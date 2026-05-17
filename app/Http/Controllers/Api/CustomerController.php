@@ -16,7 +16,7 @@ class CustomerController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = Customer::query();
+        $query = Customer::with('city');
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
@@ -27,8 +27,14 @@ class CustomerController extends Controller
             });
         }
 
+        if ($request->has('city_id')) {
+            $query->where('city_id', $request->city_id);
+        }
+
         if ($request->has('city')) {
-            $query->where('city', $request->city);
+            $query->whereHas('city', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->city}%");
+            });
         }
 
         $customers = $query->orderBy('customer_name')->paginate($request->limit ?? 15);
