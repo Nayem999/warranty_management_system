@@ -190,8 +190,8 @@ Route::prefix('')->group(function () {
             Route::get('/profile', [CustomerAuthController::class, 'profile']);
             Route::put('/profile', [CustomerAuthController::class, 'updateProfile']);
             Route::get('/claims', [CustomerAuthController::class, 'claims']);
-            Route::get('/dashboard', [CustomerAuthController::class, 'dashboard']);
         });
+        Route::get('/dashboard', [CustomerAuthController::class, 'dashboard']);
 
         Route::middleware('permission:products/list')->group(function () {
             Route::get('/products', [ProductController::class, 'index']);
@@ -320,11 +320,11 @@ Route::prefix('')->group(function () {
             Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
         });
 
-        Route::middleware('permission:reports/view')->group(function () {
-            Route::get('/dashboard', [DashboardController::class, 'index']);
-            Route::get('/client-dashboard', [DashboardController::class, 'clientDashboard']);
-            Route::get('/exports/products', [ExportController::class, 'downloadProducts']);
-        });
+        // Route::middleware('permission:reports/view')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+        Route::get('/client-dashboard', [DashboardController::class, 'clientDashboard']);
+        Route::get('/exports/products', [ExportController::class, 'downloadProducts']);
+        // });
 
         Route::middleware('permission:activity_logs/list')->group(function () {
             Route::get('/activity-logs', [ActivityLogController::class, 'index']);
@@ -349,6 +349,5 @@ Route::prefix('')->group(function () {
         Route::middleware('permission:memorized_reports/delete')->group(function () {
             Route::delete('/memorize-reports/{memorizeReport}', [MemorizeReportController::class, 'destroy']);
         });
-
     });
 });
