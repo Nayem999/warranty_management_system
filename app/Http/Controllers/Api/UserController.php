@@ -22,7 +22,7 @@ class UserController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = User::query()->with(['role', 'brands']);
+        $query = User::query()->with(['role', 'brands','serviceCenters']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -189,15 +189,29 @@ class UserController extends Controller
             'brand_ids.*' => 'exists:wms_brands,id',
         ])['brand_ids'];
 
-        UserBrandAccess::where('user_id', $id)->delete();
-
         foreach ($brandIds as $brandId) {
-            UserBrandAccess::create([
-                'user_id' => $user->id,
-                'brand_id' => $brandId,
-                'created_by' => $request->user()->id,
-            ]);
+            $existing = UserBrandAccess::withTrashed()
+                ->where('user_id', $id)
+                ->where('brand_id', $brandId)
+                ->first();
+
+            if ($existing) {
+                if ($existing->trashed()) {
+                    $existing->restore();
+                }
+            } else {
+                UserBrandAccess::create([
+                    'user_id' => $user->id,
+                    'brand_id' => $brandId,
+                    'created_by' => $request->user()->id,
+                ]);
+            }
         }
+
+        $keepIds = array_map('intval', $brandIds);
+        UserBrandAccess::where('user_id', $id)
+            ->whereNotIn('brand_id', $keepIds)
+            ->delete();
 
         return $this->success($user->load('brandAccess.brand'), 'Brand access assigned successfully.');
     }
@@ -241,15 +255,31 @@ class UserController extends Controller
             'service_center_ids.*' => 'exists:wms_service_centers,id',
         ])['service_center_ids'];
 
-        UserServiceCenterAccess::where('user_id', $id)->delete();
+        $now = now();
 
         foreach ($serviceCenterIds as $serviceCenterId) {
-            UserServiceCenterAccess::create([
-                'user_id' => $user->id,
-                'service_center_id' => $serviceCenterId,
-                'created_by' => $request->user()->id,
-            ]);
+            $existing = UserServiceCenterAccess::withTrashed()
+                ->where('user_id', $id)
+                ->where('service_center_id', $serviceCenterId)
+                ->first();
+
+            if ($existing) {
+                if ($existing->trashed()) {
+                    $existing->restore();
+                }
+            } else {
+                UserServiceCenterAccess::create([
+                    'user_id' => $user->id,
+                    'service_center_id' => $serviceCenterId,
+                    'created_by' => $request->user()->id,
+                ]);
+            }
         }
+
+        $keepIds = array_map('intval', $serviceCenterIds);
+        UserServiceCenterAccess::where('user_id', $id)
+            ->whereNotIn('service_center_id', $keepIds)
+            ->delete();
 
         return $this->success($user->load('serviceCenterAccess.serviceCenter'), 'Service center access assigned successfully.');
     }

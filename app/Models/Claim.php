@@ -138,6 +138,7 @@ protected $fillable = [
         return $query->where('status', 'In Progress');
     }
 
+
     public static function generateClaimNumber(): string
     {
         $year = now()->year;

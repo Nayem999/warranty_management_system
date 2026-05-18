@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserBrandAccess extends BaseModel
 {
+    use SoftDeletes;
+
     protected $table = 'wms_user_brand_access';
 
     public $timestamps = true;
