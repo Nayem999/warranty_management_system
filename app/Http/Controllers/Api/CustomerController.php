@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
+use App\Mail\CustomerWelcomeEmail;
 use App\Models\Customer;
 use App\Traits\ApiResponse;
+use App\Traits\EmailHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, EmailHelper;
 
     public function index(Request $request): JsonResponse
     {
@@ -46,9 +49,18 @@ class CustomerController extends Controller
     {
         $data = $request->validated();
 
+        $password = Str::random(12);
+        $data['password'] = $password;
+
         $customer = Customer::create($data);
 
-        return $this->created($customer, 'Customer created successfully.');
+        $this->sendEmail(
+            new CustomerWelcomeEmail($customer, $password),
+            $customer->email,
+            'Welcome to ' . config('app.name') . ' - Your Account Details'
+        );
+
+        return $this->created($customer, 'Customer created successfully. Password: ' . $password);
     }
 
     public function show(int $id): JsonResponse
