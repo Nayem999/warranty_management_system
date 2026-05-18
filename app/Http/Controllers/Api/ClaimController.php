@@ -23,12 +23,13 @@ class ClaimController extends Controller
 
     private array $statuses = [
         'Not Assigned',
-        'Open',
+        'Assigned',
         'In Progress',
-        'Closed(Repaired)',
-        'Closed-(Without Repaired)',
-        'Closed-(Replaced)',
-        'Closed-(Reimbursed)',
+        'Waiting for Part',
+        'Repaired',
+        'Un Repaired',
+        'Replaced',
+        'Reimbursement',
         'Delivered',
     ];
 
@@ -225,14 +226,9 @@ class ClaimController extends Controller
                 $q->where('replace_serial', 'like', "%{$request->replace_serial}%");
             });
         }
-        if ($request->has('replace_product_name')) {
+        if ($request->has('replace_product_id')) {
             $query->whereHas('workOrder', function ($q) use ($request) {
-                $q->where('replace_product_name', 'like', "%{$request->replace_product_name}%");
-            });
-        }
-        if ($request->has('replace_product_info')) {
-            $query->whereHas('workOrder', function ($q) use ($request) {
-                $q->where('replace_product_info', 'like', "%{$request->replace_product_info}%");
+                $q->where('replace_product_id', $request->replace_product_id);
             });
         }
 
@@ -452,8 +448,7 @@ class ClaimController extends Controller
             'assigned_by' => 'nullable|exists:users,id',
 
             'replace_serial' => 'nullable|string',
-            'replace_product_name' => 'nullable|string',
-            'replace_product_info' => 'nullable|string',
+            'replace_product_id' => 'nullable|integer|exists:wms_products,id',
             'replace_ref' => 'nullable|string',
             'parts' => 'nullable|array',
             'job_remarks' => 'nullable|string',
@@ -464,8 +459,7 @@ class ClaimController extends Controller
         $claim->update($data);
         if (
             isset($data['replace_serial']) ||
-            isset($data['replace_product_name']) ||
-            isset($data['replace_product_info']) ||
+            isset($data['replace_product_id']) ||
             isset($data['replace_ref']) ||
             isset($data['parts'])
         ) {
@@ -485,8 +479,7 @@ class ClaimController extends Controller
 
             $workOrder->update([
                 'replace_serial' => $data['replace_serial'] ?? null,
-                'replace_product_name' => $data['replace_product_name'] ?? null,
-                'replace_product_info' => $data['replace_product_info'] ?? null,
+                'replace_product_id' => $data['replace_product_id'] ?? null,
                 'replace_ref' => $data['replace_ref'] ?? null,
             ]);
 
@@ -555,7 +548,7 @@ class ClaimController extends Controller
         }
 
         $statuses = implode(',', $this->statuses);
-        $status = request()->status ?? 'Closed(Repaired)';
+        $status = request()->status ?? 'Closed (Repaired)';
 
         if (! in_array($status, $this->statuses)) {
             return $this->error('Invalid status. Allowed: ' . $statuses);

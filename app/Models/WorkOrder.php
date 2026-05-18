@@ -17,10 +17,13 @@ class WorkOrder extends BaseModel
         'product_id',
         'service_center_id',
         'replace_serial',
-        'replace_product_name',
-        'replace_product_info',
+        'replace_product_id',
         'replace_ref',
         'created_by',
+    ];
+
+    protected $casts = [
+        'replace_product_id' => 'integer',
     ];
 
     public function claim(): BelongsTo
@@ -36,6 +39,11 @@ class WorkOrder extends BaseModel
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function replaceProduct(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'replace_product_id');
     }
 
     public function serviceCenter(): BelongsTo
