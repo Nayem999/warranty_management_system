@@ -15,12 +15,13 @@ class StoreClaimRequest extends FormRequest
     {
         $statuses = implode(',', [
             'Not Assigned',
-            'Open',
+            'Assigned',
             'In Progress',
-            'Closed(Repaired)',
-            'Closed-(Without Repaired)',
-            'Closed-(Replaced)',
-            'Closed-(Reimbursed)',
+            'Waiting for Part',
+            'Repaired',
+            'Un Repaired',
+            'Replaced',
+            'Reimbursement',
             'Delivered',
         ]);
 
