@@ -164,6 +164,9 @@ class ProductController extends Controller
         $hasNonOpenClaim = $claimList->contains(function ($claim) {
             return $claim->status === 'Delivered';
         });
+        if (!$claimList) {
+            $hasNonOpenClaim = true;
+        }
 
         return $this->success([
             'claim_status' => $hasNonOpenClaim,

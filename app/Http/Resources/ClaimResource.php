@@ -34,6 +34,7 @@ class ClaimResource extends JsonResource
             'courier_slip_outward' => $this->courier_slip_outward,
             'received_date_time' => $this->received_date_time?->toIso8601String(),
             'delivered_date_time' => $this->delivered_date_time?->toIso8601String(),
+            'delivered_remarks' => $this->delivered_remarks,
             'counter' => $this->counter,
             'wo_assigned_date' => $this->wo_assigned_date?->format('Y-m-d'),
             'wo_closed_date' => $this->wo_closed_date?->format('Y-m-d'),

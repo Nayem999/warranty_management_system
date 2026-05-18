@@ -686,4 +686,37 @@ class ClaimController extends Controller
 
         return $this->success($activityLogs);
     }
+
+
+    public function getDeliveryList(int $id): JsonResponse
+    {
+        $user = auth()->user();
+
+        $claimQuery = Claim::with(['product.brand']);
+
+        if ($user->isBrandRestricted()) {
+            $claimQuery->where(function ($q) use ($user) {
+                $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            });
+        }
+        if ($user->isServiceCenterRestricted()) {
+            $claimQuery->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+        }
+
+        $claim = $claimQuery->find($id);
+
+        if (! $claim) {
+            return $this->notFound('Claim not found.');
+        }
+
+        $customer_id = $claim->customer_id;
+        $service_center_id = $claim->service_center_id;
+
+        $claimList = Claim::where("customer_id", $customer_id)->where("service_center_id", $service_center_id)->whereIn("status",["Repaired","Un Repaired","Replaced","Reimbursement"])->get();
+        if (! $claimList) {
+            return $this->notFound("'Not Delivery' Claim Not Found.");
+        }
+
+        return $this->success($claimList);
+    }
 }

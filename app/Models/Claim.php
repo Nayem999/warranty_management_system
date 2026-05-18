@@ -26,6 +26,7 @@ protected $fillable = [
         'courier_slip_outward',
         'received_date_time',
         'delivered_date_time',
+        'delivered_remarks',
         'counter',
         'wo_assigned_date',
         'wo_closed_date',

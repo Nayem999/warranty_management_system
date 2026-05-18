@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ClaimController;
 use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CustomerAuthController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\DeliveryChallanController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\MemorizeReportController;
@@ -286,6 +287,18 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:couriers/delete')->group(function () {
             Route::delete('/couriers/{courier}', [CourierController::class, 'destroy']);
+        });
+
+        Route::middleware('permission:delivery_challans/list')->group(function () {
+            Route::get('/delivery-challans', [DeliveryChallanController::class, 'index']);
+        });
+
+        Route::middleware('permission:delivery_challans/view')->group(function () {
+            Route::get('/delivery-challans/{id}', [DeliveryChallanController::class, 'show']);
+        });
+
+        Route::middleware('permission:delivery_challans/create')->group(function () {
+            Route::post('/delivery-challans', [DeliveryChallanController::class, 'store']);
         });
 
         Route::middleware('permission:parts/list')->group(function () {

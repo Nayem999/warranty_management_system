@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class DeliveryChallanResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'delivery_number' => $this->delivery_number,
+            'customer' => new CustomerResource($this->whenLoaded('customer')),
+            'courier_out' => new CourierResource($this->whenLoaded('courierOut')),
+            'courier_slip_outward' => $this->courier_slip_outward,
+            'delivered_date_time' => $this->delivered_date_time?->toIso8601String(),
+            'delivered_remarks' => $this->delivered_remarks,
+            'claim_ids' => $this->claim_ids,
+            'claims' => ClaimResource::collection($this->whenLoaded('claims')),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
+        ];
+    }
+}
