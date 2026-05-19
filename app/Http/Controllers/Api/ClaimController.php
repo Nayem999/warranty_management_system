@@ -135,6 +135,9 @@ class ClaimController extends Controller
                         case 'product_serial':
                             $q->orWhereHas('product', fn($q) => $q->where('product_serial', 'like', "%{$request->search}%"));
                             break;
+                        case 'model_no':
+                            $q->orWhereHas('product', fn($q) => $q->where('model_no', 'like', "%{$request->search}%"));
+                            break;
                         case 'problem':
                             $q->orWhere('problem_description', 'like', "%{$request->search}%");
                             break;
@@ -559,16 +562,18 @@ class ClaimController extends Controller
 
             if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
                 $data['assigned_by'] = $request->user()->id;
+                $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::today();
                 $data['status'] = "Assigned";
             } else if ($claim->status == "Not Assigned" && $data['engineer_id']) {
                 $data['assigned_by'] = $request->user()->id;
+                $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::today();
             }
 
             $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
             $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement');
 
             if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
-                $data['wo_closed_date'] = now();
+                $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::today();
             }
 
             $claim->update($data);
