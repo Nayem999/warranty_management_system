@@ -47,6 +47,7 @@ class ClaimController extends Controller
             'courierOut',
             'assignedByUser',
             'creator',
+            'workOrder.replaceProduct',
             'workOrder.parts.part',
             'workOrder.parts.faultyPart',
         ]);
@@ -372,7 +373,7 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn', 'courierOut']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct','workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn', 'courierOut']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);

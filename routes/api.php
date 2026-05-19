@@ -219,6 +219,7 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:claims/list')->group(function () {
             Route::get('/claims', [ClaimController::class, 'index']);
+            Route::get('/claimDeliveryList', [ClaimController::class, 'getDeliveryList']);
         });
 
         Route::middleware('permission:claims/view')->group(function () {
