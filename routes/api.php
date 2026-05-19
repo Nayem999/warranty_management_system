@@ -219,11 +219,11 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:claims/list')->group(function () {
             Route::get('/claims', [ClaimController::class, 'index']);
-            Route::get('/claimDeliveryList', [ClaimController::class, 'getDeliveryList']);
         });
 
         Route::middleware('permission:claims/view')->group(function () {
             Route::get('/claims/{claim}', [ClaimController::class, 'show']);
+            Route::get('/claims/{id}/delivery', [ClaimController::class, 'getDeliveryList']);
             Route::get('/claims/{id}/feedback-link', [ClaimController::class, 'getFeedbackLink']);
             Route::get('/claims/{id}/activity-timeline', [ClaimController::class, 'activityTimeline']);
         });

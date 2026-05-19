@@ -2681,6 +2681,19 @@
               }
             ]
           }
+        },
+        {
+          "name": "Get Claim Delivery List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/claims/1/delivery"
+          }
         }
       ]
     },

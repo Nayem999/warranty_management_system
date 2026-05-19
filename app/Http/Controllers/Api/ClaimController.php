@@ -373,7 +373,7 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct','workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn', 'courierOut']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn', 'courierOut']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);
@@ -457,7 +457,24 @@ class ClaimController extends Controller
             'accessories' => 'nullable|string|max:500',
         ]);
 
-        $oldData = $claim->toArray();
+        if ($data['status'] == "Delivered") {
+            return $this->error("status Should Not Delivered From Claim Update");
+        }
+
+        if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
+            $data['assigned_by'] = $request->user()->id;
+            $data['status'] = "Assigned";
+        } else if ($claim->status == "Not Assigned" && $data['engineer_id']) {
+            $data['assigned_by'] = $request->user()->id;
+        }
+
+        $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
+        $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement');
+
+        if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
+            $data['wo_closed_date'] = now();
+        }
+
         $claim->update($data);
         if (
             isset($data['replace_serial']) ||
@@ -697,10 +714,11 @@ class ClaimController extends Controller
         $claimQuery = Claim::with(['product.brand']);
 
         if ($user->isBrandRestricted()) {
-            $claimQuery->where(function ($q) use ($user) {
-                $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()));
+            $claimQuery->whereHas('product', function ($q) use ($user) {
+                $q->whereIn('brand_id', $user->accessibleBrandIds());
             });
         }
+
         if ($user->isServiceCenterRestricted()) {
             $claimQuery->whereIn('service_center_id', $user->accessibleServiceCenterIds());
         }
@@ -711,12 +729,31 @@ class ClaimController extends Controller
             return $this->notFound('Claim not found.');
         }
 
-        $customer_id = $claim->customer_id;
-        $service_center_id = $claim->service_center_id;
+        $claimListQuery = Claim::with(['product.brand'])
+            ->where('customer_id', $claim->customer_id)
+            ->where('service_center_id', $claim->service_center_id)
+            ->whereIn('status', [
+                'Repaired',
+                'Un Repaired',
+                'Replaced',
+                'Reimbursement'
+            ]);
 
-        $claimList = Claim::where("customer_id", $customer_id)->where("service_center_id", $service_center_id)->whereIn("status",["Repaired","Un Repaired","Replaced","Reimbursement"])->get();
-        if (! $claimList) {
-            return $this->notFound("'Not Delivery' Claim Not Found.");
+        // Apply same restrictions for delivery list
+        if ($user->isBrandRestricted()) {
+            $claimListQuery->whereHas('product', function ($q) use ($user) {
+                $q->whereIn('brand_id', $user->accessibleBrandIds());
+            });
+        }
+
+        if ($user->isServiceCenterRestricted()) {
+            $claimListQuery->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+        }
+
+        $claimList = $claimListQuery->get();
+
+        if ($claimList->isEmpty()) {
+            return $this->notFound('Claim not found for delivery.');
         }
 
         return $this->success($claimList);

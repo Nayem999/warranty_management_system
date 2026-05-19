@@ -4,14 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 class DeliveryChallan extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'wms_delivery_challans';
 
     protected $fillable = [
         'delivery_number',
+        'service_center_id',
         'customer_id',
         'courier_out_id',
         'courier_slip_outward',
@@ -39,13 +43,20 @@ class DeliveryChallan extends Model
         return $this->belongsTo(Courier::class, 'courier_out_id');
     }
 
+    public function claims()
+    {
+        return Claim::query()
+            ->whereIn('id', $this->claim_ids ?? [])
+            ->with( 'product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'courierOut', 'assignedByUser', 'creator', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart');
+    }
+
     public function getClaimsAttribute(): Collection
     {
         if (empty($this->claim_ids)) {
             return collect();
         }
 
-        return Claim::with('product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'courierOut', 'assignedByUser', 'creator', 'workOrder.parts.part')->whereIn('id', $this->claim_ids)->get();
+        return Claim::with( 'product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'courierOut', 'assignedByUser', 'creator', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart',)->whereIn('id', $this->claim_ids)->get();
     }
 
     public static function generateDeliveryNumber(): string

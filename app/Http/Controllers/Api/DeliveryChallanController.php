@@ -7,9 +7,11 @@ use App\Http\Requests\DeliveryChallan\StoreDeliveryChallanRequest;
 use App\Http\Resources\DeliveryChallanResource;
 use App\Models\Claim;
 use App\Models\DeliveryChallan;
+use App\Models\ActivityLog;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DeliveryChallanController extends Controller
 {
@@ -37,44 +39,95 @@ class DeliveryChallanController extends Controller
 
     public function store(StoreDeliveryChallanRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        DB::beginTransaction();
 
-        $data['delivery_number'] = DeliveryChallan::generateDeliveryNumber();
+        try {
+            $data = $request->validated();
 
-        $claimIds = $data['claim_ids'];
-        unset($data['claim_ids']);
+            $claimIds = $data['claim_ids'];
 
-        if (! isset($data['customer_id'])) {
-            $firstClaim = Claim::with('customer')->find($claimIds[0]);
+            if (empty($claimIds)) {
+                return $this->error('Claim ids are required.');
+            }
+
+            $claims = Claim::whereIn('id', $claimIds)->get();
+
+            if ($claims->count() !== count($claimIds)) {
+                return $this->notFound('Some claims were not found.');
+            }
+
+            // Ensure same customer
+            $customerIds = $claims->pluck('customer_id')->unique();
+
+            if ($customerIds->count() > 1) {
+                return $this->error('All claims must belong to the same customer.');
+            }
+
+            // Ensure same service center
+            $serviceCenterIds = $claims->pluck('service_center_id')->unique();
+
+            if ($serviceCenterIds->count() > 1) {
+                return $this->error('All claims must belong to the same service center.');
+            }
+
+            $firstClaim = $claims->first();
+
+            $data['delivery_number'] = DeliveryChallan::generateDeliveryNumber();
             $data['customer_id'] = $firstClaim->customer_id;
             $data['service_center_id'] = $firstClaim->service_center_id;
+
+            $challan = DeliveryChallan::create($data);
+
+            foreach ($claims as $claim) {
+
+                $claim->update([
+                    'courier_out_id'        => $data['courier_out_id'],
+                    'courier_slip_outward'  => $data['courier_slip_outward'],
+                    'delivered_date_time'   => $data['delivered_date_time'],
+                    'delivered_remarks'     => $data['delivered_remarks'] ?? null,
+                    'status'                => 'Delivered',
+                ]);
+
+                ActivityLog::log(
+                    $request->user()->id,
+                    'updated',
+                    'Claim',
+                    $claim->claim_number,
+                    $claim->id,
+                    [
+                        'status'  => 'Delivered',
+                        'comment' => $data['delivered_remarks'] ?? null,
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            $challanResult = DeliveryChallan::with(['customer', 'courierOut'])->find($challan->id);
+
+            $challanResult->setRelation('claims', $challanResult->claims()->get());
+
+            return $this->created(
+                $challanResult,
+                'Delivery challan created successfully.'
+            );
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return $this->error($e->getMessage());
         }
-
-        $challan = DeliveryChallan::create($data);
-
-        foreach ($claimIds as $claimId) {
-            Claim::where('id', $claimId)->update([
-                'courier_out_id' => $data['courier_out_id'],
-                'courier_slip_outward' => $data['courier_slip_outward'],
-                'delivered_date_time' => $data['delivered_date_time'],
-                'delivered_remarks' => $data['delivered_remarks'],
-                'status' => 'Delivered',
-            ]);
-        }
-
-        return $this->created(
-            $challan->load(['customer', 'courierOut', 'claims.product']),
-            'Delivery challan created successfully.'
-        );
     }
 
     public function show(int $id): JsonResponse
     {
-        $challan = DeliveryChallan::with(['customer', 'courierOut', 'claims.product'])->find($id);
+        $challan = DeliveryChallan::with(['customer', 'courierOut'])->find($id);
 
         if (! $challan) {
             return $this->notFound('Delivery challan not found.');
         }
+
+        $challan->setRelation('claims', $challan->claims()->get());
 
         return $this->success($challan);
     }

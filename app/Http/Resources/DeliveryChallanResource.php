@@ -18,7 +18,7 @@ class DeliveryChallanResource extends JsonResource
             'delivered_date_time' => $this->delivered_date_time?->toIso8601String(),
             'delivered_remarks' => $this->delivered_remarks,
             'claim_ids' => $this->claim_ids,
-            'claims' => ClaimResource::collection($this->whenLoaded('claims')),
+            'claims' => ClaimResource::collection($this->claims),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];
