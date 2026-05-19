@@ -62,8 +62,11 @@ class ClaimController extends Controller
             $query->whereIn('service_center_id', $user->accessibleServiceCenterIds());
         }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
+        if ($request->has('status') && $request->filled('status')) {
+            $statuses = array_filter(array_map('trim', explode(',', $request->status)));
+            if (!empty($statuses)) {
+                $query->whereIn('status', $statuses);
+            }
         }
 
         if ($request->has('brand_id')) {
@@ -108,19 +111,105 @@ class ClaimController extends Controller
             $query->where('claim_date', '<=', Carbon::parse($request->date_to));
         }
 
-        if ($request->has('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('claim_number', 'like', "%{$request->search}%")
-                    ->orWhere('problem_description', 'like', "%{$request->search}%");
+        if ($request->has('search') && $request->filled('search_include')) {
+            $searchFields = explode(',', $request->search_include);
+            $query->where(function ($q) use ($request, $searchFields) {
+                foreach ($searchFields as $field) {
+                    $field = trim($field);
+                    if (empty($field)) continue;
+
+                    switch ($field) {
+                        case 'wo_number':
+                            $q->orWhereHas('workOrder', fn($q) => $q->where('wo_number', 'like', "%{$request->search}%"));
+                            break;
+                        case 'customer_name':
+                            $q->orWhereHas('customer', fn($q) => $q->where('customer_name', 'like', "%{$request->search}%"));
+                            break;
+                        case 'customer_email':
+                            $q->orWhereHas('customer', fn($q) => $q->where('email', 'like', "%{$request->search}%"));
+                            break;
+                        case 'customer_phone':
+                            $q->orWhereHas('customer', fn($q) => $q->where('phone', 'like', "%{$request->search}%"));
+                            break;
+                        case 'product_serial':
+                            $q->orWhereHas('product', fn($q) => $q->where('product_serial', 'like', "%{$request->search}%"));
+                            break;
+                        case 'problem':
+                            $q->orWhere('problem_description', 'like', "%{$request->search}%");
+                            break;
+                        case 'case_id':
+                            $q->orWhereHas('workOrder.parts', fn($q) => $q->where('case_id', 'like', "%{$request->search}%"));
+                            break;
+                        case 'order_id':
+                            $q->orWhereHas('workOrder.parts', fn($q) => $q->where('order_id', 'like', "%{$request->search}%"));
+                            break;
+                        case 'part_return_comment':
+                            $q->orWhereHas('workOrder.parts', fn($q) => $q->where('part_return_comment', 'like', "%{$request->search}%"));
+                            break;
+                        case 'replacement_item_description':
+                            $q->orWhereHas('workOrder.replaceProduct', fn($q) => $q->where('item_description', 'like', "%{$request->search}%"));
+                            break;
+                        case 'replacement_item_serial':
+                            $q->orWhereHas('workOrder', fn($q) => $q->where('replace_serial', 'like', "%{$request->search}%"));
+                            break;
+                        case 'work_done_comment':
+                            $q->orWhere('work_done_comment', 'like', "%{$request->search}%");
+                            break;
+                        case 'claim_number':
+                            $q->orWhere('claim_number', 'like', "%{$request->search}%");
+                            break;
+                        case 'customer_feedback':
+                            $q->orWhere('customer_feedback', 'like', "%{$request->search}%");
+                            break;
+                        case 'complaint':
+                            $q->orWhere('additional_comment', 'like', "%{$request->search}%");
+                            break;
+                        case 'aging':
+                            $q->orWhere('aging', 'like', "%{$request->search}%");
+                            break;
+                    }
+                }
             });
         }
 
-        if ($request->has('service_type')) {
+        if ($request->has('part_qty_used') && $request->filled('part_qty_used')) {
+            $query->whereHas('workOrder.parts', function ($q) use ($request) {
+                $q->where('qty_used', $request->part_qty_used);
+            });
+        }
+
+        if ($request->has('service_type') && $request->filled('service_type')) {
             $query->where('service_type', $request->service_type);
         }
 
-        if ($request->has('job_type')) {
+        if ($request->has('job_type') && $request->filled('job_type')) {
             $query->where('job_type', $request->job_type);
+        }
+
+        if ($request->has('wo_delivery_date') && $request->filled('wo_delivery_date')) {
+            $query->whereDate('wo_delivery_date', Carbon::parse($request->wo_delivery_date));
+        }
+
+        if ($request->has('customer_rating') && $request->filled('customer_rating')) {
+            $query->where('customer_rating', $request->customer_rating);
+        }
+
+        if ($request->has('courier_in_id') && $request->filled('courier_in_id')) {
+            $query->where('courier_in_id', $request->courier_in_id);
+        }
+
+        if ($request->has('courier_out_id') && $request->filled('courier_out_id')) {
+            $query->where('courier_out_id', $request->courier_out_id);
+        }
+
+        if ($request->has('attachment') && $request->filled('attachment')) {
+            if (strtolower($request->attachment) === 'Yes') {
+                $query->whereNotNull('attachments')->where('attachments', '!=', '[]');
+            } else {
+                $query->where(function ($q) {
+                    $q->whereNull('attachments')->orWhere('attachments', '[]');
+                });
+            }
         }
 
         if ($request->has('doa')) {
@@ -143,17 +232,13 @@ class ClaimController extends Controller
             $query->whereDate('wo_closed_date', Carbon::parse($request->wo_closed_date));
         }
 
-        if ($request->has('wo_delivery_date')) {
-            $query->whereDate('wo_delivery_date', Carbon::parse($request->wo_delivery_date));
-        }
-
         if ($request->has('invoice_date')) {
             $query->whereDate('invoice_date', Carbon::parse($request->invoice_date));
         }
 
-        if ($request->has('part_id')) {
+        if ($request->has('part_id') && $request->filled('part_id')) {
             $query->whereHas('workOrder.parts', function ($q) use ($request) {
-                $q->where('part_id', 'like', "%{$request->part_id}%");
+                $q->where('part_id', $request->part_id);
             });
         }
 
