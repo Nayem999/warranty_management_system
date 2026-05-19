@@ -9,6 +9,7 @@ use App\Models\ProductCategory;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -44,11 +45,19 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
 
-        $category = ProductCategory::create($data);
+            $category = ProductCategory::create($data);
 
-        return $this->created($category->load(['parent', 'children']), 'Category created successfully.');
+            DB::commit();
+
+            return $this->created($category->load(['parent', 'children']), 'Category created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function show(int $id): JsonResponse
@@ -64,21 +73,29 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, int $id): JsonResponse
     {
-        $category = ProductCategory::find($id);
+        DB::beginTransaction();
+        try {
+            $category = ProductCategory::find($id);
 
-        if (! $category) {
-            return $this->notFound('Category not found.');
+            if (! $category) {
+                return $this->notFound('Category not found.');
+            }
+
+            $data = $request->validated();
+
+            if (isset($data['parent_id']) && $data['parent_id'] == $id) {
+                return $this->error('A category cannot be its own parent.');
+            }
+
+            $category->update($data);
+
+            DB::commit();
+
+            return $this->success($category->load(['parent', 'children']), 'Category updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $data = $request->validated();
-
-        if (isset($data['parent_id']) && $data['parent_id'] == $id) {
-            return $this->error('A category cannot be its own parent.');
-        }
-
-        $category->update($data);
-
-        return $this->success($category->load(['parent', 'children']), 'Category updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

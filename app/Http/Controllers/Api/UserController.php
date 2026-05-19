@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -53,37 +54,45 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $this->uploadFile($request->file('image'), 'users');
-        } elseif (! empty($data['image']) && is_string($data['image'])) {
-            $data['image'] = $this->handleImageUpload($data['image'], 'users');
-        }
-
-        $password = $data['password'] ?? Str::random(12);
-        $data['password'] = Hash::make($password);
-
-        if (! isset($data['is_admin'])) {
-            $data['is_admin'] = false;
-        }
-        if (! isset($data['status'])) {
-            $data['status'] = 'active';
-        }
-
-        $user = User::create($data);
-
-        if (! empty($data['brand_ids'])) {
-            foreach ($data['brand_ids'] as $brandId) {
-                UserBrandAccess::create([
-                    'user_id' => $user->id,
-                    'brand_id' => $brandId,
-                    'created_by' => $request->user()->id,
-                ]);
+            if ($request->hasFile('image')) {
+                $data['image'] = $this->uploadFile($request->file('image'), 'users');
+            } elseif (! empty($data['image']) && is_string($data['image'])) {
+                $data['image'] = $this->handleImageUpload($data['image'], 'users');
             }
-        }
 
-        return $this->created($user, 'User created successfully. Password: ' . $password);
+            $password = $data['password'] ?? Str::random(12);
+            $data['password'] = Hash::make($password);
+
+            if (! isset($data['is_admin'])) {
+                $data['is_admin'] = false;
+            }
+            if (! isset($data['status'])) {
+                $data['status'] = 'active';
+            }
+
+            $user = User::create($data);
+
+            if (! empty($data['brand_ids'])) {
+                foreach ($data['brand_ids'] as $brandId) {
+                    UserBrandAccess::create([
+                        'user_id' => $user->id,
+                        'brand_id' => $brandId,
+                        'created_by' => $request->user()->id,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return $this->created($user, 'User created successfully. Password: ' . $password);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function show(int $id): JsonResponse
@@ -99,35 +108,43 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        $user = User::find($id);
+        DB::beginTransaction();
+        try {
+            $user = User::find($id);
 
-        if (! $user) {
-            return $this->notFound('User not found.');
-        }
-
-        $data = $request->validated();
-
-        if (!isset($data['image']) || empty($data['image'])) {
-            unset($data['image']);
-        }
-
-        if ($request->hasFile('image')) {
-            $this->deleteFile($user->image);
-            $data['image'] = $this->uploadFile($request->file('image'), 'users');
-        } elseif (! empty($data['image']) && is_string($data['image'])) {
-            if ($user->image !== $data['image']) {
-                $this->deleteFile($user->image);
-                $data['image'] = $this->handleImageUpload($data['image'], 'users');
+            if (! $user) {
+                return $this->notFound('User not found.');
             }
+
+            $data = $request->validated();
+
+            if (!isset($data['image']) || empty($data['image'])) {
+                unset($data['image']);
+            }
+
+            if ($request->hasFile('image')) {
+                $this->deleteFile($user->image);
+                $data['image'] = $this->uploadFile($request->file('image'), 'users');
+            } elseif (! empty($data['image']) && is_string($data['image'])) {
+                if ($user->image !== $data['image']) {
+                    $this->deleteFile($user->image);
+                    $data['image'] = $this->handleImageUpload($data['image'], 'users');
+                }
+            }
+
+            if (isset($data['password'])) {
+                $data['password'] = Hash::make($data['password']);
+            }
+
+            $user->update($data);
+
+            DB::commit();
+
+            return $this->success($user, 'User updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
-        $user->update($data);
-
-        return $this->success($user, 'User updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

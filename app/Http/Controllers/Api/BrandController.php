@@ -11,6 +11,7 @@ use App\Traits\ApiResponse;
 use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BrandController extends Controller
 {
@@ -49,45 +50,61 @@ class BrandController extends Controller
 
     public function store(StoreBrandRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
 
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $this->uploadFile($request->file('logo'), 'brands');
-        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
-            $data['logo'] = $this->handleImageUpload($data['logo'], 'brands');
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $this->uploadFile($request->file('logo'), 'brands');
+            } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+                $data['logo'] = $this->handleImageUpload($data['logo'], 'brands');
+            }
+
+            $brand = Brand::create($data);
+
+            DB::commit();
+
+            return $this->created($brand, 'Brand created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $brand = Brand::create($data);
-
-        return $this->created($brand, 'Brand created successfully.');
     }
 
     public function update(UpdateBrandRequest $request, int $id): JsonResponse
     {
-        $brand = Brand::find($id);
+        DB::beginTransaction();
+        try {
+            $brand = Brand::find($id);
 
-        if (! $brand) {
-            return $this->notFound('Brand not found.');
-        }
-
-        $data = $request->validated();
-        if (!isset($data['logo']) || empty($data['logo'])) {
-            unset($data['logo']);
-        }
-
-        if ($request->hasFile('logo')) {
-            $this->deleteFile($brand->logo);
-            $data['logo'] = $this->uploadFile($request->file('logo'), 'brands');
-        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
-            if ($brand->logo !== $data['logo']) {
-                $this->deleteFile($brand->logo);
-                $data['logo'] = $this->handleImageUpload($data['logo'], 'brands');
+            if (! $brand) {
+                return $this->notFound('Brand not found.');
             }
+
+            $data = $request->validated();
+            if (!isset($data['logo']) || empty($data['logo'])) {
+                unset($data['logo']);
+            }
+
+            if ($request->hasFile('logo')) {
+                $this->deleteFile($brand->logo);
+                $data['logo'] = $this->uploadFile($request->file('logo'), 'brands');
+            } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+                if ($brand->logo !== $data['logo']) {
+                    $this->deleteFile($brand->logo);
+                    $data['logo'] = $this->handleImageUpload($data['logo'], 'brands');
+                }
+            }
+
+            $brand->update($data);
+
+            DB::commit();
+
+            return $this->success($brand, 'Brand updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $brand->update($data);
-
-        return $this->success($brand, 'Brand updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

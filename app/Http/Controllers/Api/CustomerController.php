@@ -12,6 +12,7 @@ use App\Traits\EmailHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -47,20 +48,28 @@ class CustomerController extends Controller
 
     public function store(StoreCustomerRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
 
-        $password = Str::random(12);
-        $data['password'] = $password;
+            $password = Str::random(12);
+            $data['password'] = $password;
 
-        $customer = Customer::create($data);
+            $customer = Customer::create($data);
 
-        $this->sendEmail(
-            new CustomerWelcomeEmail($customer, $password),
-            $customer->email,
-            'Welcome to ' . config('app.name') . ' - Your Account Details'
-        );
+            $this->sendEmail(
+                new CustomerWelcomeEmail($customer, $password),
+                $customer->email,
+                'Welcome to ' . config('app.name') . ' - Your Account Details'
+            );
 
-        return $this->created($customer, 'Customer created successfully. Password: ' . $password);
+            DB::commit();
+
+            return $this->created($customer, 'Customer created successfully. Password: ' . $password);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function show(int $id): JsonResponse

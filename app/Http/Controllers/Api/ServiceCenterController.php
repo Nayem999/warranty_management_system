@@ -9,6 +9,7 @@ use App\Traits\ApiResponse;
 use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ServiceCenterController extends Controller
 {
@@ -37,27 +38,35 @@ class ServiceCenterController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|unique:wms_service_centers,title|max:255',
-            'address' => 'nullable|string',
-            'uan' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-            'working_hours' => 'nullable|string',
-            'logo' => 'nullable|string',
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
-        ]);
+        DB::beginTransaction();
+        try {
+            $data = $request->validate([
+                'title' => 'required|string|unique:wms_service_centers,title|max:255',
+                'address' => 'nullable|string',
+                'uan' => 'nullable|string|max:20',
+                'email' => 'nullable|email',
+                'working_hours' => 'nullable|string',
+                'logo' => 'nullable|string',
+                'display_order' => 'nullable|integer',
+                'is_active' => 'nullable|boolean',
+            ]);
 
 
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
-        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
-            $data['logo'] = $this->handleImageUpload($data['logo'], 'service-centers');
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
+            } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+                $data['logo'] = $this->handleImageUpload($data['logo'], 'service-centers');
+            }
+
+            $serviceCenter = ServiceCenter::create($data);
+
+            DB::commit();
+
+            return $this->created($serviceCenter, 'Service center created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $serviceCenter = ServiceCenter::create($data);
-
-        return $this->created($serviceCenter, 'Service center created successfully.');
     }
 
     public function show(int $id): JsonResponse
@@ -73,40 +82,48 @@ class ServiceCenterController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        $serviceCenter = ServiceCenter::find($id);
+        DB::beginTransaction();
+        try {
+            $serviceCenter = ServiceCenter::find($id);
 
-        if (! $serviceCenter) {
-            return $this->notFound('Service center not found.');
-        }
-
-        $data = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'address' => 'nullable|string',
-            'uan' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-            'working_hours' => 'nullable|string',
-            'logo' => 'nullable|string',
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
-        ]);
-
-        if (!isset($data['logo']) || empty($data['logo'])) {
-            unset($data['logo']);
-        }
-
-        if ($request->hasFile('logo')) {
-            $this->deleteFile($serviceCenter->logo);
-            $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
-        } elseif (! empty($data['logo']) && is_string($data['logo'])) {
-            if ($serviceCenter->logo !== $data['logo']) {
-                $this->deleteFile($serviceCenter->logo);
-                $data['logo'] = $this->handleImageUpload($data['logo'], 'service-centers');
+            if (! $serviceCenter) {
+                return $this->notFound('Service center not found.');
             }
+
+            $data = $request->validate([
+                'title' => 'sometimes|string|max:255',
+                'address' => 'nullable|string',
+                'uan' => 'nullable|string|max:20',
+                'email' => 'nullable|email',
+                'working_hours' => 'nullable|string',
+                'logo' => 'nullable|string',
+                'display_order' => 'nullable|integer',
+                'is_active' => 'nullable|boolean',
+            ]);
+
+            if (!isset($data['logo']) || empty($data['logo'])) {
+                unset($data['logo']);
+            }
+
+            if ($request->hasFile('logo')) {
+                $this->deleteFile($serviceCenter->logo);
+                $data['logo'] = $this->uploadFile($request->file('logo'), 'service-centers');
+            } elseif (! empty($data['logo']) && is_string($data['logo'])) {
+                if ($serviceCenter->logo !== $data['logo']) {
+                    $this->deleteFile($serviceCenter->logo);
+                    $data['logo'] = $this->handleImageUpload($data['logo'], 'service-centers');
+                }
+            }
+
+            $serviceCenter->update($data);
+
+            DB::commit();
+
+            return $this->success(new ServiceCenterResource($serviceCenter), 'Service center updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $serviceCenter->update($data);
-
-        return $this->success(new ServiceCenterResource($serviceCenter), 'Service center updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

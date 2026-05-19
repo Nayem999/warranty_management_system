@@ -7,6 +7,7 @@ use App\Models\Courier;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CourierController extends Controller
 {
@@ -34,16 +35,24 @@ class CourierController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
-        ]);
+        DB::beginTransaction();
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string',
+                'is_active' => 'nullable|boolean',
+            ]);
 
-        $courier = Courier::create($data);
+            $courier = Courier::create($data);
 
-        return $this->created($courier, 'Courier created successfully.');
+            DB::commit();
+
+            return $this->created($courier, 'Courier created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function show(int $id): JsonResponse
@@ -59,22 +68,30 @@ class CourierController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        $courier = Courier::find($id);
+        DB::beginTransaction();
+        try {
+            $courier = Courier::find($id);
 
-        if (! $courier) {
-            return $this->notFound('Courier not found.');
+            if (! $courier) {
+                return $this->notFound('Courier not found.');
+            }
+
+            $data = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string',
+                'is_active' => 'nullable|boolean',
+            ]);
+
+            $courier->update($data);
+
+            DB::commit();
+
+            return $this->success($courier, 'Courier updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
-        ]);
-
-        $courier->update($data);
-
-        return $this->success($courier, 'Courier updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

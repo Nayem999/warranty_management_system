@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
@@ -27,14 +28,22 @@ class RoleController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255|unique:wms_roles,title',
-            'permissions' => 'nullable|array',
-        ]);
+        DB::beginTransaction();
+        try {
+            $data = $request->validate([
+                'title' => 'required|string|max:255|unique:wms_roles,title',
+                'permissions' => 'nullable|array',
+            ]);
 
-        $role = Role::create($data);
+            $role = Role::create($data);
 
-        return $this->created($role, 'Role created successfully.');
+            DB::commit();
+
+            return $this->created($role, 'Role created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function show(int $id): JsonResponse
@@ -50,20 +59,28 @@ class RoleController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        $role = Role::find($id);
+        DB::beginTransaction();
+        try {
+            $role = Role::find($id);
 
-        if (!$role) {
-            return $this->notFound('Role not found.');
+            if (!$role) {
+                return $this->notFound('Role not found.');
+            }
+
+            $data = $request->validate([
+                'title' => 'sometimes|string|max:255|unique:wms_roles,title,' . $id,
+                'permissions' => 'nullable|array',
+            ]);
+
+            $role->update($data);
+
+            DB::commit();
+
+            return $this->success($role, 'Role updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $data = $request->validate([
-            'title' => 'sometimes|string|max:255|unique:wms_roles,title,' . $id,
-            'permissions' => 'nullable|array',
-        ]);
-
-        $role->update($data);
-
-        return $this->success($role, 'Role updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

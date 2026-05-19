@@ -15,6 +15,7 @@ use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -74,20 +75,28 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $data['created_by'] = $request->user()->id;
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
+            $data['created_by'] = $request->user()->id;
 
-        $product = Product::create($data);
+            $product = Product::create($data);
 
-        ActivityLog::log(
-            $request->user()->id,
-            'created',
-            'Product',
-            $product->model_no,
-            $product->id
-        );
+            ActivityLog::log(
+                $request->user()->id,
+                'created',
+                'Product',
+                $product->model_no,
+                $product->id
+            );
 
-        return $this->created($product->load(['brand', 'category', 'subCategory']), 'Product created successfully.');
+            DB::commit();
+
+            return $this->created($product->load(['brand', 'category', 'subCategory']), 'Product created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function show(int $id): JsonResponse
@@ -106,27 +115,35 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
-        $product = Product::find($id);
+        DB::beginTransaction();
+        try {
+            $product = Product::find($id);
 
-        if (! $product) {
-            return $this->notFound('Product not found.');
+            if (! $product) {
+                return $this->notFound('Product not found.');
+            }
+
+            $oldData = $product->toArray();
+            $data = $request->validated();
+
+            $product->update($data);
+
+            ActivityLog::log(
+                $request->user()->id,
+                'updated',
+                'Product',
+                $product->model_no,
+                $product->id,
+                ['old' => $oldData, 'new' => $product->toArray()]
+            );
+
+            DB::commit();
+
+            return $this->success($product->load(['brand', 'category', 'subCategory']), 'Product updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $oldData = $product->toArray();
-        $data = $request->validated();
-
-        $product->update($data);
-
-        ActivityLog::log(
-            $request->user()->id,
-            'updated',
-            'Product',
-            $product->model_no,
-            $product->id,
-            ['old' => $oldData, 'new' => $product->toArray()]
-        );
-
-        return $this->success($product->load(['brand', 'category', 'subCategory']), 'Product updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
@@ -176,87 +193,95 @@ class ProductController extends Controller
 
     public function import(Request $request): JsonResponse
     {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,csv',
-        ]);
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
 
-        $file = $request->file('file');
-        $path = $file->getRealPath();
+            $file = $request->file('file');
+            $path = $file->getRealPath();
 
-        $spreadsheet = IOFactory::load($path);
-        $sheet = $spreadsheet->getActiveSheet();
-        $rows = $sheet->toArray();
+            $spreadsheet = IOFactory::load($path);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
 
-        if (count($rows) < 2) {
-            return $this->error('File is empty or has no data rows.');
-        }
-
-        $headers = array_map('strtolower', array_map('trim', $rows[0]));
-        $dataRows = array_slice($rows, 1);
-
-        $imported = 0;
-        $failed = [];
-        $createdBy = $request->user()->id;
-
-        foreach ($dataRows as $index => $row) {
-            try {
-                $data = array_combine($headers, $row);
-
-                if (empty($data['model_no']) && empty($data['model_number'])) {
-                    continue;
-                }
-
-                $modelNo = $data['model_no'] ?? $data['model_number'] ?? null;
-                $itemDescription = $data['item_description'] ?? $data['description'] ?? null;
-                $brandShortName = $data['brand short name'] ?? $data['brand_short_name'] ?? null;
-                $categoryShortName = $data['category short name'] ?? $data['category_short_name'] ?? null;
-                $subCategoryShortName = $data['sub-category short name'] ?? $data['sub_category_short_name'] ?? null;
-                $startDate = $data['start date'] ?? $data['start_date'] ?? null;
-                $endDate = $data['end date'] ?? $data['end_date'] ?? null;
-                $isCountable = $data['is_countable'] ?? $data['countable'] ?? false;
-
-                $brandId = null;
-                if (! empty($brandShortName)) {
-                    $brand = Brand::where('short_name', $brandShortName)->first();
-                    $brandId = $brand?->id;
-                }
-
-                $categoryId = null;
-                if (! empty($categoryShortName)) {
-                    $category = ProductCategory::where('short_name', $categoryShortName)->first();
-                    $categoryId = $category?->id;
-                }
-
-                $subCategoryId = null;
-                if (! empty($subCategoryShortName)) {
-                    $subCategory = ProductCategory::where('short_name', $subCategoryShortName)->first();
-                    $subCategoryId = $subCategory?->id;
-                }
-
-                $productData = [
-                    'model_no' => $modelNo,
-                    'item_description' => $itemDescription,
-                    'brand_id' => $brandId,
-                    'category_id' => $categoryId,
-                    'sub_category_id' => $subCategoryId,
-                    'is_countable' => filter_var($isCountable, FILTER_VALIDATE_BOOLEAN) ? true : false,
-                    'start_date' => $startDate ? Carbon::parse($startDate)->format('Y-m-d') : null,
-                    'end_date' => $endDate ? Carbon::parse($endDate)->format('Y-m-d') : null,
-                    'created_by' => $createdBy,
-                ];
-
-                Product::create($productData);
-                $imported++;
-            } catch (\Exception $e) {
-                $failed[] = ['row' => $index + 2, 'error' => $e->getMessage()];
+            if (count($rows) < 2) {
+                return $this->error('File is empty or has no data rows.');
             }
-        }
 
-        return $this->success([
-            'imported' => $imported,
-            'failed' => $failed,
-            'total' => count($dataRows),
-        ], 'Product import completed.');
+            $headers = array_map('strtolower', array_map('trim', $rows[0]));
+            $dataRows = array_slice($rows, 1);
+
+            $imported = 0;
+            $failed = [];
+            $createdBy = $request->user()->id;
+
+            foreach ($dataRows as $index => $row) {
+                try {
+                    $data = array_combine($headers, $row);
+
+                    if (empty($data['model_no']) && empty($data['model_number'])) {
+                        continue;
+                    }
+
+                    $modelNo = $data['model_no'] ?? $data['model_number'] ?? null;
+                    $itemDescription = $data['item_description'] ?? $data['description'] ?? null;
+                    $brandShortName = $data['brand short name'] ?? $data['brand_short_name'] ?? null;
+                    $categoryShortName = $data['category short name'] ?? $data['category_short_name'] ?? null;
+                    $subCategoryShortName = $data['sub-category short name'] ?? $data['sub_category_short_name'] ?? null;
+                    $startDate = $data['start date'] ?? $data['start_date'] ?? null;
+                    $endDate = $data['end date'] ?? $data['end_date'] ?? null;
+                    $isCountable = $data['is_countable'] ?? $data['countable'] ?? false;
+
+                    $brandId = null;
+                    if (! empty($brandShortName)) {
+                        $brand = Brand::where('short_name', $brandShortName)->first();
+                        $brandId = $brand?->id;
+                    }
+
+                    $categoryId = null;
+                    if (! empty($categoryShortName)) {
+                        $category = ProductCategory::where('short_name', $categoryShortName)->first();
+                        $categoryId = $category?->id;
+                    }
+
+                    $subCategoryId = null;
+                    if (! empty($subCategoryShortName)) {
+                        $subCategory = ProductCategory::where('short_name', $subCategoryShortName)->first();
+                        $subCategoryId = $subCategory?->id;
+                    }
+
+                    $productData = [
+                        'model_no' => $modelNo,
+                        'item_description' => $itemDescription,
+                        'brand_id' => $brandId,
+                        'category_id' => $categoryId,
+                        'sub_category_id' => $subCategoryId,
+                        'is_countable' => filter_var($isCountable, FILTER_VALIDATE_BOOLEAN) ? true : false,
+                        'start_date' => $startDate ? Carbon::parse($startDate)->format('Y-m-d') : null,
+                        'end_date' => $endDate ? Carbon::parse($endDate)->format('Y-m-d') : null,
+                        'created_by' => $createdBy,
+                    ];
+
+                    Product::create($productData);
+                    $imported++;
+                } catch (\Exception $e) {
+                    $failed[] = ['row' => $index + 2, 'error' => $e->getMessage()];
+                }
+            }
+
+            DB::commit();
+
+            return $this->success([
+                'imported' => $imported,
+                'failed' => $failed,
+                'total' => count($dataRows),
+            ], 'Product import completed.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function importSample(Request $request): BinaryFileResponse

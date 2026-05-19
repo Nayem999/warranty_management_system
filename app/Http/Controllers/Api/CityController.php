@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CityController extends Controller
 {
@@ -45,34 +46,50 @@ class CityController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:50',
-            'status' => 'nullable|string|in:active,inactive',
-        ]);
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'code' => 'nullable|string|max:50',
+                'status' => 'nullable|string|in:active,inactive',
+            ]);
 
-        $city = City::create($validated);
+            $city = City::create($validated);
 
-        return $this->created($city, 'City created successfully.');
+            DB::commit();
+
+            return $this->created($city, 'City created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
-        $city = City::find($id);
+        DB::beginTransaction();
+        try {
+            $city = City::find($id);
 
-        if (! $city) {
-            return $this->notFound('City not found.');
+            if (! $city) {
+                return $this->notFound('City not found.');
+            }
+
+            $validated = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'code' => 'nullable|string|max:50',
+                'status' => 'nullable|string|in:active,inactive',
+            ]);
+
+            $city->update($validated);
+
+            DB::commit();
+
+            return $this->success($city, 'City updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'code' => 'nullable|string|max:50',
-            'status' => 'nullable|string|in:active,inactive',
-        ]);
-
-        $city->update($validated);
-
-        return $this->success($city, 'City updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse

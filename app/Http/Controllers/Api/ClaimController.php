@@ -16,6 +16,7 @@ use App\Traits\UserAccessFilter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ClaimController extends Controller
 {
@@ -375,57 +376,65 @@ class ClaimController extends Controller
 
     public function store(StoreClaimRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
 
-        $product = isset($data['product_id']) ? Product::find($data['product_id']) : null;
-        $serialNumber = $data['serial_number'] ?? null;
+            $product = isset($data['product_id']) ? Product::find($data['product_id']) : null;
+            $serialNumber = $data['serial_number'] ?? null;
 
-        if (! $product) {
-            return $this->error('Product not found.');
-        }
-
-        if (! $product->isActive()) {
-            return $this->error('Product is not active or has expired.');
-        }
-        if ($product->is_countable && !$serialNumber) {
-            return $this->error('Serial Number Required For Claim Countable Product');
-        }
-        $existingClaim = 0;
-        if ($product->is_countable && $serialNumber) {
-            $existingClaim = Claim::where('serial_number', $serialNumber)
-                ->count();
-
-            $prev_Claim = Claim::where('serial_number', $serialNumber)
-                ->where('status', '!=', 'Delivered')
-                ->first();
-
-            if ($prev_Claim) {
-                return $this->error("A claim with status " . $prev_Claim->status . " already exists for this product. Claim Number: " . $prev_Claim->claim_number);
+            if (! $product) {
+                return $this->error('Product not found.');
             }
 
-            $existingClaim = $existingClaim + 1;
+            if (! $product->isActive()) {
+                return $this->error('Product is not active or has expired.');
+            }
+            if ($product->is_countable && !$serialNumber) {
+                return $this->error('Serial Number Required For Claim Countable Product');
+            }
+            $existingClaim = 0;
+            if ($product->is_countable && $serialNumber) {
+                $existingClaim = Claim::where('serial_number', $serialNumber)
+                    ->count();
+
+                $prev_Claim = Claim::where('serial_number', $serialNumber)
+                    ->where('status', '!=', 'Delivered')
+                    ->first();
+
+                if ($prev_Claim) {
+                    return $this->error("A claim with status " . $prev_Claim->status . " already exists for this product. Claim Number: " . $prev_Claim->claim_number);
+                }
+
+                $existingClaim = $existingClaim + 1;
+            }
+
+            $data['claim_number'] = Claim::generateClaimNumber();
+            $data['counter'] = $existingClaim;
+            $data['created_by'] = $request->user()->id;
+            $data['claim_date'] = $data['claim_date'] ?? Carbon::today();
+            $data['status'] = $data['status'] ?? 'Not Assigned';
+
+            $claim = Claim::create($data);
+
+            ActivityLog::log(
+                $request->user()->id,
+                'created',
+                'Claim',
+                $claim->claim_number,
+                $claim->id,
+                ['status' => $claim->status, 'comment' => $claim->status_comment]
+            );
+
+            ClaimCreated::dispatch($claim);
+
+            DB::commit();
+
+            return $this->created($claim->load(['product.brand', 'customer', 'serviceCenter']), 'Claim created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        $data['claim_number'] = Claim::generateClaimNumber();
-        $data['counter'] = $existingClaim;
-        $data['created_by'] = $request->user()->id;
-        $data['claim_date'] = $data['claim_date'] ?? Carbon::today();
-        $data['status'] = $data['status'] ?? 'Not Assigned';
-
-        $claim = Claim::create($data);
-
-        ActivityLog::log(
-            $request->user()->id,
-            'created',
-            'Claim',
-            $claim->claim_number,
-            $claim->id,
-            ['status' => $claim->status, 'comment' => $claim->status_comment]
-        );
-
-        ClaimCreated::dispatch($claim);
-
-        return $this->created($claim->load(['product.brand', 'customer', 'serviceCenter']), 'Claim created successfully.');
     }
 
     public function track(string $claimNumber): JsonResponse
@@ -492,129 +501,137 @@ class ClaimController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        $claim = Claim::find($id);
+        DB::beginTransaction();
+        try {
+            $claim = Claim::find($id);
 
-        if (! $claim) {
-            return $this->notFound('Claim not found.');
-        }
-
-        $statuses = implode(',', $this->statuses);
-        $serviceTypes = implode(',', ['In Warranty', 'Warranty Void', 'DOA', 'OOW/Expired']);
-        $jobTypes = implode(',', ['Carry In', 'On Site', 'Pick Up']);
-
-        $data = $request->validate([
-            'service_center_id' => 'nullable|exists:wms_service_centers,id',
-            'problem_description' => 'nullable|string',
-            'claim_date' => 'nullable|date',
-            'status' => "nullable|in:{$statuses}",
-            'engineer_id' => 'nullable|exists:users,id',
-            'courier_in_id' => 'nullable|exists:wms_couriers,id',
-            'courier_slip_inward' => 'nullable|string',
-            'courier_out_id' => 'nullable|exists:wms_couriers,id',
-            'courier_slip_outward' => 'nullable|string',
-            'received_date_time' => 'nullable|date',
-            'delivered_date_time' => 'nullable|date',
-            'counter' => 'nullable|integer|min:0',
-            'wo_assigned_date' => 'nullable|date',
-            'wo_closed_date' => 'nullable|date',
-            'wo_delivery_date' => 'nullable|date',
-            'tat' => 'nullable|integer|min:0',
-            'doa' => 'nullable|boolean',
-            'invoice_no' => 'nullable|string',
-            'invoice_date' => 'nullable|date',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'ref' => 'nullable|string',
-            'web_wty_date' => 'nullable|date',
-            'additional_comment' => 'nullable|string',
-            'work_done_comment' => 'nullable|string',
-            'customer_feedback' => 'nullable|string',
-            'customer_rating' => 'nullable|integer|min:1|max:5',
-            'status_comment' => 'nullable|string',
-            'service_type' => "nullable|in:{$serviceTypes}",
-            'job_type' => "nullable|in:{$jobTypes}",
-            'assigned_by' => 'nullable|exists:users,id',
-
-            'replace_serial' => 'nullable|string',
-            'replace_product_id' => 'nullable|integer|exists:wms_products,id',
-            'replace_ref' => 'nullable|string',
-            'parts' => 'nullable|array',
-            'job_remarks' => 'nullable|string',
-            'accessories' => 'nullable|string|max:500',
-        ]);
-
-        if ($data['status'] == "Delivered") {
-            return $this->error("status Should Not Delivered From Claim Update");
-        }
-
-        if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
-            $data['assigned_by'] = $request->user()->id;
-            $data['status'] = "Assigned";
-        } else if ($claim->status == "Not Assigned" && $data['engineer_id']) {
-            $data['assigned_by'] = $request->user()->id;
-        }
-
-        $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
-        $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement');
-
-        if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
-            $data['wo_closed_date'] = now();
-        }
-
-        $claim->update($data);
-        if (
-            isset($data['replace_serial']) ||
-            isset($data['replace_product_id']) ||
-            isset($data['replace_ref']) ||
-            isset($data['parts'])
-        ) {
-
-            $workOrder = $claim->workOrder;
-
-            if (! $workOrder) {
-                $workOrder = WorkOrder::create([
-                    'wo_number' => WorkOrder::generateWoNumber(),
-                    'claim_id' => $claim->id,
-                    'product_id' => $claim->product_id,
-                    'service_center_id' => $claim->service_center_id,
-                    'status' => 'Closed',
-                    'created_by' => $request->user()->id,
-                ]);
+            if (! $claim) {
+                return $this->notFound('Claim not found.');
             }
 
-            $workOrder->update([
-                'replace_serial' => $data['replace_serial'] ?? null,
-                'replace_product_id' => $data['replace_product_id'] ?? null,
-                'replace_ref' => $data['replace_ref'] ?? null,
+            $statuses = implode(',', $this->statuses);
+            $serviceTypes = implode(',', ['In Warranty', 'Warranty Void', 'DOA', 'OOW/Expired']);
+            $jobTypes = implode(',', ['Carry In', 'On Site', 'Pick Up']);
+
+            $data = $request->validate([
+                'service_center_id' => 'nullable|exists:wms_service_centers,id',
+                'problem_description' => 'nullable|string',
+                'claim_date' => 'nullable|date',
+                'status' => "nullable|in:{$statuses}",
+                'engineer_id' => 'nullable|exists:users,id',
+                'courier_in_id' => 'nullable|exists:wms_couriers,id',
+                'courier_slip_inward' => 'nullable|string',
+                'courier_out_id' => 'nullable|exists:wms_couriers,id',
+                'courier_slip_outward' => 'nullable|string',
+                'received_date_time' => 'nullable|date',
+                'delivered_date_time' => 'nullable|date',
+                'counter' => 'nullable|integer|min:0',
+                'wo_assigned_date' => 'nullable|date',
+                'wo_closed_date' => 'nullable|date',
+                'wo_delivery_date' => 'nullable|date',
+                'tat' => 'nullable|integer|min:0',
+                'doa' => 'nullable|boolean',
+                'invoice_no' => 'nullable|string',
+                'invoice_date' => 'nullable|date',
+                'purchase_price' => 'nullable|numeric|min:0',
+                'ref' => 'nullable|string',
+                'web_wty_date' => 'nullable|date',
+                'additional_comment' => 'nullable|string',
+                'work_done_comment' => 'nullable|string',
+                'customer_feedback' => 'nullable|string',
+                'customer_rating' => 'nullable|integer|min:1|max:5',
+                'status_comment' => 'nullable|string',
+                'service_type' => "nullable|in:{$serviceTypes}",
+                'job_type' => "nullable|in:{$jobTypes}",
+                'assigned_by' => 'nullable|exists:users,id',
+
+                'replace_serial' => 'nullable|string',
+                'replace_product_id' => 'nullable|integer|exists:wms_products,id',
+                'replace_ref' => 'nullable|string',
+                'parts' => 'nullable|array',
+                'job_remarks' => 'nullable|string',
+                'accessories' => 'nullable|string|max:500',
             ]);
 
-            if (isset($data['parts'])) {
-                $workOrder->parts()->delete();
+            if ($data['status'] == "Delivered") {
+                return $this->error("status Should Not Delivered From Claim Update");
+            }
 
-                foreach ($data['parts'] as $partData) {
-                    $workOrder->parts()->create($partData);
+            if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
+                $data['assigned_by'] = $request->user()->id;
+                $data['status'] = "Assigned";
+            } else if ($claim->status == "Not Assigned" && $data['engineer_id']) {
+                $data['assigned_by'] = $request->user()->id;
+            }
+
+            $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
+            $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement');
+
+            if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
+                $data['wo_closed_date'] = now();
+            }
+
+            $claim->update($data);
+            if (
+                isset($data['replace_serial']) ||
+                isset($data['replace_product_id']) ||
+                isset($data['replace_ref']) ||
+                isset($data['parts'])
+            ) {
+
+                $workOrder = $claim->workOrder;
+
+                if (! $workOrder) {
+                    $workOrder = WorkOrder::create([
+                        'wo_number' => WorkOrder::generateWoNumber(),
+                        'claim_id' => $claim->id,
+                        'product_id' => $claim->product_id,
+                        'service_center_id' => $claim->service_center_id,
+                        'status' => 'Closed',
+                        'created_by' => $request->user()->id,
+                    ]);
+                }
+
+                $workOrder->update([
+                    'replace_serial' => $data['replace_serial'] ?? null,
+                    'replace_product_id' => $data['replace_product_id'] ?? null,
+                    'replace_ref' => $data['replace_ref'] ?? null,
+                ]);
+
+                if (isset($data['parts'])) {
+                    $workOrder->parts()->delete();
+
+                    foreach ($data['parts'] as $partData) {
+                        $workOrder->parts()->create($partData);
+                    }
                 }
             }
+
+            ActivityLog::log(
+                $request->user()->id,
+                'updated',
+                'Claim',
+                $claim->claim_number,
+                $claim->id,
+                ['status' => $claim->status, 'comment' => $claim->status_comment]
+            );
+
+            DB::commit();
+
+            return $this->success($claim->load([
+                'product.brand',
+                'customer',
+                'serviceCenter',
+                'engineer',
+                'courierIn',
+                'courierOut',
+                'assignedByUser',
+                'workOrder.parts.part',
+            ]), 'Claim updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
         }
-
-        ActivityLog::log(
-            $request->user()->id,
-            'updated',
-            'Claim',
-            $claim->claim_number,
-            $claim->id,
-            ['status' => $claim->status, 'comment' => $claim->status_comment]
-        );
-
-        return $this->success($claim->load([
-            'product.brand',
-            'customer',
-            'serviceCenter',
-            'engineer',
-            'courierIn',
-            'courierOut',
-            'assignedByUser',
-            'workOrder.parts.part', // ✅ include parts
-        ]), 'Claim updated successfully.');
     }
 
     public function destroy(int $id): JsonResponse
