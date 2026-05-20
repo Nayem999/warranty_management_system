@@ -25,15 +25,15 @@ class UserResource extends JsonResource
             'job_title' => $this->job_title,
             'disable_login' => $this->disable_login,
             'address' => $this->address,
-            'dob' => $this->dob?->format('Y-m-d'),
+            'dob' => $this->dob?->format('d-M-Y'),
             'gender' => $this->gender,
             'language' => $this->language,
-            'last_online' => $this->last_online?->toIso8601String(),
+            'last_online' => $this->last_online?->format("d-M-Y h:i A"),
             'enable_web_notification' => $this->enable_web_notification,
             'enable_email_notification' => $this->enable_email_notification,
             'brands' => $this->whenLoaded('brands'),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format("d-M-Y h:i A"),
+            'updated_at' => $this->updated_at?->format("d-M-Y h:i A"),
         ];
     }
 }

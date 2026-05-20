@@ -17,9 +17,9 @@ class WorkOrderResource extends JsonResource
             'warranty' => $this->whenLoaded('warranty'),
             'service_center_id' => $this->service_center_id,
             'service_center' => $this->whenLoaded('serviceCenter'),
-            'wo_assigned_date' => $this->wo_assigned_date?->format('Y-m-d'),
-            'wo_closed_date' => $this->wo_closed_date?->format('Y-m-d'),
-            'wo_delivery_date' => $this->wo_delivery_date?->format('Y-m-d'),
+            'wo_assigned_date' => $this->wo_assigned_date?->format('d-M-Y'),
+            'wo_closed_date' => $this->wo_closed_date?->format('d-M-Y'),
+            'wo_delivery_date' => $this->wo_delivery_date?->format('d-M-Y'),
             'tat' => $this->tat,
             'doa' => $this->doa,
             'replace_serial' => $this->replace_serial,
@@ -39,8 +39,8 @@ class WorkOrderResource extends JsonResource
             'creator' => $this->whenLoaded('creator'),
             'assigned_by' => $this->assigned_by,
             'assignedBy' => $this->whenLoaded('assignedBy'),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format("d-M-Y h:i A"),
+            'updated_at' => $this->updated_at?->format("d-M-Y h:i A"),
         ];
     }
 }

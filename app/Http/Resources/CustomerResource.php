@@ -18,8 +18,8 @@ class CustomerResource extends JsonResource
             'landline' => $this->landline,
             'address' => $this->address,
             'city' => $this->city,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format("d-M-Y h:i A"),
+            'updated_at' => $this->updated_at?->format("d-M-Y h:i A"),
         ];
     }
 }

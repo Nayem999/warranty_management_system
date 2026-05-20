@@ -21,13 +21,13 @@ class ProductResource extends JsonResource
             'sub_category_id' => $this->sub_category_id,
             'sub_category' => $this->whenLoaded('subCategory'),
             'is_countable' => $this->is_countable,
-            'start_date' => $this->start_date?->toIso8601String(),
-            'end_date' => $this->end_date?->toIso8601String(),
+            'start_date' => $this->start_date?->format("d-M-Y"),
+            'end_date' => $this->end_date?->format("d-M-Y"),
             'product_status' => $this->product_status,
             'created_by' => $this->created_by,
             'creator' => $this->whenLoaded('creator'),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format("d-M-Y h:i A"),
+            'updated_at' => $this->updated_at?->format("d-M-Y h:i A"),
         ];
     }
 }

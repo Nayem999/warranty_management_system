@@ -20,8 +20,8 @@ class ServiceCenterResource extends JsonResource
             'logo' => $this->logo ? asset('storage/'.$this->logo) : null,
             'display_order' => $this->display_order,
             'is_active' => $this->is_active,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format("d-M-Y h:i A"),
+            'updated_at' => $this->updated_at?->format("d-M-Y h:i A"),
         ];
     }
 }

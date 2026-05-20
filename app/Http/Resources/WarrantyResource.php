@@ -20,13 +20,13 @@ class WarrantyResource extends JsonResource
             'category' => $this->whenLoaded('category'),
             'sub_category_id' => $this->sub_category_id,
             'sub_category' => $this->whenLoaded('subCategory'),
-            'start_date' => $this->start_date?->format('Y-m-d'),
-            'end_date' => $this->end_date?->format('Y-m-d'),
+            'start_date' => $this->start_date?->format('d-M-Y'),
+            'end_date' => $this->end_date?->format('d-M-Y'),
             'warranty_status' => $this->warranty_status,
             'created_by' => $this->created_by,
             'creator' => $this->whenLoaded('creator'),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'created_at' => $this->created_at?->format("d-M-Y h:i A"),
+            'updated_at' => $this->updated_at?->format("d-M-Y h:i A"),
         ];
     }
 }
