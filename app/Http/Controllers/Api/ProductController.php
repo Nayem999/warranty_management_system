@@ -178,15 +178,19 @@ class ProductController extends Controller
 
         $claimList = $claimQuery->orderBy('id', 'asc')->get();
 
-        $hasNonOpenClaim = $claimList->contains(function ($claim) {
-            return $claim->status === 'Delivered';
+        $pendingStatuses = [
+            'Not Assigned',
+            'Assigned',
+            'In Progress',
+            'Waiting for Part',
+        ];
+
+        $claimStatus = !$claimList->contains(function ($claim) use ($pendingStatuses) {
+            return in_array($claim->status, $pendingStatuses);
         });
-        if (!$claimList) {
-            $hasNonOpenClaim = true;
-        }
 
         return $this->success([
-            'claim_status' => $hasNonOpenClaim,
+            'claim_status' => $claimStatus,
             'claim_list' => $claimList,
         ]);
     }
