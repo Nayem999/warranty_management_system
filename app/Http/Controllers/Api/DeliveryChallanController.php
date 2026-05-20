@@ -81,24 +81,9 @@ class DeliveryChallanController extends Controller
             foreach ($claims as $claim) {
 
                 $claim->update([
-                    'courier_out_id'        => $data['courier_out_id'],
-                    'courier_slip_outward'  => $data['courier_slip_outward'],
-                    'delivered_date_time'   => $data['delivered_date_time'],
-                    'delivered_remarks'     => $data['delivered_remarks'] ?? null,
-                    'status'                => 'Delivered',
+                    'is_delivered'        => 1,
+                    'delivery_id'        => $challan->id,
                 ]);
-
-                ActivityLog::log(
-                    $request->user()->id,
-                    'updated',
-                    'Claim',
-                    $claim->claim_number,
-                    $claim->id,
-                    [
-                        'status'  => 'Delivered',
-                        'comment' => $data['delivered_remarks'] ?? null,
-                    ]
-                );
             }
 
             DB::commit();

@@ -32,7 +32,6 @@ class ExportController extends Controller
                 'serviceCenter',
                 'engineer',
                 'courierIn',
-                'courierOut',
                 'assignedByUser',
                 'creator',
                 'workOrder.replaceProduct',

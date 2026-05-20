@@ -31,7 +31,6 @@ class ClaimController extends Controller
         'Un Repaired',
         'Replaced',
         'Reimbursement',
-        'Delivered',
     ];
 
     public function index(Request $request): JsonResponse
@@ -45,7 +44,6 @@ class ClaimController extends Controller
             'serviceCenter',
             'engineer',
             'courierIn',
-            'courierOut',
             'assignedByUser',
             'creator',
             'workOrder.replaceProduct',
@@ -202,8 +200,12 @@ class ClaimController extends Controller
             $query->where('courier_in_id', $request->courier_in_id);
         }
 
-        if ($request->has('courier_out_id') && $request->filled('courier_out_id')) {
-            $query->where('courier_out_id', $request->courier_out_id);
+        if ($request->has('delivery_id') && $request->filled('delivery_id')) {
+            $query->where('delivery_id', $request->delivery_id);
+        }
+
+        if ($request->has('is_delivered') && $request->filled('is_delivered')) {
+            $query->where('is_delivered', $request->is_delivered);
         }
 
         if ($request->has('attachment') && $request->filled('attachment')) {
@@ -402,7 +404,7 @@ class ClaimController extends Controller
                     ->count();
 
                 $prev_Claim = Claim::where('serial_number', $serialNumber)
-                    ->where('status', '!=', 'Delivered')
+                    ->whereIn('status', ['Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part'])
                     ->first();
 
                 if ($prev_Claim) {
@@ -470,7 +472,7 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn', 'courierOut']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);
@@ -524,10 +526,9 @@ class ClaimController extends Controller
                 'engineer_id' => 'nullable|exists:users,id',
                 'courier_in_id' => 'nullable|exists:wms_couriers,id',
                 'courier_slip_inward' => 'nullable|string',
-                'courier_out_id' => 'nullable|exists:wms_couriers,id',
-                'courier_slip_outward' => 'nullable|string',
                 'received_date_time' => 'nullable|date',
-                'delivered_date_time' => 'nullable|date',
+                'delivery_id' => 'nullable|exists:wms_delivery_challans,id',
+                'is_delivered' => 'nullable|boolean',
                 'counter' => 'nullable|integer|min:0',
                 'wo_assigned_date' => 'nullable|date',
                 'wo_closed_date' => 'nullable|date',
@@ -556,8 +557,8 @@ class ClaimController extends Controller
                 'accessories' => 'nullable|string|max:500',
             ]);
 
-            if ($data['status'] == "Delivered") {
-                return $this->error("status Should Not Delivered From Claim Update");
+            if ($claim->is_delivered) {
+                return $this->error("Claim already delivered, Claim can not update");
             }
 
             if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
@@ -629,7 +630,6 @@ class ClaimController extends Controller
                 'serviceCenter',
                 'engineer',
                 'courierIn',
-                'courierOut',
                 'assignedByUser',
                 'workOrder.parts.part',
             ]), 'Claim updated successfully.');
@@ -839,6 +839,7 @@ class ClaimController extends Controller
         $claimListQuery = Claim::with(['product.brand'])
             ->where('customer_id', $claim->customer_id)
             ->where('service_center_id', $claim->service_center_id)
+            ->where('is_delivered', 0)
             ->whereIn('status', [
                 'Repaired',
                 'Un Repaired',

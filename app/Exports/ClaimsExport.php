@@ -26,7 +26,6 @@ class ClaimsExport implements FromCollection, WithHeadings
             'serviceCenter',
             'engineer',
             'courierIn',
-            'courierOut',
             'assignedByUser',
             'creator',
             'workOrder.replaceProduct',

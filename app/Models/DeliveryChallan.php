@@ -47,7 +47,7 @@ class DeliveryChallan extends Model
     {
         return Claim::query()
             ->whereIn('id', $this->claim_ids ?? [])
-            ->with( 'product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'courierOut', 'assignedByUser', 'creator', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart');
+            ->with( 'product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'assignedByUser', 'creator', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart');
     }
 
     public function getClaimsAttribute(): Collection
@@ -56,7 +56,7 @@ class DeliveryChallan extends Model
             return collect();
         }
 
-        return Claim::with( 'product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'courierOut', 'assignedByUser', 'creator', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart',)->whereIn('id', $this->claim_ids)->get();
+        return Claim::with( 'product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'engineer', 'courierIn', 'assignedByUser', 'creator', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart',)->whereIn('id', $this->claim_ids)->get();
     }
 
     public static function generateDeliveryNumber(): string

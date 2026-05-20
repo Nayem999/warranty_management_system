@@ -22,7 +22,6 @@ class StoreClaimRequest extends FormRequest
             'Un Repaired',
             'Replaced',
             'Reimbursement',
-            'Delivered',
         ]);
 
         $serviceTypes = implode(',', [
@@ -49,10 +48,7 @@ class StoreClaimRequest extends FormRequest
             'engineer_id' => 'nullable|exists:users,id',
             'courier_in_id' => 'nullable|exists:wms_couriers,id',
             'courier_slip_inward' => 'nullable|string|max:255',
-            'courier_out_id' => 'nullable|exists:wms_couriers,id',
-            'courier_slip_outward' => 'nullable|string|max:255',
             'received_date_time' => 'nullable|date',
-            'delivered_date_time' => 'nullable|date',
             'counter' => 'nullable|integer|min:0',
             'wo_assigned_date' => 'nullable|date',
             'wo_closed_date' => 'nullable|date',

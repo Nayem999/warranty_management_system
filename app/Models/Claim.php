@@ -9,7 +9,7 @@ class Claim extends BaseModel
 {
     protected $table = 'wms_claims';
 
-protected $fillable = [
+    protected $fillable = [
         'claim_number',
         'product_id',
         'serial_number',
@@ -22,11 +22,7 @@ protected $fillable = [
         'engineer_id',
         'courier_in_id',
         'courier_slip_inward',
-        'courier_out_id',
-        'courier_slip_outward',
         'received_date_time',
-        'delivered_date_time',
-        'delivered_remarks',
         'counter',
         'wo_assigned_date',
         'wo_closed_date',
@@ -51,12 +47,13 @@ protected $fillable = [
         'is_feedback_taken',
         'job_remarks',
         'accessories',
+        'is_delivered',
+        'delivery_id',
     ];
 
     protected $casts = [
         'claim_date' => 'date',
         'received_date_time' => 'datetime',
-        'delivered_date_time' => 'datetime',
         'invoice_date' => 'date',
         'web_wty_date' => 'date',
         'wo_assigned_date' => 'date',
@@ -67,6 +64,7 @@ protected $fillable = [
         'status' => 'string',
         'attachments' => 'array',
         'is_feedback_taken' => 'boolean',
+        'is_delivered' => 'boolean',
     ];
 
     public function product(): BelongsTo
@@ -94,9 +92,9 @@ protected $fillable = [
         return $this->belongsTo(Courier::class, 'courier_in_id');
     }
 
-    public function courierOut(): BelongsTo
+    public function delivery(): BelongsTo
     {
-        return $this->belongsTo(Courier::class, 'courier_out_id');
+        return $this->belongsTo(DeliveryChallan::class, 'delivery_id');
     }
 
     public function assignedByUser(): BelongsTo
