@@ -34,7 +34,7 @@ class MemorizeReportController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string|max:100',
-            'filter' => 'nullable|array',
+            'filter' => 'nullable|string',
         ]);
 
         $report = MemorizeReport::create($data);
@@ -64,7 +64,7 @@ class MemorizeReportController extends Controller
         $data = $request->validate([
             'title' => 'sometimes|string|max:255',
             'type' => 'sometimes|string|max:100',
-            'filter' => 'nullable|array',
+            'filter' => 'nullable|string',
         ]);
 
         $report->update($data);
