@@ -22,6 +22,7 @@ class StoreClaimRequest extends FormRequest
             'Un Repaired',
             'Replaced',
             'Reimbursement',
+            'Delivered',
         ]);
 
         $serviceTypes = implode(',', [

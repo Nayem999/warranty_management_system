@@ -31,6 +31,7 @@ class ClaimController extends Controller
         'Un Repaired',
         'Replaced',
         'Reimbursement',
+        'Delivered',
     ];
 
     public function index(Request $request): JsonResponse
@@ -571,7 +572,7 @@ class ClaimController extends Controller
             }
 
             $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
-            $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement');
+            $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement','Delivered');
 
             if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::today();

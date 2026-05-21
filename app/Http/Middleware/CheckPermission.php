@@ -30,6 +30,13 @@ class CheckPermission
             ], 400);
         }
 
+        if ($user instanceof \App\Models\Customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customers do not have permission to perform this action.',
+            ], 403);
+        }
+
         if (!$user->hasPermission($module, $action)) {
             return response()->json([
                 'success' => false,
