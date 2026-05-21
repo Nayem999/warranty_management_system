@@ -10,6 +10,7 @@ use App\Models\Claim;
 use App\Models\DeliveryChallan;
 use App\Models\ActivityLog;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +87,7 @@ class DeliveryChallanController extends Controller
                     'delivery_id'     => $challan->id,
                     'status'          => "Delivered",
                     'status_comment'  => $challan->delivered_remarks,
+                    'wo_delivery_date'  =>  Carbon::today(),
                 ]);
 
                 ActivityLog::log(
