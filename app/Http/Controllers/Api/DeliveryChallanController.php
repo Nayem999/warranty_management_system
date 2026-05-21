@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\DeliveryChallanCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryChallan\StoreDeliveryChallanRequest;
 use App\Http\Resources\DeliveryChallanResource;
@@ -98,6 +99,8 @@ class DeliveryChallanController extends Controller
             }
 
             DB::commit();
+
+            DeliveryChallanCreated::dispatch($challan);
 
             $challanResult = DeliveryChallan::with(['customer', 'courierOut'])->find($challan->id);
 

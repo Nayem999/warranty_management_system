@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\ClaimCreated;
+use App\Events\ClaimStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Claim\StoreClaimRequest;
 use App\Http\Requests\WorkOrder\SubmitFeedbackRequest;
@@ -168,7 +169,7 @@ class ClaimController extends Controller
                             $q->orWhere('additional_comment', 'like', "%{$request->search}%");
                             break;
                         case 'aging':
-                            $q->orWhere('aging', 'like', "%{$request->search}%");
+                            $q->orWhere('aging', $request->search);
                             break;
                     }
                 }
@@ -578,7 +579,13 @@ class ClaimController extends Controller
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::today();
             }
 
+            $previousStatus = $claim->status;
             $claim->update($data);
+
+            if ($previousStatus !== $claim->status) {
+                ClaimStatusUpdated::dispatch($claim, $previousStatus);
+            }
+
             if (
                 isset($data['replace_serial']) ||
                 isset($data['replace_product_id']) ||
@@ -681,10 +688,14 @@ class ClaimController extends Controller
             return $this->error('Invalid status. Allowed: ' . $statuses);
         }
 
+        $previousStatus = $claim->status;
+
         $claim->update([
             'status' => $status,
             'wo_closed_date' => now()->toDateString(),
         ]);
+
+        ClaimStatusUpdated::dispatch($claim, $previousStatus);
 
         ActivityLog::log(
             request()->user()->id,

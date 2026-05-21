@@ -3,6 +3,7 @@
 namespace App\Services\Notifications;
 
 use App\Models\Claim;
+use App\Models\DeliveryChallan;
 use App\Models\WorkOrder;
 
 class NotificationService
@@ -129,6 +130,61 @@ class NotificationService
         }
     }
 
+    public function sendClaimStatusUpdatedNotification(Claim $claim, string $previousStatus): void
+    {
+        $product = $claim->product;
+        $customerName = trim($claim->customer->customer_name ?? '');
+        $productName = $product->model_no ?? 'N/A';
+        $productSerial = $product->serial_number ?? 'N/A';
+
+        $data = [
+            'customerName' => $customerName,
+            'claimNumber' => $claim->claim_number,
+            'previousStatus' => $previousStatus,
+            'currentStatus' => $claim->status,
+            'productName' => $productName,
+            'productSerial' => $productSerial,
+            'claimDate' => $claim->claim_date?->format('Y-m-d') ?? 'N/A',
+            'companyName' => config('settings.company_name', 'SNP Distribution'),
+            'companySubtitle' => config('settings.company_subtitle', 'Warranty Service Center'),
+        ];
+
+        if ($this->channels['email'] ?? false) {
+            $this->sendClaimStatusUpdatedEmail($claim->customer->email, $data);
+        }
+
+        if ($this->channels['whatsapp'] ?? false && $claim->customer->phone) {
+            $this->sendClaimStatusUpdatedWhatsApp($claim->customer->phone, $data);
+        }
+    }
+
+    public function sendDeliveryChallanCreatedNotification(DeliveryChallan $challan): void
+    {
+        $customer = $challan->customer;
+        $customerName = trim($customer->customer_name ?? '');
+        $claims = $challan->claims()->get();
+
+        $claimNumbers = $claims->pluck('claim_number')->implode(', ');
+
+        $data = [
+            'customerName' => $customerName,
+            'deliveryNumber' => $challan->delivery_number,
+            'deliveredDateTime' => $challan->delivered_date_time?->format('Y-m-d H:i') ?? now()->format('Y-m-d H:i'),
+            'deliveredRemarks' => $challan->delivered_remarks ?? 'N/A',
+            'claimNumbers' => $claimNumbers,
+            'companyName' => config('settings.company_name', 'SNP Distribution'),
+            'companySubtitle' => config('settings.company_subtitle', 'Warranty Service Center'),
+        ];
+
+        if ($this->channels['email'] ?? false) {
+            $this->sendDeliveryChallanCreatedEmail($customer->email, $data);
+        }
+
+        if ($this->channels['whatsapp'] ?? false && $customer->phone) {
+            $this->sendDeliveryChallanCreatedWhatsApp($customer->phone, $data);
+        }
+    }
+
     protected function sendClaimCreatedEmail(string $email, array $data): bool
     {
         if (empty($email)) {
@@ -220,5 +276,68 @@ class NotificationService
             . 'Thank you for your patience!';
 
         return $this->whatsAppService->send($phone, 'WO Status Update', $message);
+    }
+
+    protected function sendClaimStatusUpdatedEmail(?string $email, array $data): bool
+    {
+        if (empty($email)) {
+            return false;
+        }
+
+        return $this->emailService->send(
+            $email,
+            'Claim Status Update - ' . $data['claimNumber'],
+            view('emails.claim.status-updated', $data)->render()
+        );
+    }
+
+    protected function sendClaimStatusUpdatedWhatsApp(?string $phone, array $data): bool
+    {
+        if (empty($phone)) {
+            return false;
+        }
+
+        $message = "📋 *Claim Status Update*\n\n"
+            . "Dear {$data['customerName']},\n\n"
+            . "Your claim status has been updated.\n\n"
+            . "📋 *Claim Number:* {$data['claimNumber']}\n"
+            . "🔄 *Previous Status:* {$data['previousStatus']}\n"
+            . "✅ *Current Status:* {$data['currentStatus']}\n"
+            . "📦 *Product:* {$data['productName']}\n"
+            . "🔢 *Serial:* {$data['productSerial']}\n\n"
+            . 'Thank you for your patience!';
+
+        return $this->whatsAppService->send($phone, 'Claim Status Update', $message);
+    }
+
+    protected function sendDeliveryChallanCreatedEmail(?string $email, array $data): bool
+    {
+        if (empty($email)) {
+            return false;
+        }
+
+        return $this->emailService->send(
+            $email,
+            'Delivery Challan Created - ' . $data['deliveryNumber'],
+            view('emails.delivery-challan.created', $data)->render()
+        );
+    }
+
+    protected function sendDeliveryChallanCreatedWhatsApp(?string $phone, array $data): bool
+    {
+        if (empty($phone)) {
+            return false;
+        }
+
+        $message = "🚚 *Delivery Confirmation*\n\n"
+            . "Dear {$data['customerName']},\n\n"
+            . "Your product(s) have been delivered.\n\n"
+            . "📋 *Delivery No:* {$data['deliveryNumber']}\n"
+            . "📎 *Claim(s):* {$data['claimNumbers']}\n"
+            . "📅 *Delivered At:* {$data['deliveredDateTime']}\n"
+            . "📝 *Remarks:* {$data['deliveredRemarks']}\n\n"
+            . 'Thank you for your trust in our service!';
+
+        return $this->whatsAppService->send($phone, 'Delivery Confirmation', $message);
     }
 }
