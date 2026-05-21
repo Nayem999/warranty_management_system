@@ -44,7 +44,7 @@ class StoreClaimRequest extends FormRequest
             'customer_id' => 'required|exists:wms_customers,id',
             'problem_description' => 'required|string',
             'service_center_id' => 'required|exists:wms_service_centers,id',
-            'claim_date' => 'nullable||date_format:Y-m-d H:i:s',
+            'claim_date' => 'nullable|date_format:Y-m-d H:i:s',
             'status' => "nullable|in:{$statuses}",
             'engineer_id' => 'nullable|exists:users,id',
             'courier_in_id' => 'nullable|exists:wms_couriers,id',

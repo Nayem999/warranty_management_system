@@ -64,6 +64,7 @@ class CustomerController extends Controller
             );
 
             DB::commit();
+            $customer = Customer::with(["city"])->find($customer->id);
 
             return $this->created($customer, 'Customer created successfully. Password: ' . $password);
         } catch (\Throwable $e) {
