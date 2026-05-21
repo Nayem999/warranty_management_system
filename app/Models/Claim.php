@@ -51,45 +51,61 @@ class Claim extends BaseModel
         'delivery_id',
     ];
 
+    // protected $casts = [
+    //     'claim_date' => 'datetime',
+    //     'received_date_time' => 'datetime',
+    //     'invoice_date' => 'date',
+    //     'web_wty_date' => 'date',
+    //     'wo_assigned_date' => 'datetime',
+    //     'wo_closed_date' => 'datetime',
+    //     'wo_delivery_date' => 'datetime',
+    //     'purchase_price' => 'decimal:2',
+    //     'doa' => 'boolean',
+    //     'status' => 'string',
+    //     'attachments' => 'array',
+    //     'is_feedback_taken' => 'boolean',
+    //     'is_delivered' => 'boolean',
+    // ];
+
+
     protected $casts = [
-        'claim_date' => 'datetime',
-        'received_date_time' => 'datetime',
-        'invoice_date' => 'date',
-        'web_wty_date' => 'date',
-        'wo_assigned_date' => 'datetime',
-        'wo_closed_date' => 'datetime',
-        'wo_delivery_date' => 'datetime',
+        'claim_date' => 'datetime:Y-m-d H:i:s',
+        'received_date_time' => 'datetime:Y-m-d H:i:s',
+        'invoice_date' => 'date:Y-m-d',
+        'web_wty_date' => 'date:Y-m-d',
+        'wo_assigned_date' => 'datetime:Y-m-d H:i:s',
+        'wo_closed_date' => 'datetime:Y-m-d H:i:s',
+        'wo_delivery_date' => 'datetime:Y-m-d H:i:s',
         'purchase_price' => 'decimal:2',
         'doa' => 'boolean',
-        'status' => 'string',
         'attachments' => 'array',
         'is_feedback_taken' => 'boolean',
         'is_delivered' => 'boolean',
     ];
 
-    public function getClaimDateAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
-    public function getWoAssignedDateAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
+    // public function getClaimDateAttribute($value)
+    // {
+    //     return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    // }
+    // public function getWoAssignedDateAttribute($value)
+    // {
+    //     return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    // }
 
-    public function getWoClosedDateAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
+    // public function getWoClosedDateAttribute($value)
+    // {
+    //     return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    // }
 
-    public function getWoDeliveryDateAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
+    // public function getWoDeliveryDateAttribute($value)
+    // {
+    //     return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    // }
 
-    public function getReceivedDateTimeAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
+    // public function getReceivedDateTimeAttribute($value)
+    // {
+    //     return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    // }
 
     public function product(): BelongsTo
     {
