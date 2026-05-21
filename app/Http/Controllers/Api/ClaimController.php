@@ -573,7 +573,7 @@ class ClaimController extends Controller
             }
 
             $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
-            $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement','Delivered');
+            $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement', 'Delivered');
 
             if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::today();
@@ -587,10 +587,10 @@ class ClaimController extends Controller
             }
 
             if (
-                isset($data['replace_serial']) ||
-                isset($data['replace_product_id']) ||
-                isset($data['replace_ref']) ||
-                isset($data['parts'])
+                !empty($data['replace_serial']) ||
+                !empty($data['replace_product_id']) ||
+                !empty($data['replace_ref']) ||
+                !empty($data['parts'])
             ) {
 
                 $workOrder = $claim->workOrder;
