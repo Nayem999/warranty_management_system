@@ -52,7 +52,7 @@ class Claim extends BaseModel
     ];
 
     protected $casts = [
-        'claim_date' => 'date',
+        'claim_date' => 'datetime',
         'received_date_time' => 'datetime',
         'invoice_date' => 'date',
         'web_wty_date' => 'date',
@@ -67,6 +67,10 @@ class Claim extends BaseModel
         'is_delivered' => 'boolean',
     ];
 
+    public function getClaimDateAttribute($value)
+    {
+        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    }
     public function getWoAssignedDateAttribute($value)
     {
         return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;

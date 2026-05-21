@@ -523,7 +523,7 @@ class ClaimController extends Controller
             $data = $request->validate([
                 'service_center_id' => 'nullable|exists:wms_service_centers,id',
                 'problem_description' => 'nullable|string',
-                'claim_date' => 'nullable|date',
+                'claim_date' => 'nullable|date_format:Y-m-d H:i:s',
                 'status' => "nullable|in:{$statuses}",
                 'engineer_id' => 'nullable|exists:users,id',
                 'courier_in_id' => 'nullable|exists:wms_couriers,id',

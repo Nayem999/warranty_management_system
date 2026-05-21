@@ -19,7 +19,7 @@ class ClaimResource extends JsonResource
             'problem_description' => $this->problem_description,
             'service_center_id' => $this->service_center_id,
             'service_center' => $this->whenLoaded('serviceCenter'),
-            'claim_date' => $this->claim_date?->format('d-M-Y'),
+            'claim_date' => $this->claim_date?->format('d-M-Y h:i A'),
             'status' => $this->status,
             'created_by' => $this->created_by,
             'creator' => $this->whenLoaded('creator'),
