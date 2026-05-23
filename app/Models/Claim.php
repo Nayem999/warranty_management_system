@@ -71,8 +71,8 @@ class Claim extends BaseModel
     protected $casts = [
         'claim_date' => 'datetime:Y-m-d H:i:s',
         'received_date_time' => 'datetime:Y-m-d H:i:s',
-        'invoice_date' => 'date:Y-m-d',
-        'web_wty_date' => 'date:Y-m-d',
+        'invoice_date' => 'date',
+        'web_wty_date' => 'date',
         'wo_assigned_date' => 'datetime:Y-m-d H:i:s',
         'wo_closed_date' => 'datetime:Y-m-d H:i:s',
         'wo_delivery_date' => 'datetime:Y-m-d H:i:s',
