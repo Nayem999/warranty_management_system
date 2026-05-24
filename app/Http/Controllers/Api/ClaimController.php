@@ -612,9 +612,11 @@ class ClaimController extends Controller
                     'replace_ref' => $data['replace_ref'] ?? null,
                 ]);
 
-                if (isset($data['parts'])) {
+                if($workOrder->parts()){
                     $workOrder->parts()->delete();
+                }
 
+                if (isset($data['parts'])) {
                     foreach ($data['parts'] as $partData) {
                         $workOrder->parts()->create($partData);
                     }
