@@ -565,18 +565,18 @@ class ClaimController extends Controller
 
             if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
                 $data['assigned_by'] = $request->user()->id;
-                $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::today();
+                $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
                 $data['status'] = "Assigned";
             } else if ($claim->status == "Not Assigned" && $data['engineer_id']) {
                 $data['assigned_by'] = $request->user()->id;
-                $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::today();
+                $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
 
             $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
             $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement', 'Delivered');
 
             if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
-                $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::today();
+                $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
 
             $previousStatus = $claim->status;
@@ -618,6 +618,14 @@ class ClaimController extends Controller
                     foreach ($data['parts'] as $partData) {
                         $workOrder->parts()->create($partData);
                     }
+                }
+            }
+            else{
+                if ($claim->workOrder) {
+                    if($claim->workOrder->parts()){
+                        $claim->workOrder->parts()->delete();
+                    }
+                    $claim->workOrder->delete();
                 }
             }
 
