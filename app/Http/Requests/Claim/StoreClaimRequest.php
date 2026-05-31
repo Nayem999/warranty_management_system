@@ -21,7 +21,7 @@ class StoreClaimRequest extends FormRequest
             'Repaired',
             'Un Repaired',
             'Replaced',
-            'Reimbursement',
+            'Closed-Reimbursement',
             'Delivered',
         ]);
 

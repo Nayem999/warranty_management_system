@@ -28,10 +28,10 @@ class ClaimController extends Controller
         'Assigned',
         'In Progress',
         'Waiting for Part',
-        'Repaired',
-        'Un Repaired',
-        'Replaced',
-        'Reimbursement',
+        'Closed-Repaired',
+        'Closed-Un Repaired',
+        'Closed-Replaced',
+        'Closed-Reimbursement',
         'Delivered',
     ];
 
@@ -573,7 +573,7 @@ class ClaimController extends Controller
             }
 
             $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
-            $close_status = array('Repaired', 'Un Repaired', 'Replaced', 'Reimbursement', 'Delivered');
+            $close_status = array('Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement', 'Delivered');
 
             if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
@@ -863,10 +863,10 @@ class ClaimController extends Controller
             ->where('service_center_id', $claim->service_center_id)
             ->where('is_delivered', 0)
             ->whereIn('status', [
-                'Repaired',
-                'Un Repaired',
-                'Replaced',
-                'Reimbursement'
+                'Closed-Repaired',
+                'Closed-Un Repaired',
+                'Closed-Replaced',
+                'Closed-Reimbursement'
             ]);
 
         // Apply same restrictions for delivery list
