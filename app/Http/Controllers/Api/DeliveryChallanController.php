@@ -76,6 +76,7 @@ class DeliveryChallanController extends Controller
 
             $data['delivery_number'] = DeliveryChallan::generateDeliveryNumber();
             $data['customer_id'] = $firstClaim->customer_id;
+            $data['delivered_date_time'] = $data['delivered_date_time'] ?? Carbon::now()->format('Y-m-d H:i:s');
             $data['service_center_id'] = $firstClaim->service_center_id;
 
             $challan = DeliveryChallan::create($data);
