@@ -174,6 +174,28 @@ class ClaimController extends Controller
                     }
                 }
             });
+        } else if ($request->filled('search')) {
+
+            $query->where(function ($q) use ($request) {
+
+                $q->orWhereHas('workOrder', fn($q) => $q->where('wo_number', 'like', "%{$request->search}%"))
+                    ->orWhereHas('customer', fn($q) => $q->where('customer_name', 'like', "%{$request->search}%"))
+                    ->orWhereHas('customer', fn($q) => $q->where('email', 'like', "%{$request->search}%"))
+                    ->orWhereHas('customer', fn($q) => $q->where('phone', 'like', "%{$request->search}%"))
+                    ->orWhere('serial_number', 'like', "%{$request->search}%")
+                    ->orWhereHas('product', fn($q) => $q->where('model_no', 'like', "%{$request->search}%"))
+                    ->orWhere('problem_description', 'like', "%{$request->search}%")
+                    ->orWhereHas('workOrder.parts', fn($q) => $q->where('case_id', 'like', "%{$request->search}%"))
+                    ->orWhereHas('workOrder.parts', fn($q) => $q->where('order_id', 'like', "%{$request->search}%"))
+                    ->orWhereHas('workOrder.parts', fn($q) => $q->where('part_return_comment', 'like', "%{$request->search}%"))
+                    ->orWhereHas('workOrder.replaceProduct', fn($q) => $q->where('item_description', 'like', "%{$request->search}%"))
+                    ->orWhereHas('workOrder', fn($q) => $q->where('replace_serial', 'like', "%{$request->search}%"))
+                    ->orWhere('work_done_comment', 'like', "%{$request->search}%")
+                    ->orWhere('claim_number', 'like', "%{$request->search}%")
+                    ->orWhere('customer_feedback', 'like', "%{$request->search}%")
+                    ->orWhere('additional_comment', 'like', "%{$request->search}%")
+                    ->orWhere('tat', $request->search);
+            });
         }
 
         if ($request->has('part_qty_used') && $request->filled('part_qty_used')) {
@@ -563,11 +585,11 @@ class ClaimController extends Controller
                 return $this->error("Claim already delivered, Claim can not update");
             }
 
-            if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && $data['engineer_id']) {
+            if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && !empty($data['engineer_id'])) {
                 $data['assigned_by'] = $request->user()->id;
                 $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
                 $data['status'] = "Assigned";
-            } else if ($claim->status == "Not Assigned" && $data['engineer_id']) {
+            } else if ($claim->status == "Not Assigned" && !empty($data['engineer_id'])) {
                 $data['assigned_by'] = $request->user()->id;
                 $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
