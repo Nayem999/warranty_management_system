@@ -215,13 +215,13 @@ class DashboardController extends Controller
 
             $dateFilter = function ($q, $column) use ($value) {
 
-                if ($column === 'claim_date') {
+                /* if ($column === 'claim_date') {
                     if (!$value['start']) {
                         return $q->where($column, '<=', Carbon::parse($value['end'])->toDateString());
                     }
                     return $q->whereDate($column, '>=', Carbon::parse($value['start'])->toDateString())
                         ->whereDate($column, '<=', Carbon::parse($value['end'])->toDateString());
-                }
+                } */
 
                 if (!$value['start']) {
                     return $q->where($column, '<=', $value['end']);
