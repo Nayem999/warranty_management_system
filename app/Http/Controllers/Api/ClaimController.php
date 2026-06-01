@@ -105,19 +105,19 @@ class ClaimController extends Controller
         }
 
         if ($request->has('date_from')) {
-            $query->where('claim_date', '>=', Carbon::parse($request->date_from));
+            $query->where('claim_date', '>=', Carbon::parse($request->date_from)->startOfDay());
         }
 
         if ($request->has('date_to')) {
-            $query->where('claim_date', '<=', Carbon::parse($request->date_to));
+            $query->where('claim_date', '<=', Carbon::parse($request->date_to)->endOfDay());
         }
 
         if ($request->has('wo_closed_date_from')) {
-            $query->where('wo_closed_date', '>=', Carbon::parse($request->wo_closed_date_from));
+            $query->where('wo_closed_date', '>=', Carbon::parse($request->wo_closed_date_from)->startOfDay());
         }
 
         if ($request->has('wo_closed_date_to')) {
-            $query->where('wo_closed_date', '<=', Carbon::parse($request->wo_closed_date_to));
+            $query->where('wo_closed_date', '<=', Carbon::parse($request->wo_closed_date_to)->endOfDay());
         }
 
         if ($request->has('search') && $request->filled('search_include')) {
