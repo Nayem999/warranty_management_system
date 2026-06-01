@@ -133,7 +133,7 @@ class ClaimController extends Controller
                             $q->orWhereHas('customer', fn($q) => $q->where('phone', 'like', "%{$request->search}%"));
                             break;
                         case 'product_serial':
-                            $q->orWhereHas('product', fn($q) => $q->where('product_serial', 'like', "%{$request->search}%"));
+                            $q->orWhere('serial_number', 'like', "%{$request->search}%");
                             break;
                         case 'model_no':
                             $q->orWhereHas('product', fn($q) => $q->where('model_no', 'like', "%{$request->search}%"));
@@ -169,7 +169,7 @@ class ClaimController extends Controller
                             $q->orWhere('additional_comment', 'like', "%{$request->search}%");
                             break;
                         case 'aging':
-                            $q->orWhere('aging', $request->search);
+                            $q->orWhere('tat', $request->search);
                             break;
                     }
                 }
@@ -579,6 +579,11 @@ class ClaimController extends Controller
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
 
+            if (in_array($claim->status, $open_status)) {
+                $tat = Carbon::parse($claim->claim_date)->diffInDays(now());
+                $data['tat'] = $tat;
+            }
+
             $previousStatus = $claim->status;
             $claim->update($data);
 
@@ -612,7 +617,7 @@ class ClaimController extends Controller
                     'replace_ref' => $data['replace_ref'] ?? null,
                 ]);
 
-                if($workOrder->parts()){
+                if ($workOrder->parts()) {
                     $workOrder->parts()->delete();
                 }
 
@@ -621,10 +626,9 @@ class ClaimController extends Controller
                         $workOrder->parts()->create($partData);
                     }
                 }
-            }
-            else{
+            } else {
                 if ($claim->workOrder) {
-                    if($claim->workOrder->parts()){
+                    if ($claim->workOrder->parts()) {
                         $claim->workOrder->parts()->delete();
                     }
                     $claim->workOrder->delete();
