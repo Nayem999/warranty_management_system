@@ -75,24 +75,24 @@ class DashboardController extends Controller
             'in_progress_work_orders' => (clone $workOrderQuery)->inProgress()->count(),
             'completed_work_orders' => (clone $workOrderQuery)->completed()->count(),
             'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
-            'total_service_centers' => ServiceCenter::when($brandId, fn ($q) => $q->whereHas('brands', fn ($q) => $q->where('wms_brands.id', $brandId)))->where('is_active', true)->count(),
+            'total_service_centers' => ServiceCenter::when($brandId, fn($q) => $q->whereHas('brands', fn($q) => $q->where('wms_brands.id', $brandId)))->where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
             'avg_customer_rating' => (int) (clone $claimQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
             'avg_tat_days' => (int) (clone $claimQuery)->whereNotNull('tat')->avg('tat') ?? 0,
         ];
 
         $recentClaims = Claim::with(['product.brand', 'serviceCenter'])
-            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
-            ->when($user->isServiceCenterRestricted(), fn ($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
-            ->when($brandId, fn ($q) => $q->whereHas('product', fn ($q) => $q->where('brand_id', $brandId)))
+            ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+            ->when($brandId, fn($q) => $q->whereHas('product', fn($q) => $q->where('brand_id', $brandId)))
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
         $recentWorkOrders = WorkOrder::with(['claim.product.brand', 'serviceCenter'])
-            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('claim.product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
-            ->when($user->isServiceCenterRestricted(), fn ($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
-            ->when($brandId, fn ($q) => $q->whereHas('claim.product', fn ($q) => $q->where('brand_id', $brandId)))
+            ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('claim.product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+            ->when($brandId, fn($q) => $q->whereHas('claim.product', fn($q) => $q->where('brand_id', $brandId)))
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
@@ -101,8 +101,8 @@ class DashboardController extends Controller
         $monthlyClaims = Claim::query()
             ->selectRaw('MONTH(claim_date) as month, COUNT(*) as count')
             ->whereYear('claim_date', $year)
-            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
-            ->when($user->isServiceCenterRestricted(), fn ($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+            ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
             ->groupBy('month')
             ->get();
 
@@ -118,7 +118,7 @@ class DashboardController extends Controller
         $expiringProducts = Product::with(['brand', 'category'])
             ->where('end_date', '<=', now()->addDays(30))
             ->where('end_date', '>=', now())
-            ->when($user->isBrandRestricted(), fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()))
+            ->when($user->isBrandRestricted(), fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()))
             ->orderBy('end_date', 'asc')
             ->limit(10)
             ->get();
@@ -126,7 +126,7 @@ class DashboardController extends Controller
         $serviceCenterQuery = ServiceCenter::query();
         if ($user->isBrandRestricted()) {
             $brandIds = $user->accessibleBrandIds();
-            $serviceCenterQuery->whereHas('brands', fn ($q) => $q->whereIn('wms_brands.id', $brandIds));
+            $serviceCenterQuery->whereHas('brands', fn($q) => $q->whereIn('wms_brands.id', $brandIds));
         }
         if ($user->isServiceCenterRestricted()) {
             $serviceCenterQuery->whereIn('id', $user->accessibleServiceCenterIds());
@@ -137,7 +137,7 @@ class DashboardController extends Controller
                 ->where('service_center_id', $center->id);
 
             if ($brandId) {
-                $query->whereHas('claim.product', fn ($q) => $q->where('brand_id', $brandId));
+                $query->whereHas('claim.product', fn($q) => $q->where('brand_id', $brandId));
             }
 
             $total = $query->count();
@@ -161,13 +161,13 @@ class DashboardController extends Controller
         $customerRatings = Claim::query()
             ->select('customer_rating', DB::raw('COUNT(*) as count'))
             ->whereNotNull('customer_rating')
-            ->when($user->isBrandRestricted(), fn ($q) => $q->whereHas('product', fn ($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
-            ->when($user->isServiceCenterRestricted(), fn ($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
-            ->when($brandId, fn ($q) => $q->whereHas('product', fn ($q) => $q->where('brand_id', $brandId)))
-            ->when($serviceCenterId, fn ($q) => $q->where('service_center_id', $serviceCenterId))
+            ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+            ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+            ->when($brandId, fn($q) => $q->whereHas('product', fn($q) => $q->where('brand_id', $brandId)))
+            ->when($serviceCenterId, fn($q) => $q->where('service_center_id', $serviceCenterId))
             ->groupBy('customer_rating')
             ->get()
-            ->mapWithKeys(fn ($item) => [(int) $item->customer_rating => $item->count]);
+            ->mapWithKeys(fn($item) => [(int) $item->customer_rating => $item->count]);
 
         $ratingDistribution = [];
         for ($i = 1; $i <= 5; $i++) {
@@ -177,6 +177,104 @@ class DashboardController extends Controller
             ];
         }
 
+
+        $today = Carbon::today();
+
+        $ranges = [
+            '1-7 Days'   => [
+                'start' => $today->copy()->subDays(7)->startOfDay()->format('Y-m-d H:i:s'),
+                'end'   => $today->copy()->endOfDay()->format('Y-m-d H:i:s'),
+            ],
+            '8-14 Days'  => [
+                'start' => $today->copy()->subDays(14)->startOfDay()->format('Y-m-d H:i:s'),
+                'end'   => $today->copy()->subDays(8)->endOfDay()->format('Y-m-d H:i:s'),
+            ],
+            '1 Month'    => [
+                'start' => $today->copy()->subDays(30)->startOfDay()->format('Y-m-d H:i:s'),
+                'end'   => $today->copy()->subDays(15)->endOfDay()->format('Y-m-d H:i:s'),
+            ],
+            '2 Months'   => [
+                'start' => $today->copy()->subDays(60)->startOfDay()->format('Y-m-d H:i:s'),
+                'end'   => $today->copy()->subDays(31)->endOfDay()->format('Y-m-d H:i:s'),
+            ],
+            '3 Months'   => [
+                'start' => $today->copy()->subDays(90)->startOfDay()->format('Y-m-d H:i:s'),
+                'end'   => $today->copy()->subDays(61)->endOfDay()->format('Y-m-d H:i:s'),
+            ],
+            '> 3 Months' => [
+                'start' => null,
+                'end'   => $today->copy()->subDays(91)->endOfDay()->format('Y-m-d H:i:s'),
+            ],
+        ];
+
+        $pending_by_claim_date = [];
+        $completed_by_closed_date = [];
+        $completed_by_closed_date_n_delivered = [];
+        $delivered_by_claim_date = [];
+        foreach ($ranges as $key => $value) {
+            // dd($value);
+
+            $dateFilter = function ($q, $column) use ($value) {
+
+                if ($column === 'claim_date') {
+                    // dd(Carbon::parse($value['end'])->toDateString());
+
+                    if (!$value['start']) {
+                        return $q->where($column, '<=', Carbon::parse($value['end'])->toDateString());
+                    }
+                    return $q->whereDate($column, '>=', Carbon::parse($value['start'])->toDateString())
+                        ->whereDate($column, '<=', Carbon::parse($value['end'])->toDateString());
+                }
+
+                if (!$value['start']) {
+                    return $q->where($column, '<=', $value['end']);
+                }
+
+                return $q->whereBetween($column, [
+                    $value['start'],
+                    $value['end']
+                ]);
+            };
+
+            $pending_by_claim_date[$key] = Claim::query()
+                ->where(function ($q) use ($dateFilter) {
+                    $dateFilter($q, 'claim_date');
+                })
+                ->whereIn('status', ["Not Assigned", "Assigned", "In Progress", "Waiting for Part"])
+                ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+                ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+                ->get();
+
+
+            $completed_by_closed_date[$key] = Claim::query()
+                ->where(function ($q) use ($dateFilter) {
+                    $dateFilter($q, 'wo_closed_date');
+                })
+                ->whereIn('status', ["Closed-Repaired", "Closed-Un Repaired", "Closed-Replaced", "Closed-Reimbursement", "Delivered"])
+                ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+                ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+                ->count();
+
+
+            $completed_by_closed_date_n_delivered[$key] = Claim::query()
+                ->where(function ($q) use ($dateFilter) {
+                    $dateFilter($q, 'wo_closed_date');
+                })
+                ->where('is_delivered', 1)
+                ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+                ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+                ->count();
+
+
+            $delivered_by_claim_date[$key] = Claim::query()
+                ->where(function ($q) use ($dateFilter) {
+                    $dateFilter($q, 'claim_date');
+                })
+                ->where('is_delivered', 1)
+                ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
+                ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
+                ->count();
+        }
         $data = [
             'stats' => $stats,
             'product' => [
@@ -212,6 +310,13 @@ class DashboardController extends Controller
                 'avg_customer_rating' => $stats['avg_customer_rating'],
                 'avg_tat_days' => $stats['avg_tat_days'],
                 'customer_rating_distribution' => $ratingDistribution,
+            ],
+            'aging_rpt' => [
+                'ranges' => $ranges,
+                'pending_by_claim_date' => $pending_by_claim_date,
+                'completed_by_closed_date' => $completed_by_closed_date,
+                'completed_by_closed_date_n_delivered' => $completed_by_closed_date_n_delivered,
+                'delivered_by_claim_date' => $delivered_by_claim_date,
             ],
         ];
 
@@ -269,24 +374,6 @@ class DashboardController extends Controller
 
         return $this->success($stats);
     }
-
-    /* public function warrantyStats(Request $request): JsonResponse
-    {
-        $user = $request->user();
-        $query = Warranty::query();
-
-        if ($user->isBrandRestricted()) {
-            $query->whereIn('brand_id', $user->accessibleBrandIds());
-        }
-
-        $stats = [
-            'total' => $query->count(),
-            'active' => (clone $query)->active()->count(),
-            'expired' => (clone $query)->expired()->count(),
-        ];
-
-        return $this->success($stats);
-    } */
 
     public function claimStats(Request $request): JsonResponse
     {
@@ -424,7 +511,7 @@ class DashboardController extends Controller
 
         if ($user->isBrandRestricted()) {
             $brandIds = $user->accessibleBrandIds();
-            $serviceCenterQuery->whereHas('brands', fn ($q) => $q->whereIn('wms_brands.id', $brandIds));
+            $serviceCenterQuery->whereHas('brands', fn($q) => $q->whereIn('wms_brands.id', $brandIds));
         }
 
         if ($user->isServiceCenterRestricted()) {

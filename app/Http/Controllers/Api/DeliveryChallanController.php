@@ -91,14 +91,14 @@ class DeliveryChallanController extends Controller
                     'wo_delivery_date'  =>  Carbon::now()->format('Y-m-d H:i:s'),
                 ]);
 
-                ActivityLog::log(
+                /* ActivityLog::log(
                     $request->user()->id,
                     'updated',
                     'Claim',
                     $claim->claim_number,
                     $claim->id,
                     ['status' => $claim->status, 'comment' => $claim->status_comment]
-                );
+                ); */
             }
 
             DB::commit();

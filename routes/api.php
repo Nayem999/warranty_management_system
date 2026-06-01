@@ -248,7 +248,7 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:service_centers/list')->group(function () {
             Route::get('/service-centers', [ServiceCenterController::class, 'index']);
-            Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
+            // Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
             Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
         });
 
