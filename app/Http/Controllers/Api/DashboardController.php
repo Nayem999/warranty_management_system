@@ -212,13 +212,10 @@ class DashboardController extends Controller
         $completed_by_closed_date_n_delivered = [];
         $delivered_by_claim_date = [];
         foreach ($ranges as $key => $value) {
-            // dd($value);
 
             $dateFilter = function ($q, $column) use ($value) {
 
                 if ($column === 'claim_date') {
-                    // dd(Carbon::parse($value['end'])->toDateString());
-
                     if (!$value['start']) {
                         return $q->where($column, '<=', Carbon::parse($value['end'])->toDateString());
                     }
