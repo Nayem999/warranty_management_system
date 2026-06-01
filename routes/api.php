@@ -98,7 +98,7 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:brands/list')->group(function () {
             Route::get('/brands', [BrandController::class, 'index']);
-            Route::get('/brands/list', [BrandController::class, 'brands_list']);
+            // Route::get('/brands/list', [BrandController::class, 'brands_list']);
         });
 
         Route::middleware('permission:brands/view')->group(function () {
@@ -145,7 +145,7 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:cities/list')->group(function () {
             Route::get('/cities', [CityController::class, 'index']);
-            Route::get('/cities/list', [CityController::class, 'cities_list']);
+            // Route::get('/cities/list', [CityController::class, 'cities_list']);
         });
 
         Route::middleware('permission:cities/view')->group(function () {
@@ -249,7 +249,7 @@ Route::prefix('')->group(function () {
         Route::middleware('permission:service_centers/list')->group(function () {
             Route::get('/service-centers', [ServiceCenterController::class, 'index']);
             // Route::get('/service-centers/list', [ServiceCenterController::class, 'service_centers_list']);
-            Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
+            // Route::get('/service-centers/by-brand', [ServiceCenterController::class, 'byBrand']);
         });
 
         Route::middleware('permission:service_centers/view')->group(function () {
