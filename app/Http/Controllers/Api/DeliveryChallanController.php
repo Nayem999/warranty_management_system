@@ -87,7 +87,7 @@ class DeliveryChallanController extends Controller
                     'is_delivered'    => 1,
                     'delivery_id'     => $challan->id,
                     // 'status'          => "Delivered",
-                    'status_comment'  => $challan->delivered_remarks,
+                    // 'status_comment'  => $challan->delivered_remarks,
                     'wo_delivery_date'  =>  Carbon::now()->format('Y-m-d H:i:s'),
                 ]);
 
