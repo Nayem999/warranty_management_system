@@ -112,6 +112,14 @@ class ClaimController extends Controller
             $query->where('claim_date', '<=', Carbon::parse($request->date_to));
         }
 
+        if ($request->has('wo_closed_date_from')) {
+            $query->where('wo_closed_date', '>=', Carbon::parse($request->wo_closed_date_from));
+        }
+
+        if ($request->has('wo_closed_date_to')) {
+            $query->where('wo_closed_date', '<=', Carbon::parse($request->wo_closed_date_to));
+        }
+
         if ($request->has('search') && $request->filled('search_include')) {
             $searchFields = explode(',', $request->search_include);
             $query->where(function ($q) use ($request, $searchFields) {

@@ -208,7 +208,7 @@ class DashboardController extends Controller
         ];
 
         $pending_by_claim_date = [];
-        $completed_by_closed_date = [];
+        $completed_by_claim_date = [];
         $completed_by_closed_date_n_delivered = [];
         $delivered_by_claim_date = [];
         foreach ($ranges as $key => $value) {
@@ -243,9 +243,9 @@ class DashboardController extends Controller
                 ->count();
 
 
-            $completed_by_closed_date[$key] = Claim::query()
+            $completed_by_claim_date[$key] = Claim::query()
                 ->where(function ($q) use ($dateFilter) {
-                    $dateFilter($q, 'wo_closed_date');
+                    $dateFilter($q, 'claim_date');
                 })
                 ->whereIn('status', ["Closed-Repaired", "Closed-Un Repaired", "Closed-Replaced", "Closed-Reimbursement", "Delivered"])
                 ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
@@ -309,9 +309,9 @@ class DashboardController extends Controller
                 'customer_rating_distribution' => $ratingDistribution,
             ],
             'aging_rpt' => [
-                'ranges' => $ranges,
+                // 'ranges' => $ranges,
                 'pending_by_claim_date' => $pending_by_claim_date,
-                'completed_by_closed_date' => $completed_by_closed_date,
+                'completed_by_claim_date' => $completed_by_claim_date,
                 'completed_by_closed_date_n_delivered' => $completed_by_closed_date_n_delivered,
                 'delivered_by_claim_date' => $delivered_by_claim_date,
             ],
