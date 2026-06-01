@@ -240,7 +240,7 @@ class DashboardController extends Controller
                 ->whereIn('status', ["Not Assigned", "Assigned", "In Progress", "Waiting for Part"])
                 ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
                 ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
-                ->get();
+                ->count();
 
 
             $completed_by_closed_date[$key] = Claim::query()
