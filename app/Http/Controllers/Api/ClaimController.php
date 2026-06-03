@@ -566,6 +566,8 @@ class ClaimController extends Controller
             $statuses = implode(',', $this->statuses);
             $serviceTypes = implode(',', ['In Warranty', 'Warranty Void', 'DOA', 'OOW/Expired']);
             $jobTypes = implode(',', ['Carry In', 'On Site', 'Pick Up']);
+            $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
+            $close_status = array('Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement', 'Delivered');
 
             $data = $request->validate([
                 'service_center_id' => 'required|exists:wms_service_centers,id',
@@ -607,11 +609,6 @@ class ClaimController extends Controller
                 'accessories' => 'nullable|string|max:500',
             ]);
 
-            if ($claim->is_delivered) {
-                DB::rollBack();
-                return $this->error("Claim already delivered, Claim can not update");
-            }
-
             if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && !empty($data['engineer_id'])) {
                 $data['assigned_by'] = $request->user()->id;
                 $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
@@ -621,8 +618,6 @@ class ClaimController extends Controller
                 $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
 
-            $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
-            $close_status = array('Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement', 'Delivered');
 
             if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && empty($data['wo_closed_date'])) {
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
@@ -638,11 +633,16 @@ class ClaimController extends Controller
             }
 
             $previousStatus = $claim->status;
-            $claim->update($data);
-            $claim->refresh();
-            if ($previousStatus !== $claim->status) {
-                ClaimStatusUpdated::dispatch($claim, $previousStatus);
+            if (! $claim->is_delivered) {
+                // DB::rollBack();
+                // return $this->error("Claim already delivered, Claim can not update");
+                $claim->update($data);
+                $claim->refresh();
+                if ($previousStatus !== $claim->status) {
+                    ClaimStatusUpdated::dispatch($claim, $previousStatus);
+                }
             }
+
 
             if (
                 !empty($data['replace_serial']) ||
