@@ -21,7 +21,12 @@ class DeliveryChallanController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $user = $request->user();
         $query = DeliveryChallan::with(['customer', 'courierOut']);
+
+        if ($user->isServiceCenterRestricted()) {
+            $query->whereIn('service_center_id', $user->accessibleServiceCenterIds());
+        }
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
