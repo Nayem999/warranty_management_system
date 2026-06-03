@@ -17,7 +17,12 @@ class ServiceCenterController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $user = $request->user();
         $query = ServiceCenter::query();
+
+        if ($user->isServiceCenterRestricted()) {
+            $query->whereIn('id', $user->accessibleServiceCenterIds());
+        }
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
