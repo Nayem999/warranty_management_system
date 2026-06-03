@@ -568,10 +568,10 @@ class ClaimController extends Controller
             $jobTypes = implode(',', ['Carry In', 'On Site', 'Pick Up']);
 
             $data = $request->validate([
-                'service_center_id' => 'nullable|exists:wms_service_centers,id',
+                'service_center_id' => 'required|exists:wms_service_centers,id',
                 'problem_description' => 'nullable|string',
                 'claim_date' => 'nullable|date_format:Y-m-d H:i:s',
-                'status' => "nullable|in:{$statuses}",
+                'status' => "required|in:{$statuses}",
                 'engineer_id' => 'nullable|exists:users,id',
                 'courier_in_id' => 'nullable|exists:wms_couriers,id',
                 'courier_slip_inward' => 'nullable|string',
@@ -602,11 +602,13 @@ class ClaimController extends Controller
                 'replace_product_id' => 'nullable|integer|exists:wms_products,id',
                 'replace_ref' => 'nullable|string',
                 'parts' => 'nullable|array',
+                'parts.*.part_id' => 'required_with:parts|exists:wms_parts,id',
                 'job_remarks' => 'nullable|string',
                 'accessories' => 'nullable|string|max:500',
             ]);
 
             if ($claim->is_delivered) {
+                DB::rollBack();
                 return $this->error("Claim already delivered, Claim can not update");
             }
 
@@ -614,7 +616,7 @@ class ClaimController extends Controller
                 $data['assigned_by'] = $request->user()->id;
                 $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
                 $data['status'] = "Assigned";
-            } else if ($claim->status == "Not Assigned" && !empty($data['engineer_id'])) {
+            } else if (empty($claim->engineer_id) && !empty($data['engineer_id'])) {
                 $data['assigned_by'] = $request->user()->id;
                 $data['wo_assigned_date'] = $data['wo_assigned_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
@@ -622,18 +624,22 @@ class ClaimController extends Controller
             $open_status = array('Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part');
             $close_status = array('Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement', 'Delivered');
 
-            if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && !$data['wo_closed_date']) {
+            if (in_array($claim->status, $open_status) && in_array($data['status'], $close_status) && empty($data['wo_closed_date'])) {
                 $data['wo_closed_date'] = $data['wo_closed_date'] ?? Carbon::now()->format('Y-m-d H:i:s');
             }
 
             if (in_array($claim->status, $open_status)) {
-                $tat = Carbon::parse($claim->claim_date)->diffInDays(now());
-                $data['tat'] = $tat;
+                $data['tat'] = Carbon::parse($claim->claim_date)->diffInDays(now());
+            }
+
+            $workOrder = $claim->workOrder;
+            if (! $workOrder && isset($data['parts']) && $claim->status == $data['status']) {
+                $data['status'] = "Waiting for Part";
             }
 
             $previousStatus = $claim->status;
             $claim->update($data);
-
+            $claim->refresh();
             if ($previousStatus !== $claim->status) {
                 ClaimStatusUpdated::dispatch($claim, $previousStatus);
             }
@@ -644,8 +650,6 @@ class ClaimController extends Controller
                 !empty($data['replace_ref']) ||
                 !empty($data['parts'])
             ) {
-
-                $workOrder = $claim->workOrder;
 
                 if (! $workOrder) {
                     $workOrder = WorkOrder::create([
