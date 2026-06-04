@@ -522,7 +522,12 @@ class ClaimController extends Controller
             'customer.city',
             'serviceCenter',
             'workOrder',
-        ])->where('claim_number', $claimNumber)->first();
+        ])
+            ->where(function ($query) use ($claimNumber) {
+                $query->where('claim_number', $claimNumber)
+                    ->orWhere('serial_number', $claimNumber);
+            })
+            ->first();
 
         if (! $claim) {
             return $this->notFound('Claim not found.');
@@ -530,7 +535,11 @@ class ClaimController extends Controller
 
         return $this->success([
             'claim_number' => $claim->claim_number,
+            'serial_number' => $claim->serial_number,
             'status' => $claim->status,
+            'is_delivered' => $claim->is_delivered,
+            'completion_date' => $claim->wo_closed_date,
+            'delivery_date' => $claim->wo_delivery_date,
             'claim_date' => $claim->claim_date,
             'problem_description' => $claim->problem_description,
             'product' => $claim->product,
