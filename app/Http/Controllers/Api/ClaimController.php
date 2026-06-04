@@ -125,6 +125,14 @@ class ClaimController extends Controller
             $query->where('wo_closed_date', '<=', Carbon::parse($request->wo_closed_date_to)->endOfDay());
         }
 
+        if ($request->has('transferred_at_from')) {
+            $query->where('transferred_at', '>=', Carbon::parse($request->transferred_at_from)->startOfDay());
+        }
+
+        if ($request->has('transferred_at_to')) {
+            $query->where('transferred_at', '<=', Carbon::parse($request->transferred_at_to)->endOfDay());
+        }
+
         if ($request->has('search') && $request->filled('search_include')) {
             $searchFields = explode(',', $request->search_include);
             $query->where(function ($q) use ($request, $searchFields) {
@@ -181,6 +189,9 @@ class ClaimController extends Controller
                         case 'complaint':
                             $q->orWhere('additional_comment', 'like', "%{$request->search}%");
                             break;
+                        case 'transfer_reason':
+                            $q->orWhere('transfer_reason', 'like', "%{$request->search}%");
+                            break;
                         case 'aging':
                             $q->orWhere('tat', $request->search);
                             break;
@@ -224,6 +235,7 @@ class ClaimController extends Controller
                     ->orWhere('job_remarks', 'like', "%{$request->search}%")
                     ->orWhere('accessories', 'like', "%{$request->search}%")
                     ->orWhere('status', 'like', "%{$request->search}%")
+                    ->orWhere('transfer_reason', 'like', "%{$request->search}%")
                     ->orWhere('tat', $request->search);
             });
         }
