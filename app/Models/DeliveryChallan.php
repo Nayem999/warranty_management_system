@@ -17,6 +17,7 @@ class DeliveryChallan extends Model
         'delivery_number',
         'service_center_id',
         'customer_id',
+        'view_count',
         'courier_out_id',
         'courier_slip_outward',
         'delivered_date_time',
@@ -27,6 +28,7 @@ class DeliveryChallan extends Model
     protected $casts = [
         'claim_ids' => 'array',
         'delivered_date_time' => 'datetime',
+        'view_count' => 'integer',
     ];
 
     public function customer(): BelongsTo

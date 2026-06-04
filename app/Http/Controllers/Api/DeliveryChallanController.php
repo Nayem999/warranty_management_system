@@ -134,6 +134,8 @@ class DeliveryChallanController extends Controller
             return $this->notFound('Delivery challan not found.');
         }
 
+        $challan->increment('view_count');
+
         $challan->setRelation('claims', $challan->claims()->get());
 
         return $this->success($challan);
