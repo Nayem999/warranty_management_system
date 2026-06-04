@@ -537,6 +537,7 @@ class ClaimController extends Controller
             'claim_number' => $claim->claim_number,
             'serial_number' => $claim->serial_number,
             'status' => $claim->status,
+            'status_comment' => $claim->status_comment,
             'is_delivered' => $claim->is_delivered,
             'completion_date' => $claim->wo_closed_date,
             'delivery_date' => $claim->wo_delivery_date,
