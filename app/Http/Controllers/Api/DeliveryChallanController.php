@@ -126,7 +126,7 @@ class DeliveryChallanController extends Controller
         }
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $challan = DeliveryChallan::with(['customer', 'courierOut'])->find($id);
 
@@ -134,7 +134,9 @@ class DeliveryChallanController extends Controller
             return $this->notFound('Delivery challan not found.');
         }
 
-        $challan->increment('view_count');
+        if ($request->has('print')) {
+            $challan->increment('view_count');
+        }
 
         $challan->setRelation('claims', $challan->claims()->get());
 
