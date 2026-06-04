@@ -15,6 +15,9 @@ class Claim extends BaseModel
         'serial_number',
         'customer_id',
         'view_count',
+        'transferred_from_service_center_id',
+        'transferred_at',
+        'transfer_reason',
         'problem_description',
         'service_center_id',
         'claim_date',
@@ -83,6 +86,7 @@ class Claim extends BaseModel
         'is_feedback_taken' => 'boolean',
         'is_delivered' => 'boolean',
         'view_count' => 'integer',
+        'transferred_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     // public function getClaimDateAttribute($value)
@@ -122,6 +126,11 @@ class Claim extends BaseModel
     public function serviceCenter(): BelongsTo
     {
         return $this->belongsTo(ServiceCenter::class);
+    }
+
+    public function transferredFromServiceCenter(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCenter::class, 'transferred_from_service_center_id');
     }
 
     public function engineer(): BelongsTo

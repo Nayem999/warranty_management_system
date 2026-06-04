@@ -44,6 +44,7 @@ class ClaimController extends Controller
             'product.subCategory',
             'customer.city',
             'serviceCenter',
+            'transferredFromServiceCenter',
             'engineer',
             'courierIn',
             'assignedByUser',
@@ -94,6 +95,10 @@ class ClaimController extends Controller
 
         if ($request->has('service_center_id')) {
             $query->where('service_center_id', $request->service_center_id);
+        }
+
+        if ($request->has('transferred_from_service_center_id')) {
+            $query->where('transferred_from_service_center_id', $request->transferred_from_service_center_id);
         }
 
         if ($request->has('customer_id')) {
@@ -521,7 +526,7 @@ class ClaimController extends Controller
     {
         $user = auth()->user();
 
-        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn']);
+        $claimQuery = Claim::with(['product.brand', 'product.category', 'product.subCategory', 'customer.city', 'serviceCenter', 'transferredFromServiceCenter', 'creator', 'assignedByUser', 'workOrder.replaceProduct', 'workOrder.parts.part', 'workOrder.parts.faultyPart', 'engineer', 'courierIn']);
 
         if ($user && $user->user_type === 'client') {
             $claimQuery->where('customer_id', $user->id);
@@ -611,6 +616,9 @@ class ClaimController extends Controller
                 'parts.*.part_id' => 'required_with:parts|exists:wms_parts,id',
                 'job_remarks' => 'nullable|string',
                 'accessories' => 'nullable|string|max:500',
+                'transferred_from_service_center_id' => 'nullable|exists:wms_service_centers,id',
+                'transferred_at' => 'nullable|date_format:Y-m-d H:i:s',
+                'transfer_reason' => 'nullable|string',
             ]);
 
             if ($claim->status == "Not Assigned" && $data['status'] == "Not Assigned" && !empty($data['engineer_id'])) {
@@ -634,6 +642,15 @@ class ClaimController extends Controller
             $workOrder = $claim->workOrder;
             if (! $workOrder && isset($data['parts']) && $claim->status == $data['status']) {
                 $data['status'] = "Waiting for Part";
+            }
+
+            if (!empty($data['transferred_from_service_center_id'])) {
+                if ($data['transferred_from_service_center_id'] == $data['service_center_id']) {
+                    return $this->error('Transferred service center cannot be the same as the current service center.');
+                }
+                if (empty($data['transferred_at'])) {
+                    $data['transferred_at'] = Carbon::now()->format('Y-m-d H:i:s');
+                }
             }
 
             $previousStatus = $claim->status;
