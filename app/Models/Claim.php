@@ -14,6 +14,7 @@ class Claim extends BaseModel
         'product_id',
         'serial_number',
         'customer_id',
+        'view_count',
         'problem_description',
         'service_center_id',
         'claim_date',
@@ -81,6 +82,7 @@ class Claim extends BaseModel
         'attachments' => 'array',
         'is_feedback_taken' => 'boolean',
         'is_delivered' => 'boolean',
+        'view_count' => 'integer',
     ];
 
     // public function getClaimDateAttribute($value)

@@ -517,7 +517,7 @@ class ClaimController extends Controller
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
 
@@ -540,6 +540,10 @@ class ClaimController extends Controller
 
         if (! $claim) {
             return $this->notFound('Claim not found.');
+        }
+
+        if ($request->has('print')) {
+            $claim->increment('view_count');
         }
 
         $activityTimeline = ActivityLog::with('user:id,first_name,last_name')
