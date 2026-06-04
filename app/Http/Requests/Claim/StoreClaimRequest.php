@@ -73,6 +73,8 @@ class StoreClaimRequest extends FormRequest
             'assigned_by' => 'nullable|exists:users,id',
             'job_remarks' => 'nullable|string',
             'accessories' => 'nullable|string|max:500',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'nullable|string',
         ];
     }
 }

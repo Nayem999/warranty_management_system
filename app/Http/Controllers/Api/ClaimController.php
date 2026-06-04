@@ -14,6 +14,7 @@ use App\Models\WorkOrder;
 use App\Traits\ApiResponse;
 use App\Traits\EmailHelper;
 use App\Traits\UserAccessFilter;
+use App\Traits\FileUpload;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 
 class ClaimController extends Controller
 {
-    use ApiResponse, EmailHelper, UserAccessFilter;
+    use ApiResponse, EmailHelper, UserAccessFilter, FileUpload;
 
     private array $statuses = [
         'Not Assigned',
@@ -486,6 +487,11 @@ class ClaimController extends Controller
             $data['claim_date'] = isset($data['claim_date']) ? Carbon::parse($data['claim_date'])->format('Y-m-d H:i:s') : Carbon::now()->format('Y-m-d H:i:s');
             $data['status'] = $data['status'] ?? 'Not Assigned';
 
+            if (! empty($data['attachments'])) {
+                $attachments = $this->handleAttachments($data['attachments'], 'claims');
+                $data['attachments'] = $attachments ? json_decode($attachments, true) : [];
+            }
+
             $claim = Claim::create($data);
 
             ActivityLog::log(
@@ -628,6 +634,8 @@ class ClaimController extends Controller
                 'parts.*.part_id' => 'required_with:parts|exists:wms_parts,id',
                 'job_remarks' => 'nullable|string',
                 'accessories' => 'nullable|string|max:500',
+                'attachments' => 'nullable|array',
+                'attachments.*' => 'nullable|string',
                 'transferred_from_service_center_id' => 'nullable|exists:wms_service_centers,id',
                 'transferred_at' => 'nullable|date_format:Y-m-d H:i:s',
                 'transfer_reason' => 'nullable|string',
@@ -656,6 +664,13 @@ class ClaimController extends Controller
                 $data['status'] = "Waiting for Part";
             }
 
+            if (! empty($data['attachments'])) {
+                $existingAttachments = $claim->attachments ?? [];
+                $newAttachments = $this->handleAttachments($data['attachments'], 'claims');
+                $newAttachmentsArray = $newAttachments ? json_decode($newAttachments, true) : [];
+                $data['attachments'] = array_merge($existingAttachments, $newAttachmentsArray);
+            }
+
             if (!empty($data['transferred_from_service_center_id'])) {
                 if ($data['transferred_from_service_center_id'] == $data['service_center_id']) {
                     return $this->error('Transferred service center cannot be the same as the current service center.');
@@ -665,17 +680,20 @@ class ClaimController extends Controller
                 }
             }
 
+
             $previousStatus = $claim->status;
             if (! $claim->is_delivered) {
                 // DB::rollBack();
                 // return $this->error("Claim already delivered, Claim can not update");
+                // $claim->update($data);
+                // DB::enableQueryLog();
                 $claim->update($data);
+                // dd(DB::getQueryLog());
                 $claim->refresh();
                 if ($previousStatus !== $claim->status) {
                     ClaimStatusUpdated::dispatch($claim, $previousStatus);
                 }
             }
-
 
             if (
                 !empty($data['replace_serial']) ||

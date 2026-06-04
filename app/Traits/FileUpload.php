@@ -90,7 +90,7 @@ trait FileUpload
         return 'jpg';
     }
 
-    public function handleAttachments($attachments, string $folder = 'work-orders'): ?string
+    public function handleAttachments(array $attachments, string $folder = 'claims'): ?string
     {
         if (empty($attachments)) {
             return null;
