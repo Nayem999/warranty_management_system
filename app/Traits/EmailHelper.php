@@ -3,8 +3,8 @@
 namespace App\Traits;
 
 use App\Models\EmailLog;
+use App\Services\Mail\UnifiedEmailService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 trait EmailHelper
 {
@@ -26,14 +26,23 @@ trait EmailHelper
         }
 
         try {
-            Mail::to($to)->send($mailable);
+            $body = $mailable->render();
 
-            $emailLog->update([
-                'status' => 'sent',
-                'sent_at' => now(),
-            ]);
+            $result = (new UnifiedEmailService())->send($to, $subject, $body);
 
-            return true;
+            if ($result) {
+                $emailLog->update([
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                ]);
+            } else {
+                $emailLog->update([
+                    'status' => 'failed',
+                    'reason' => 'Email driver returned false',
+                ]);
+            }
+
+            return $result;
         } catch (\Exception $e) {
             $emailLog->update([
                 'status' => 'failed',

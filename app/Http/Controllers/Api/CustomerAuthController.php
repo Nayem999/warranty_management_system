@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ForgotPasswordOtp;
 use App\Models\Customer;
 use App\Traits\ApiResponse;
+use App\Traits\EmailHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class CustomerAuthController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, EmailHelper;
 
     public function login(Request $request): JsonResponse
     {
@@ -122,6 +124,12 @@ class CustomerAuthController extends Controller
                 'token' => $otp,
                 'created_at' => now(),
             ]
+        );
+
+        $this->sendEmail(
+            new ForgotPasswordOtp($otp, $customer->customer_name ?? 'Customer'),
+            $request->email,
+            'Password Reset OTP - ' . config('app.name')
         );
 
         return $this->success([

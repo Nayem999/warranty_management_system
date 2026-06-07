@@ -3,8 +3,8 @@
 namespace App\Services\Notifications;
 
 use App\Models\EmailLog;
+use App\Services\Mail\UnifiedEmailService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class EmailService implements NotificationChannelInterface
 {
@@ -26,17 +26,21 @@ class EmailService implements NotificationChannelInterface
         }
 
         try {
-            Mail::raw($message, function ($mail) use ($to, $subject) {
-                $mail->to($to)
-                    ->subject($subject);
-            });
+            $result = (new UnifiedEmailService())->send($to, $subject, $message);
 
-            $emailLog->update([
-                'status' => 'sent',
-                'sent_at' => now(),
-            ]);
+            if ($result) {
+                $emailLog->update([
+                    'status' => 'sent',
+                    'sent_at' => now(),
+                ]);
+            } else {
+                $emailLog->update([
+                    'status' => 'failed',
+                    'reason' => 'Email driver returned false',
+                ]);
+            }
 
-            return true;
+            return $result;
         } catch (\Exception $e) {
             $emailLog->update([
                 'status' => 'failed',

@@ -7,8 +7,10 @@ use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Mail\ForgotPasswordOtp;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use App\Traits\EmailHelper;
 use App\Traits\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +21,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    use ApiResponse, FileUpload;
+    use ApiResponse, EmailHelper, FileUpload;
 
     public function login(LoginRequest $request): JsonResponse
     {
@@ -90,8 +92,13 @@ class AuthController extends Controller
             ]
         );
 
+        $this->sendEmail(
+            new ForgotPasswordOtp($otp, $user->first_name),
+            $email,
+            'Password Reset OTP - ' . config('app.name')
+        );
+
         return $this->success([
-            // 'otp' => $otp,
             'email' => $email,
         ], 'Password reset OTP has been sent to your email.');
     }
