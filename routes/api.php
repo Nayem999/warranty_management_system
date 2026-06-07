@@ -339,6 +339,12 @@ Route::prefix('')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
         Route::get('/client-dashboard', [DashboardController::class, 'clientDashboard']);
         Route::get('/exports/products', [ExportController::class, 'downloadProducts']);
+
+        Route::get('/exports/customers', [ExportController::class, 'downloadCustomers']);
+        Route::get('/exports/categories', [ExportController::class, 'downloadCategories']);
+        Route::get('/exports/brands', [ExportController::class, 'downloadBrands']);
+        Route::get('/exports/cities', [ExportController::class, 'downloadCities']);
+
         // });
 
         Route::middleware('permission:activity_logs/list')->group(function () {

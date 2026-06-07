@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\BrandsExport;
+use App\Exports\CategoriesExport;
+use App\Exports\CitiesExport;
 use App\Exports\ClaimsExport;
+use App\Exports\CustomersExport;
 use App\Exports\ProductsExport;
 use App\Exports\WorkOrdersExport;
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use App\Models\City;
 use App\Models\Claim;
+use App\Models\Customer;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -443,5 +451,151 @@ class ExportController extends Controller
         $filename = 'work-orders-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
 
         return Excel::download(new WorkOrdersExport($filters), $filename);
+    }
+
+    public function downloadCustomers(Request $request)
+    {
+        $filters = $request->only([
+            'search',
+            'city_id',
+            'city',
+        ]);
+
+        if ($request->input('format') === 'pdf') {
+            $query = Customer::with('city');
+
+            if (!empty($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('customer_name', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('email', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('phone', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('contact_person', 'like', '%' . $filters['search'] . '%');
+                });
+            }
+
+            if (!empty($filters['city_id'])) {
+                $query->where('city_id', $filters['city_id']);
+            }
+
+            if (!empty($filters['city'])) {
+                $query->whereHas('city', function ($q) use ($filters) {
+                    $q->where('name', 'like', '%' . $filters['city'] . '%');
+                });
+            }
+
+            $customers = $query->orderBy('customer_name')->get();
+            $filename = 'customers-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+
+            return Pdf::loadView('exports.customers-pdf', compact('customers'))->download($filename);
+        }
+
+        $filename = 'customers-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
+
+        return Excel::download(new CustomersExport($filters), $filename);
+    }
+
+    public function downloadCategories(Request $request)
+    {
+        $filters = $request->only([
+            'parent_id',
+            'search',
+            'status',
+        ]);
+
+        if ($request->input('format') === 'pdf') {
+            $query = ProductCategory::query()->with('parent');
+
+            if (!empty($filters['parent_id'])) {
+                if ($filters['parent_id'] === 'null') {
+                    $query->whereNull('parent_id');
+                } else {
+                    $query->where('parent_id', $filters['parent_id']);
+                }
+            }
+
+            if (!empty($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('short_name', 'like', '%' . $filters['search'] . '%');
+                });
+            }
+
+            if (!empty($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            $categories = $query->orderBy('name')->get();
+            $filename = 'categories-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+
+            return Pdf::loadView('exports.categories-pdf', compact('categories'))->download($filename);
+        }
+
+        $filename = 'categories-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
+
+        return Excel::download(new CategoriesExport($filters), $filename);
+    }
+
+    public function downloadBrands(Request $request)
+    {
+        $filters = $request->only([
+            'search',
+            'status',
+        ]);
+
+        if ($request->input('format') === 'pdf') {
+            $query = Brand::query();
+
+            if (!empty($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('short_name', 'like', '%' . $filters['search'] . '%');
+                });
+            }
+
+            if (!empty($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            $brands = $query->orderBy('id', 'desc')->get();
+            $filename = 'brands-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+
+            return Pdf::loadView('exports.brands-pdf', compact('brands'))->download($filename);
+        }
+
+        $filename = 'brands-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
+
+        return Excel::download(new BrandsExport($filters), $filename);
+    }
+
+    public function downloadCities(Request $request)
+    {
+        $filters = $request->only([
+            'search',
+            'status',
+        ]);
+
+        if ($request->input('format') === 'pdf') {
+            $query = City::query();
+
+            if (!empty($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('code', 'like', '%' . $filters['search'] . '%');
+                });
+            }
+
+            if (!empty($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            $cities = $query->orderBy('id', 'desc')->get();
+            $filename = 'cities-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+
+            return Pdf::loadView('exports.cities-pdf', compact('cities'))->download($filename);
+        }
+
+        $filename = 'cities-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
+
+        return Excel::download(new CitiesExport($filters), $filename);
     }
 }
