@@ -17,15 +17,14 @@
         <thead>
             <tr>
                 <th>Model No</th>
-                <th>Serial Number</th>
                 <th>Item Description</th>
                 <th>Brand</th>
                 <th>Category</th>
                 <th>Sub Category</th>
                 <th>Is Countable</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Status</th>
+                {{-- <th>Start Date</th> --}}
+                {{-- <th>End Date</th> --}}
+                {{-- <th>Status</th> --}}
                 <th>Created By</th>
                 <th>Created At</th>
             </tr>
@@ -34,15 +33,14 @@
             @foreach ($products as $product)
             <tr>
                 <td>{{ $product->model_no }}</td>
-                <td>{{ $product->serial_number }}</td>
                 <td>{{ $product->item_description }}</td>
                 <td>{{ $product->brand?->name }}</td>
                 <td>{{ $product->category?->name }}</td>
                 <td>{{ $product->subCategory?->name }}</td>
                 <td>{{ $product->is_countable ? 'Yes' : 'No' }}</td>
-                <td>{{ $product->start_date }}</td>
-                <td>{{ $product->end_date }}</td>
-                <td>{{ $product->product_status }}</td>
+                {{-- <td>{{ $product->start_date }}</td> --}}
+                {{-- <td>{{ $product->end_date }}</td> --}}
+                {{-- <td>{{ $product->product_status }}</td> --}}
                 <td>{{ $product->creator?->first_name }} {{ $product->creator?->last_name }}</td>
                 <td>{{ $product->created_at }}</td>
             </tr>
