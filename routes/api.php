@@ -234,6 +234,7 @@ Route::prefix('')->group(function () {
 
         Route::middleware('permission:claims/edit')->group(function () {
             Route::put('/claims/{claim}', [ClaimController::class, 'update']);
+            Route::put('/transfer/{claim}', [ClaimController::class, 'transfer']);
             Route::put('/claims/{id}/close', [ClaimController::class, 'close']);
             Route::delete('/claims/{id}/attachment', [ClaimController::class, 'deleteAttachment']);
         });

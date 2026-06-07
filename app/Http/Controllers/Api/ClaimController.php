@@ -773,6 +773,61 @@ class ClaimController extends Controller
         }
     }
 
+    public function transfer(Request $request, int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $claim = Claim::find($id);
+
+            if (! $claim) {
+                return $this->notFound('Claim not found.');
+            }
+
+            $close_status = array('Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement', 'Delivered');
+
+            $data = $request->validate([
+                'service_center_id' => 'required|exists:wms_service_centers,id',
+                'transferred_at' => 'nullable|date_format:Y-m-d H:i:s',
+                'transfer_reason' => 'nullable|string',
+            ]);
+
+            if ($claim->is_delivered) {
+                return $this->error("This Claim already delivered. So it's can't transfere");
+            }
+
+            if (in_array($claim->status, $close_status)) {
+                return $this->error("This Claim already closed. So it's can't transfere");
+            }
+
+            if ($claim->service_center_id == $data['service_center_id']) {
+                return $this->error('Transferred service center cannot be the same as the current service center.');
+            }
+
+            if (empty($data['transferred_at'])) {
+                $data['transferred_at'] = Carbon::now()->format('Y-m-d H:i:s');
+            }
+            $data['transferred_from_service_center_id'] = $claim->service_center_id;
+
+            $claim->update($data);
+            $claim->refresh();
+
+            DB::commit();
+
+            return $this->success($claim->load([
+                'product.brand',
+                'customer',
+                'serviceCenter',
+                'engineer',
+                'courierIn',
+                'assignedByUser',
+                'workOrder.parts.part',
+            ]), 'Claim updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
+    }
+
     public function destroy(int $id): JsonResponse
     {
         $claim = Claim::find($id);
