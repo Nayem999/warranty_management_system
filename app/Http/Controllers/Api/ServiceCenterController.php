@@ -18,27 +18,40 @@ class ServiceCenterController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+
         $query = ServiceCenter::query();
 
         if ($user->isServiceCenterRestricted()) {
             $query->whereIn('id', $user->accessibleServiceCenterIds());
         }
 
-        if ($request->has('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('address', 'like', "%{$request->search}%");
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('address', 'like', "%{$search}%");
             });
         }
 
-        if ($request->has('is_active')) {
+        if ($request->filled('is_active')) {
             $query->where('is_active', $request->is_active);
         }
 
-        $serviceCenters = $query->orderBy('id', 'desc')->paginate($request->limit ?? 15);
+        if ($request->filled('exclude_id')) {
+            $query->where('id', '!=', $request->exclude_id);
+        }
 
-        return $this->success(ServiceCenterResource::collection($serviceCenters));
+        $limit = (int) $request->input('limit', 15);
+
+        $serviceCenters = $query
+            ->orderByDesc('id')
+            ->paginate($limit);
+
+        return $this->success(
+            ServiceCenterResource::collection($serviceCenters)
+        );
     }
 
     public function store(Request $request): JsonResponse

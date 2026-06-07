@@ -225,18 +225,18 @@ class ProductController extends Controller
                 try {
                     $data = array_combine($headers, $row);
 
-                    if (empty($data['model_no']) && empty($data['model_number'])) {
+                    if (empty($data['model no'])) {
                         continue;
                     }
 
-                    $modelNo = $data['model_no'] ?? $data['model_number'] ?? null;
-                    $itemDescription = $data['item_description'] ?? $data['description'] ?? null;
-                    $brandShortName = $data['brand short name'] ?? $data['brand_short_name'] ?? null;
-                    $categoryShortName = $data['category short name'] ?? $data['category_short_name'] ?? null;
-                    $subCategoryShortName = $data['sub-category short name'] ?? $data['sub_category_short_name'] ?? null;
-                    $startDate = $data['start date'] ?? $data['start_date'] ?? null;
-                    $endDate = $data['end date'] ?? $data['end_date'] ?? null;
-                    $isCountable = $data['is_countable'] ?? $data['countable'] ?? false;
+                    $modelNo = $data['model no'] ?? $data['model no'] ?? null;
+                    $itemDescription = $data['item description'] ?? $data['item description'] ?? null;
+                    $brandShortName = $data['brand short name'] ?? $data['brand short name'] ?? null;
+                    $categoryShortName = $data['category short name'] ?? $data['category short name'] ?? null;
+                    $subCategoryShortName = $data['sub-category short name'] ?? $data['sub-category short name'] ?? null;
+                    $startDate = $data['start date'] ?? $data['start date'] ?? null;
+                    $endDate = $data['end date'] ?? $data['end date'] ?? null;
+                    $isCountable = $data['is countable'] ?? $data['is countable'] ?? false;
 
                     $brandId = null;
                     if (! empty($brandShortName)) {
