@@ -733,8 +733,9 @@ class ClaimController extends Controller
                     $workOrder->parts()->delete();
                 }
 
-                if (isset($data['parts'])) {
-                    foreach ($data['parts'] as $partData) {
+                $partsData = $request->input('parts', []);
+                if (! empty($partsData)) {
+                    foreach ($partsData as $partData) {
                         $workOrder->parts()->create($partData);
                     }
                 }
