@@ -165,12 +165,12 @@ class Claim extends BaseModel
 
     public function scopeOpen($query)
     {
-        return $query->where('status', 'Open');
+        return $query->whereIn('status', ['Not Assigned', 'Assigned', 'In Progress', 'Waiting for Part']);
     }
 
     public function scopeClosed($query)
     {
-        return $query->where('status', 'Closed');
+        return $query->whereIn('status', ['Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement']);
     }
 
     public function scopeConverted($query)

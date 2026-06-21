@@ -26,13 +26,13 @@ class DashboardController extends Controller
         $brandId = $request->brand_id;
         $serviceCenterId = $request->service_center_id;
 
-        $productQuery = Product::query();
+        // $productQuery = Product::query();
         $claimQuery = Claim::query();
         $workOrderQuery = WorkOrder::query();
 
         if ($user->isBrandRestricted()) {
             $brandIds = $user->accessibleBrandIds();
-            $productQuery->whereIn('brand_id', $brandIds);
+            // $productQuery->whereIn('brand_id', $brandIds);
             $claimQuery->whereHas('product', function ($q) use ($brandIds) {
                 $q->whereIn('brand_id', $brandIds);
             });
@@ -48,7 +48,7 @@ class DashboardController extends Controller
         }
 
         if ($brandId) {
-            $productQuery->where('brand_id', $brandId);
+            // $productQuery->where('brand_id', $brandId);
             $claimQuery->whereHas('product', function ($q) use ($brandId) {
                 $q->where('brand_id', $brandId);
             });
@@ -63,18 +63,18 @@ class DashboardController extends Controller
         }
 
         $stats = [
-            'total_products' => $productQuery->count(),
-            'active_products' => (clone $productQuery)->active()->count(),
-            'expired_products' => (clone $productQuery)->expired()->count(),
+            // 'total_products' => $productQuery->count(),
+            // 'active_products' => (clone $productQuery)->active()->count(),
+            // 'expired_products' => (clone $productQuery)->expired()->count(),
             'total_claims' => $claimQuery->count(),
             'open_claims' => (clone $claimQuery)->open()->count(),
-            'converted_claims' => (clone $claimQuery)->converted()->count(),
+            // 'converted_claims' => (clone $claimQuery)->converted()->count(),
             'closed_claims' => (clone $claimQuery)->closed()->count(),
-            'total_work_orders' => $workOrderQuery->count(),
-            'pending_work_orders' => (clone $workOrderQuery)->pending()->count(),
-            'in_progress_work_orders' => (clone $workOrderQuery)->inProgress()->count(),
-            'completed_work_orders' => (clone $workOrderQuery)->completed()->count(),
-            'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
+            // 'total_work_orders' => $workOrderQuery->count(),
+            // 'pending_work_orders' => (clone $workOrderQuery)->pending()->count(),
+            // 'in_progress_work_orders' => (clone $workOrderQuery)->inProgress()->count(),
+            // 'completed_work_orders' => (clone $workOrderQuery)->completed()->count(),
+            // 'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
             'total_service_centers' => ServiceCenter::when($brandId, fn($q) => $q->whereHas('brands', fn($q) => $q->where('wms_brands.id', $brandId)))->where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
             'avg_customer_rating' => (int) (clone $claimQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
@@ -89,13 +89,43 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        $recentWorkOrders = WorkOrder::with(['claim.product.brand', 'serviceCenter'])
+
+        $engineerClaimsSummary = Claim::query()
+            ->join('users', 'users.id', '=', 'wms_claims.engineer_id')
+            ->select(
+                'users.id',
+                'users.first_name',
+                'users.last_name',
+                DB::raw('COUNT(*) AS total_job'),
+                DB::raw("SUM(CASE WHEN wms_claims.status = 'Assigned' THEN 1 ELSE 0 END) AS assigned"),
+                DB::raw("SUM(CASE WHEN wms_claims.status = 'In Progress' THEN 1 ELSE 0 END) AS in_progress"),
+                DB::raw("SUM(CASE WHEN wms_claims.status = 'Waiting For Part' THEN 1 ELSE 0 END) AS waiting_for_part"),
+                DB::raw("SUM( CASE WHEN wms_claims.status IN ( 'Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement') THEN 1 ELSE 0 END) AS completed")
+            )
+            ->when($user->isBrandRestricted(), function ($q) use ($user) {
+                $q->whereHas('product', function ($q) use ($user) {
+                    $q->whereIn('brand_id', $user->accessibleBrandIds());
+                });
+            })
+            ->when($user->isServiceCenterRestricted(), function ($q) use ($user) {
+                $q->whereIn('wms_claims.service_center_id', $user->accessibleServiceCenterIds());
+            })
+            ->when($brandId, function ($q) use ($brandId) {
+                $q->whereHas('product', function ($q) use ($brandId) {
+                    $q->where('brand_id', $brandId);
+                });
+            })
+            ->groupBy('users.id', 'users.first_name', 'users.last_name')
+            ->orderBy('users.first_name')
+            ->get();
+
+        /* $recentWorkOrders = WorkOrder::with(['claim.product.brand', 'serviceCenter'])
             ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('claim.product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
             ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
             ->when($brandId, fn($q) => $q->whereHas('claim.product', fn($q) => $q->where('brand_id', $brandId)))
             ->orderBy('created_at', 'desc')
             ->limit(10)
-            ->get();
+            ->get(); */
 
         $year = $request->year ?? now()->year;
         $monthlyClaims = Claim::query()
@@ -115,13 +145,13 @@ class DashboardController extends Controller
             ];
         }
 
-        $expiringProducts = Product::with(['brand', 'category'])
+        /* $expiringProducts = Product::with(['brand', 'category'])
             ->where('end_date', '<=', now()->addDays(30))
             ->where('end_date', '>=', now())
             ->when($user->isBrandRestricted(), fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds()))
             ->orderBy('end_date', 'asc')
             ->limit(10)
-            ->get();
+            ->get(); */
 
         $serviceCenterQuery = ServiceCenter::query();
         if ($user->isBrandRestricted()) {
@@ -133,7 +163,7 @@ class DashboardController extends Controller
         }
 
         $serviceCenterComparison = $serviceCenterQuery->get()->map(function ($center) use ($brandId) {
-            $query = WorkOrder::query()
+            $query = Claim::query()
                 ->where('service_center_id', $center->id);
 
             if ($brandId) {
@@ -141,9 +171,9 @@ class DashboardController extends Controller
             }
 
             $total = $query->count();
-            $progress = (clone $query)->where('status', 'Progress')->count();
-            $closed = (clone $query)->where('status', 'Closed')->count();
-            $delivered = (clone $query)->where('status', 'Delivered')->count();
+            $progress = (clone $query)->whereIn('status', ['Not Assigned', 'Progress', 'In Progress','Waiting for Part'])->count();
+            $closed = (clone $query)->whereIn('status', ['Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement'])->where('is_delivered', 0)->count();
+            $delivered = (clone $query)->where('is_delivered', 1)->count();
             $completed = $closed + $delivered;
             $completionRate = $total > 0 ? round(($completed / $total) * 100, 2) : 0;
 
@@ -214,15 +244,6 @@ class DashboardController extends Controller
         foreach ($ranges as $key => $value) {
 
             $dateFilter = function ($q, $column) use ($value) {
-
-                /* if ($column === 'claim_date') {
-                    if (!$value['start']) {
-                        return $q->where($column, '<=', Carbon::parse($value['end'])->toDateString());
-                    }
-                    return $q->whereDate($column, '>=', Carbon::parse($value['start'])->toDateString())
-                        ->whereDate($column, '<=', Carbon::parse($value['end'])->toDateString());
-                } */
-
                 if (!$value['start']) {
                     return $q->where($column, '<=', $value['end']);
                 }
@@ -274,27 +295,28 @@ class DashboardController extends Controller
         }
         $data = [
             'stats' => $stats,
-            'product' => [
+            /* 'product' => [
                 'total' => $stats['total_products'],
                 'active' => $stats['active_products'],
                 'expired' => $stats['expired_products'],
                 'expiring_soon' => $expiringProducts,
-            ],
+            ], */
             'claim' => [
                 'total' => $stats['total_claims'],
                 'open' => $stats['open_claims'],
-                'converted' => $stats['converted_claims'],
+                'converted' => 0,
                 'closed' => $stats['closed_claims'],
+                'engineerClaimsSummary' => $engineerClaimsSummary,
                 'recent' => $recentClaims,
                 'monthly' => $monthlyData,
             ],
             'work_order' => [
-                'total' => $stats['total_work_orders'],
-                'pending' => $stats['pending_work_orders'],
-                'in_progress' => $stats['in_progress_work_orders'],
-                'completed' => $stats['completed_work_orders'],
-                'delivered' => $stats['delivered_work_orders'],
-                'recent' => $recentWorkOrders,
+                'total' => 0,
+                'pending' => 0,
+                'in_progress' => 0,
+                'completed' => 0,
+                'delivered' => 0,
+                'recent' => 0,
             ],
             'service_center' => [
                 'total' => $stats['total_service_centers'],
