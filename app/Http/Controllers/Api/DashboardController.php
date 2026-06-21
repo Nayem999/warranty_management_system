@@ -167,11 +167,11 @@ class DashboardController extends Controller
                 ->where('service_center_id', $center->id);
 
             if ($brandId) {
-                $query->whereHas('claim.product', fn($q) => $q->where('brand_id', $brandId));
+                $query->whereHas('product', fn($q) => $q->where('brand_id', $brandId));
             }
 
             $total = $query->count();
-            $progress = (clone $query)->whereIn('status', ['Not Assigned', 'Progress', 'In Progress','Waiting for Part'])->count();
+            $progress = (clone $query)->whereIn('status', ['Assigned', 'Not Assigned', 'Progress', 'In Progress','Waiting for Part'])->count();
             $closed = (clone $query)->whereIn('status', ['Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement'])->where('is_delivered', 0)->count();
             $delivered = (clone $query)->where('is_delivered', 1)->count();
             $completed = $closed + $delivered;
