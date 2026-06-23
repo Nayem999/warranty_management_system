@@ -26,17 +26,13 @@ class DashboardController extends Controller
         $brandId = $request->brand_id;
         $serviceCenterId = $request->service_center_id;
 
-        // $productQuery = Product::query();
+        $productQuery = Product::query();
         $claimQuery = Claim::query();
-        $workOrderQuery = WorkOrder::query();
 
         if ($user->isBrandRestricted()) {
             $brandIds = $user->accessibleBrandIds();
-            // $productQuery->whereIn('brand_id', $brandIds);
+            $productQuery->whereIn('brand_id', $brandIds);
             $claimQuery->whereHas('product', function ($q) use ($brandIds) {
-                $q->whereIn('brand_id', $brandIds);
-            });
-            $workOrderQuery->whereHas('claim.product', function ($q) use ($brandIds) {
                 $q->whereIn('brand_id', $brandIds);
             });
         }
@@ -44,41 +40,43 @@ class DashboardController extends Controller
         if ($user->isServiceCenterRestricted()) {
             $serviceCenterIds = $user->accessibleServiceCenterIds();
             $claimQuery->whereIn('service_center_id', $serviceCenterIds);
-            $workOrderQuery->whereIn('service_center_id', $serviceCenterIds);
         }
 
         if ($brandId) {
-            // $productQuery->where('brand_id', $brandId);
+            $productQuery->where('brand_id', $brandId);
             $claimQuery->whereHas('product', function ($q) use ($brandId) {
-                $q->where('brand_id', $brandId);
-            });
-            $workOrderQuery->whereHas('claim.product', function ($q) use ($brandId) {
                 $q->where('brand_id', $brandId);
             });
         }
 
         if ($serviceCenterId) {
             $claimQuery->where('service_center_id', $serviceCenterId);
-            $workOrderQuery->where('service_center_id', $serviceCenterId);
         }
 
         $stats = [
-            // 'total_products' => $productQuery->count(),
+            'total_products' => $productQuery->count(),
             // 'active_products' => (clone $productQuery)->active()->count(),
             // 'expired_products' => (clone $productQuery)->expired()->count(),
             'total_claims' => $claimQuery->count(),
             'open_claims' => (clone $claimQuery)->open()->count(),
-            // 'converted_claims' => (clone $claimQuery)->converted()->count(),
             'closed_claims' => (clone $claimQuery)->closed()->count(),
-            // 'total_work_orders' => $workOrderQuery->count(),
-            // 'pending_work_orders' => (clone $workOrderQuery)->pending()->count(),
-            // 'in_progress_work_orders' => (clone $workOrderQuery)->inProgress()->count(),
-            // 'completed_work_orders' => (clone $workOrderQuery)->completed()->count(),
-            // 'delivered_work_orders' => (clone $workOrderQuery)->delivered()->count(),
             'total_service_centers' => ServiceCenter::when($brandId, fn($q) => $q->whereHas('brands', fn($q) => $q->where('wms_brands.id', $brandId)))->where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
             'avg_customer_rating' => (int) (clone $claimQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,
             'avg_tat_days' => (int) (clone $claimQuery)->whereNotNull('tat')->avg('tat') ?? 0,
+        ];
+
+        $closed_status = [
+            'closed_repaired' => (clone $claimQuery)->where("status", "Closed-Repaired")->count(),
+            'closed_un_repaired' => (clone $claimQuery)->where("status", "Closed-Un Repaired")->count(),
+            'closed_replaced' => (clone $claimQuery)->where("status", "Closed-Replaced")->count(),
+            'closed_reimbursement' => (clone $claimQuery)->where("status", "Closed-Reimbursement")->count(),
+        ];
+        $claim_service_type = [
+            'in_warranty' => (clone $claimQuery)->where("service_type", "In Warranty")->count(),
+            'Warranty_void' => (clone $claimQuery)->where("service_type", "Warranty Void")->count(),
+            'doa' => (clone $claimQuery)->where("service_type", "DOA")->count(),
+            'oow_or_expired' => (clone $claimQuery)->where("service_type", "OOW/Expired")->count(),
         ];
 
         $recentClaims = Claim::with(['product.brand', 'serviceCenter'])
@@ -304,19 +302,13 @@ class DashboardController extends Controller
             'claim' => [
                 'total' => $stats['total_claims'],
                 'open' => $stats['open_claims'],
-                'converted' => 0,
                 'closed' => $stats['closed_claims'],
+                'closed_status' => $closed_status,
+                'service_type' => $claim_service_type,
+
                 'engineerClaimsSummary' => $engineerClaimsSummary,
                 'recent' => $recentClaims,
                 'monthly' => $monthlyData,
-            ],
-            'work_order' => [
-                'total' => 0,
-                'pending' => 0,
-                'in_progress' => 0,
-                'completed' => 0,
-                'delivered' => 0,
-                'recent' => 0,
             ],
             'service_center' => [
                 'total' => $stats['total_service_centers'],

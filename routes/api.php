@@ -303,6 +303,10 @@ Route::prefix('')->group(function () {
             Route::post('/delivery-challans', [DeliveryChallanController::class, 'store']);
         });
 
+        Route::middleware('permission:delivery_challans/edit')->group(function () {
+            Route::put('/delivery-challans/{id}', [DeliveryChallanController::class, 'update']);
+        });
+
         Route::middleware('permission:parts/list')->group(function () {
             Route::get('/parts', [PartController::class, 'index']);
         });

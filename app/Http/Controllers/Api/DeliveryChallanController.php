@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\DeliveryChallanCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryChallan\StoreDeliveryChallanRequest;
+use App\Http\Requests\DeliveryChallan\UpdateDeliveryChallanRequest;
 use App\Http\Resources\DeliveryChallanResource;
 use App\Models\Claim;
 use App\Models\DeliveryChallan;
@@ -141,5 +142,36 @@ class DeliveryChallanController extends Controller
         $challan->setRelation('claims', $challan->claims()->get());
 
         return $this->success($challan);
+    }
+
+    public function update(UpdateDeliveryChallanRequest $request, int $id): JsonResponse
+    {
+        $challan = DeliveryChallan::find($id);
+
+        if (!$challan) {
+            return $this->notFound('Delivery challan not found.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $data = $request->validated();
+            $data['delivered_date_time'] = $data['delivered_date_time'] ?? Carbon::now()->format('Y-m-d H:i:s');
+
+            $challan->update($data);
+
+            DB::commit();
+
+            $challanResult = DeliveryChallan::with(['customer', 'courierOut'])->find($challan->id);
+            $challanResult->setRelation('claims', $challanResult->claims()->get());
+
+            return $this->updated(
+                $challanResult,
+                'Delivery challan updated successfully.'
+            );
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return $this->error($e->getMessage());
+        }
     }
 }
