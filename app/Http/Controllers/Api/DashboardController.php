@@ -60,6 +60,7 @@ class DashboardController extends Controller
             'total_claims' => $claimQuery->count(),
             'open_claims' => (clone $claimQuery)->open()->count(),
             'closed_claims' => (clone $claimQuery)->closed()->count(),
+            'delivered_claims' => (clone $claimQuery)->where('is_delivered', 1)->count(),
             'total_service_centers' => ServiceCenter::when($brandId, fn($q) => $q->whereHas('brands', fn($q) => $q->where('wms_brands.id', $brandId)))->where('is_active', true)->count(),
             'total_brands' => Brand::where('status', 'active')->count(),
             'avg_customer_rating' => (int) (clone $claimQuery)->whereNotNull('customer_rating')->avg('customer_rating') ?? 0,

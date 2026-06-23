@@ -158,9 +158,7 @@ class ExportController extends Controller
             }
 
             if ($request->has('part_qty_used') && $request->filled('part_qty_used')) {
-                $query->whereHas('workOrder.parts', function ($q) use ($request) {
-                    $q->where('qty_used', $request->part_qty_used);
-                });
+                $query->has('workOrder.parts', '=', $request->part_qty_used);
             }
 
             if ($request->has('service_type') && $request->filled('service_type')) {
