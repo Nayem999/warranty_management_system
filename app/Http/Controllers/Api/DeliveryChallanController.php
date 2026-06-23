@@ -156,6 +156,8 @@ class DeliveryChallanController extends Controller
 
         try {
             $data = $request->validated();
+            $data['courier_out_id'] = $data['courier_out_id'] ?? $challan->courier_out_id;
+            $data['delivered_remarks'] = $data['delivered_remarks'] ?? $challan->delivered_remarks;
             $data['delivered_date_time'] = $data['delivered_date_time'] ?? Carbon::now()->format('Y-m-d H:i:s');
 
             $challan->update($data);

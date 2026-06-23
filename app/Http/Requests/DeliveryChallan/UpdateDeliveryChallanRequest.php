@@ -14,6 +14,7 @@ class UpdateDeliveryChallanRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'courier_out_id' => 'nullable|exists:wms_couriers,id',
             'courier_slip_outward' => 'nullable|string|max:255',
             'delivered_date_time' => 'nullable|date',
             'delivered_remarks' => 'nullable|string|max:1000',
