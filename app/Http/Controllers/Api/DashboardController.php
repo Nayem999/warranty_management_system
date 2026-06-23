@@ -169,7 +169,7 @@ class DashboardController extends Controller
             }
 
             $total = $query->count();
-            $progress = (clone $query)->whereIn('status', ['Assigned', 'Not Assigned', 'Progress', 'In Progress','Waiting for Part'])->count();
+            $progress = (clone $query)->whereIn('status', ['Assigned', 'Not Assigned', 'Progress', 'In Progress', 'Waiting for Part'])->count();
             $closed = (clone $query)->whereIn('status', ['Closed-Repaired', 'Closed-Un Repaired', 'Closed-Replaced', 'Closed-Reimbursement'])->where('is_delivered', 0)->count();
             $delivered = (clone $query)->where('is_delivered', 1)->count();
             $completed = $closed + $delivered;
@@ -257,14 +257,33 @@ class DashboardController extends Controller
                     $dateFilter($q, 'claim_date');
                 })
                 ->whereIn('status', ["Not Assigned", "Assigned", "In Progress", "Waiting for Part"])
+                ->where('is_delivered', 0)
                 ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))
                 ->when($user->isServiceCenterRestricted(), fn($q) => $q->whereIn('service_center_id', $user->accessibleServiceCenterIds()))
                 ->count();
 
 
             $completed_by_claim_date[$key] = Claim::query()
-                ->where(function ($q) use ($dateFilter) {
+                /* ->where(function ($q) use ($dateFilter) {
                     $dateFilter($q, 'claim_date');
+                }) */
+                ->when($key === '1-7 Days', function ($q) {
+                    $q->whereRaw('DATEDIFF(wo_closed_date, claim_date) BETWEEN 0 AND 6');
+                })
+                ->when($key === '8-14 Days', function ($q) {
+                    $q->whereRaw('DATEDIFF(wo_closed_date, claim_date) BETWEEN 7 AND 13');
+                })
+                ->when($key === '1 Month', function ($q) {
+                    $q->whereRaw('DATEDIFF(wo_closed_date, claim_date) BETWEEN 14 AND 29');
+                })
+                ->when($key === '2 Months', function ($q) {
+                    $q->whereRaw('DATEDIFF(wo_closed_date, claim_date) BETWEEN 30 AND 59');
+                })
+                ->when($key === '3 Months', function ($q) {
+                    $q->whereRaw('DATEDIFF(wo_closed_date, claim_date) BETWEEN 60 AND 89');
+                })
+                ->when($key === '> 3 Months', function ($q) {
+                    $q->whereRaw('DATEDIFF(wo_closed_date, claim_date) > 89');
                 })
                 ->whereIn('status', ["Closed-Repaired", "Closed-Un Repaired", "Closed-Replaced", "Closed-Reimbursement", "Delivered"])
                 ->when($user->isBrandRestricted(), fn($q) => $q->whereHas('product', fn($q) => $q->whereIn('brand_id', $user->accessibleBrandIds())))

@@ -57,15 +57,15 @@ class ProductsExport implements FromCollection, WithHeadings
         return $products->map(function ($product) {
             return [
                 'Model No' => $product->model_no,
-                'Serial Number' => $product->serial_number,
+                // 'Serial Number' => $product->serial_number,
                 'Item Description' => $product->item_description,
                 'Brand' => $product->brand?->name,
                 'Category' => $product->category?->name,
                 'Sub Category' => $product->subCategory?->name,
                 'Is Countable' => $product->is_countable ? 'Yes' : 'No',
-                'Start Date' => $product->start_date,
-                'End Date' => $product->end_date,
-                'Status' => $product->product_status,
+                // 'Start Date' => $product->start_date,
+                // 'End Date' => $product->end_date,
+                // 'Status' => $product->product_status,
                 'Created By' => $product->creator?->first_name.' '.$product->creator?->last_name,
                 'Created At' => $product->created_at,
             ];
@@ -76,15 +76,15 @@ class ProductsExport implements FromCollection, WithHeadings
     {
         return [
             'Model No',
-            'Serial Number',
+            // 'Serial Number',
             'Item Description',
             'Brand',
             'Category',
             'Sub Category',
             'Is Countable',
-            'Start Date',
-            'End Date',
-            'Status',
+            // 'Start Date',
+            // 'End Date',
+            // 'Status',
             'Created By',
             'Created At',
         ];

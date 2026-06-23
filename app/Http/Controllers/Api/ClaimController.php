@@ -692,7 +692,7 @@ class ClaimController extends Controller
 
 
             $previousStatus = $claim->status;
-            if (! $claim->is_delivered) {
+            if (! $claim->is_delivered || ($claim->is_delivered && $request->user()->role_id == 1)) {
                 // DB::rollBack();
                 // return $this->error("Claim already delivered, Claim can not update");
                 // $claim->update($data);
