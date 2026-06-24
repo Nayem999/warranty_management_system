@@ -693,7 +693,8 @@ class ClaimController extends Controller
 
 
             $previousStatus = $claim->status;
-            if (! $claim->is_delivered || ($claim->is_delivered && $request->user()->role_id == 1)) {
+            $engineer_id = $claim->engineer_id ?? $data["engineer_id"];
+            if (! $claim->is_delivered || ($claim->is_delivered && $request->user()->is_admin)) {
                 // DB::rollBack();
                 // return $this->error("Claim already delivered, Claim can not update");
                 // $claim->update($data);
@@ -706,46 +707,48 @@ class ClaimController extends Controller
                 }
             }
 
-            if (
-                !empty($data['replace_serial']) ||
-                !empty($data['replace_product_id']) ||
-                !empty($data['replace_ref']) ||
-                !empty($data['parts'])
-            ) {
+            if (! $claim->is_delivered || $engineer_id == $request->user()->id || $request->user()->is_admin) {
 
-                if (! $workOrder) {
-                    $workOrder = WorkOrder::create([
-                        'wo_number' => WorkOrder::generateWoNumber(),
-                        'claim_id' => $claim->id,
-                        'product_id' => $claim->product_id,
-                        'service_center_id' => $claim->service_center_id,
-                        'status' => 'Closed',
-                        'created_by' => $request->user()->id,
+                if ((
+                    !empty($data['replace_serial']) ||
+                    !empty($data['replace_product_id']) ||
+                    !empty($data['replace_ref']) ||
+                    !empty($data['parts']))) {
+
+                    if (! $workOrder) {
+                        $workOrder = WorkOrder::create([
+                            'wo_number' => WorkOrder::generateWoNumber(),
+                            'claim_id' => $claim->id,
+                            'product_id' => $claim->product_id,
+                            'service_center_id' => $claim->service_center_id,
+                            'status' => 'Closed',
+                            'created_by' => $request->user()->id,
+                        ]);
+                    }
+
+                    $workOrder->update([
+                        'replace_serial' => $data['replace_serial'] ?? null,
+                        'replace_product_id' => $data['replace_product_id'] ?? null,
+                        'replace_ref' => $data['replace_ref'] ?? null,
                     ]);
-                }
 
-                $workOrder->update([
-                    'replace_serial' => $data['replace_serial'] ?? null,
-                    'replace_product_id' => $data['replace_product_id'] ?? null,
-                    'replace_ref' => $data['replace_ref'] ?? null,
-                ]);
-
-                if ($workOrder->parts()) {
-                    $workOrder->parts()->delete();
-                }
-
-                $partsData = $request->input('parts', []);
-                if (! empty($partsData)) {
-                    foreach ($partsData as $partData) {
-                        $workOrder->parts()->create($partData);
+                    if ($workOrder->parts()) {
+                        $workOrder->parts()->delete();
                     }
-                }
-            } else {
-                if ($claim->workOrder) {
-                    if ($claim->workOrder->parts()) {
-                        $claim->workOrder->parts()->delete();
+
+                    $partsData = $request->input('parts', []);
+                    if (! empty($partsData)) {
+                        foreach ($partsData as $partData) {
+                            $workOrder->parts()->create($partData);
+                        }
                     }
-                    $claim->workOrder->delete();
+                } else {
+                    if ($claim->workOrder) {
+                        if ($claim->workOrder->parts()) {
+                            $claim->workOrder->parts()->delete();
+                        }
+                        $claim->workOrder->delete();
+                    }
                 }
             }
 
