@@ -23,7 +23,7 @@ class DeliveryChallanController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $query = DeliveryChallan::with(['customer', 'courierOut']);
+        $query = DeliveryChallan::with(['customer', 'serviceCenter', 'courierOut']);
 
         if ($user->isServiceCenterRestricted()) {
             $query->whereIn('service_center_id', $user->accessibleServiceCenterIds());
@@ -41,6 +41,26 @@ class DeliveryChallanController extends Controller
         }
 
         $challans = $query->orderBy('created_at', 'desc')->paginate($request->limit ?? 15);
+
+        $allClaimIds = collect($challans->items())->pluck('claim_ids')->flatten()->unique()->filter()->values()->toArray();
+
+        if (!empty($allClaimIds)) {
+            $claims = Claim::whereIn('id', $allClaimIds)->get()->keyBy('id');
+
+            collect($challans->items())->each(function ($challan) use ($claims) {
+                $challanClaims = collect();
+                foreach (($challan->claim_ids ?? []) as $claimId) {
+                    if ($claims->has($claimId)) {
+                        $challanClaims->push($claims->get($claimId));
+                    }
+                }
+                $challan->setRelation('claims', $challanClaims);
+            });
+        } else {
+            collect($challans->items())->each(function ($challan) {
+                $challan->setRelation('claims', collect());
+            });
+        }
 
         return $this->success($challans);
     }
@@ -129,7 +149,7 @@ class DeliveryChallanController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $challan = DeliveryChallan::with(['customer', 'courierOut'])->find($id);
+        $challan = DeliveryChallan::with(['customer', 'serviceCenter', 'courierOut'])->find($id);
 
         if (! $challan) {
             return $this->notFound('Delivery challan not found.');
