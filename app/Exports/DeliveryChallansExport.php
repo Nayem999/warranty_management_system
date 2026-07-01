@@ -49,7 +49,7 @@ class DeliveryChallansExport implements FromCollection, WithHeadings
                 'Courier Slip' => $challan->courier_slip_outward,
                 'Delivered Date Time' => $challan->delivered_date_time,
                 'Delivered Remarks' => $challan->delivered_remarks,
-                'Claim IDs' => $challan->claim_ids ? implode(', ', $challan->claim_ids) : '',
+                'Claim Numbers' => $challan->claims->pluck('claim_number')->implode(', '),
                 'Created At' => $challan->created_at,
             ];
         });
@@ -65,7 +65,7 @@ class DeliveryChallansExport implements FromCollection, WithHeadings
             'Courier Slip',
             'Delivered Date Time',
             'Delivered Remarks',
-            'Claim IDs',
+            'Claim Numbers',
             'Created At',
         ];
     }

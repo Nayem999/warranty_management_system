@@ -23,7 +23,7 @@
                 <th>Courier Slip</th>
                 <th>Delivered Date Time</th>
                 <th>Delivered Remarks</th>
-                <th>Claim IDs</th>
+                <th>Claim Numbers</th>
                 <th>Created At</th>
             </tr>
         </thead>
@@ -37,7 +37,7 @@
                 <td>{{ $challan->courier_slip_outward }}</td>
                 <td>{{ $challan->delivered_date_time }}</td>
                 <td>{{ $challan->delivered_remarks }}</td>
-                <td>{{ $challan->claim_ids ? implode(', ', $challan->claim_ids) : '' }}</td>
+                <td>{{ $challan->claims->pluck('claim_number')->implode(', ') }}</td>
                 <td>{{ $challan->created_at }}</td>
             </tr>
             @endforeach
