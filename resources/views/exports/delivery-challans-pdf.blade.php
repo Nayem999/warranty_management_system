@@ -17,13 +17,13 @@
         <thead>
             <tr>
                 <th>Delivery Number</th>
+                <th>Claim Numbers</th>
                 <th>Customer</th>
                 <th>Service Center</th>
                 <th>Courier</th>
                 <th>Courier Slip</th>
                 <th>Delivered Date Time</th>
                 <th>Delivered Remarks</th>
-                <th>Claim Numbers</th>
                 <th>Created At</th>
             </tr>
         </thead>
@@ -31,13 +31,13 @@
             @foreach ($deliveryChallans as $challan)
             <tr>
                 <td>{{ $challan->delivery_number }}</td>
+                <td>{{ $challan->claims->pluck('claim_number')->implode(', ') }}</td>
                 <td>{{ $challan->customer?->customer_name }}</td>
                 <td>{{ $challan->serviceCenter?->title }}</td>
                 <td>{{ $challan->courierOut?->name }}</td>
                 <td>{{ $challan->courier_slip_outward }}</td>
                 <td>{{ $challan->delivered_date_time }}</td>
                 <td>{{ $challan->delivered_remarks }}</td>
-                <td>{{ $challan->claims->pluck('claim_number')->implode(', ') }}</td>
                 <td>{{ $challan->created_at }}</td>
             </tr>
             @endforeach

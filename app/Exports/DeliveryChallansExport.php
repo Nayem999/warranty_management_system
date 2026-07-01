@@ -43,13 +43,13 @@ class DeliveryChallansExport implements FromCollection, WithHeadings
         return $challans->map(function ($challan) {
             return [
                 'Delivery Number' => $challan->delivery_number,
+                'Claim Numbers' => $challan->claims->pluck('claim_number')->implode(', '),
                 'Customer' => $challan->customer?->customer_name,
                 'Service Center' => $challan->serviceCenter?->title,
                 'Courier' => $challan->courierOut?->name,
                 'Courier Slip' => $challan->courier_slip_outward,
                 'Delivered Date Time' => $challan->delivered_date_time,
                 'Delivered Remarks' => $challan->delivered_remarks,
-                'Claim Numbers' => $challan->claims->pluck('claim_number')->implode(', '),
                 'Created At' => $challan->created_at,
             ];
         });
@@ -59,13 +59,13 @@ class DeliveryChallansExport implements FromCollection, WithHeadings
     {
         return [
             'Delivery Number',
+            'Claim Numbers',
             'Customer',
             'Service Center',
             'Courier',
             'Courier Slip',
             'Delivered Date Time',
             'Delivered Remarks',
-            'Claim Numbers',
             'Created At',
         ];
     }
