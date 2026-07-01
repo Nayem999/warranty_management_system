@@ -1,34 +1,8 @@
 {
   "info": {
-    "name": "SNP Distribution v2",
+    "name": "SNP Distribution",
     "description": "SNP Distribution - Warranty Management System RESTful API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "https://localhost/warranty_management_system/api",
-      "type": "string"
-    },
-    {
-      "key": "token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "customer_token",
-      "value": "",
-      "type": "string"
-    }
-  ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{token}}"
-      }
-    ]
   },
   "item": [
     {
@@ -44,7 +18,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/login",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"login\": \"admin@snpdist.com\",\n    \"password\": \"Admin@1234\"\n}",
@@ -53,6 +26,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
           "response": [
@@ -74,10 +57,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-03-29 04:30 PM\",\n        \"expires_in\": 259200,\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
             }
           ]
@@ -92,8 +81,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/logout"
-          }
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Forgot Password",
@@ -105,7 +104,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/forgot-password",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"admin@snpdist.com\"\n}",
@@ -114,6 +112,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
             }
           },
           "response": [
@@ -135,10 +143,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Password reset OTP has been sent to your email.\",\n    \"data\": {\n        \"otp\": \"123456\",\n        \"email\": \"admin@snpdist.com\"\n    }\n}"
             }
           ]
@@ -153,7 +167,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/reset-password",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"admin@snpdist.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
@@ -162,6 +175,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
             }
           },
           "response": [
@@ -183,10 +206,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Password reset successfully.\",\n    \"data\": null\n}"
             }
           ]
@@ -201,7 +230,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/change-password",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"current_password\": \"Admin@1234\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
@@ -210,6 +238,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
             }
           },
           "response": [
@@ -235,10 +273,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Password changed successfully.\",\n    \"data\": null\n}"
             }
           ]
@@ -253,7 +297,16 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/me"
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
           },
           "response": [
             {
@@ -269,10 +322,16 @@
                     "key": "Authorization",
                     "value": "Bearer {{token}}"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"user\": {},\n        \"permissions\": {}\n    }\n}"
             }
           ]
@@ -287,7 +346,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/auth/profile",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"phone\": \"+8801234567890\"\n}",
@@ -296,6 +354,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
             }
           },
           "response": [
@@ -321,10 +389,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {}\n}"
             }
           ]
@@ -343,7 +417,15 @@
                 "value": "Bearer {{token}}"
               }
             ],
-            "url": "{{base_url}}/client-dashboard"
+            "url": {
+              "raw": "{{base_url}}/client-dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "client-dashboard"
+              ]
+            }
           },
           "response": [
             {
@@ -359,10 +441,16 @@
                     "key": "Authorization",
                     "value": "Bearer {{token}}"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"total_claims\": 10,\n        \"status_wise\": [\n            {\"status\": \"Open\", \"count\": 5},\n            {\"status\": \"Converted\", \"count\": 3},\n            {\"status\": \"Closed\", \"count\": 2}\n        ],\n        \"recent_claims\": []\n    }\n}"
             }
           ]
@@ -375,6 +463,9 @@
         {
           "name": "List Brands (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -382,15 +473,25 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/list",
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/brands/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "list"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "List Cities (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -398,15 +499,25 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/cities/list",
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/cities/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "list"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "List Service Centers (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -414,15 +525,25 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers/list",
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/service-centers/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers",
+                "list"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Service Centers by Brand (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -445,15 +566,16 @@
                   "value": "1"
                 }
               ]
-            },
-            "auth": {
-              "type": "noauth"
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Track Claim (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -461,15 +583,26 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/track/CLM-2024-00001",
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/claims/track/CLM-2024-00001",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "track",
+                "CLM-2024-00001"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Submit Feedback (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -477,7 +610,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/feedback/abc123token",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"rating\": 5,\n    \"feedback\": \"Great service!\"\n}",
@@ -487,14 +619,26 @@
                 }
               }
             },
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/claims/feedback/abc123token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "feedback",
+                "abc123token"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Feedback Link (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -502,15 +646,26 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1/feedback-link",
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/claims/1/feedback-link",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "1",
+                "feedback-link"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Setting (Public)",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
@@ -518,11 +673,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/settings/company_name",
-            "auth": {
-              "type": "noauth"
+            "url": {
+              "raw": "{{base_url}}/settings/company_name",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings",
+                "company_name"
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -539,7 +701,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customer/login",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"contact@abccorp.com\",\n    \"password\": \"Password@123\"\n}",
@@ -548,6 +709,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "login"
+              ]
             }
           },
           "response": [
@@ -569,10 +740,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Login successful.\",\n    \"data\": {\n        \"customer\": {},\n        \"token\": \"1|abc123...\",\n        \"expires_at\": \"2026-05-03 10:00:00\",\n        \"expires_in\": 259200\n    }\n}"
             }
           ]
@@ -587,7 +764,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customer/forgot-password",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"contact@abccorp.com\"\n}",
@@ -596,6 +772,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "forgot-password"
+              ]
             }
           },
           "response": [
@@ -617,10 +803,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Password reset OTP has been sent to your email.\",\n    \"data\": {\n        \"email\": \"contact@abccorp.com\"\n    }\n}"
             }
           ]
@@ -635,7 +827,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customer/reset-password",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"contact@abccorp.com\",\n    \"otp\": \"123456\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
@@ -644,6 +835,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "reset-password"
+              ]
             }
           },
           "response": [
@@ -665,10 +866,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Password reset successfully.\",\n    \"data\": null\n}"
             }
           ]
@@ -687,7 +894,6 @@
                 "value": "Bearer {{customer_token}}"
               }
             ],
-            "url": "{{base_url}}/customer/change-password",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"current_password\": \"OldPassword@123\",\n    \"password\": \"NewPassword@123\",\n    \"password_confirmation\": \"NewPassword@123\"\n}",
@@ -696,6 +902,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "change-password"
+              ]
             }
           },
           "response": [
@@ -721,10 +937,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Password changed successfully.\",\n    \"data\": null\n}"
             }
           ]
@@ -743,7 +965,16 @@
                 "value": "Bearer {{customer_token}}"
               }
             ],
-            "url": "{{base_url}}/customer/profile"
+            "url": {
+              "raw": "{{base_url}}/customer/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "profile"
+              ]
+            }
           },
           "response": [
             {
@@ -759,10 +990,16 @@
                     "key": "Authorization",
                     "value": "Bearer {{customer_token}}"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"customer_name\": \"ABC Corporation\",\n        \"email\": \"contact@abccorp.com\"\n    }\n}"
             }
           ]
@@ -781,7 +1018,6 @@
                 "value": "Bearer {{customer_token}}"
               }
             ],
-            "url": "{{base_url}}/customer/profile",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"John Smith\",\n    \"phone\": \"+8801234567891\",\n    \"city_id\": 2\n}",
@@ -790,6 +1026,16 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customer/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "profile"
+              ]
             }
           },
           "response": [
@@ -815,10 +1061,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Profile updated successfully.\",\n    \"data\": {}\n}"
             }
           ]
@@ -837,7 +1089,16 @@
                 "value": "Bearer {{customer_token}}"
               }
             ],
-            "url": "{{base_url}}/customer/logout"
+            "url": {
+              "raw": "{{base_url}}/customer/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "logout"
+              ]
+            }
           },
           "response": [
             {
@@ -853,10 +1114,16 @@
                     "key": "Authorization",
                     "value": "Bearer {{customer_token}}"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Logout successful.\",\n    \"data\": null\n}"
             }
           ]
@@ -876,7 +1143,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/customer/claims?status=Open&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/customer/claims",
               "host": [
                 "{{base_url}}"
               ],
@@ -917,10 +1184,16 @@
                     "key": "Authorization",
                     "value": "Bearer {{customer_token}}"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"claim_number\": \"CLM-2024-00001\",\n                \"status\": \"Open\"\n            }\n        ]\n    }\n}"
             }
           ]
@@ -939,7 +1212,16 @@
                 "value": "Bearer {{customer_token}}"
               }
             ],
-            "url": "{{base_url}}/customer/dashboard"
+            "url": {
+              "raw": "{{base_url}}/customer/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customer",
+                "dashboard"
+              ]
+            }
           },
           "response": [
             {
@@ -955,10 +1237,16 @@
                     "key": "Authorization",
                     "value": "Bearer {{customer_token}}"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"total_claims\": 10,\n        \"open_claims\": 5,\n        \"in_progress_claims\": 3,\n        \"closed_claims\": 2,\n        \"recent_claims\": []\n    }\n}"
             }
           ]
@@ -997,7 +1285,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create User",
@@ -1009,7 +1298,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@snpdist.com\",\n    \"password\": \"Password@123\",\n    \"user_type\": \"staff\",\n    \"role_id\": 1,\n    \"phone\": \"+8801234567890\",\n    \"job_title\": \"Manager\"\n}",
@@ -1018,8 +1306,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get User",
@@ -1031,8 +1329,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update User",
@@ -1044,7 +1352,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe Updated\",\n    \"phone\": \"+8801234567891\"\n}",
@@ -1053,8 +1360,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete User",
@@ -1066,8 +1384,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get User Brand Access",
@@ -1079,8 +1407,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/brand-access"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/brand-access",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "brand-access"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Assign Brand Access",
@@ -1092,7 +1431,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/brand-access",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"brand_ids\": [1, 2]\n}",
@@ -1101,8 +1439,20 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/brand-access",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "brand-access"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Revoke Brand Access",
@@ -1114,8 +1464,20 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/brand-access/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/brand-access/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "brand-access",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Service Center Access",
@@ -1127,8 +1489,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/service-center-access"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/service-center-access",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "service-center-access"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Assign Service Center Access",
@@ -1140,7 +1513,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/service-center-access",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"service_center_ids\": [1, 2]\n}",
@@ -1149,8 +1521,20 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/service-center-access",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "service-center-access"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Revoke Service Center Access",
@@ -1162,8 +1546,20 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/service-center-access/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/service-center-access/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "service-center-access",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle User Status",
@@ -1175,8 +1571,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get User Permissions",
@@ -1188,8 +1595,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/permissions"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/permissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "permissions"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Assign Personal Permissions",
@@ -1201,7 +1619,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/permissions",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\"],\n        \"claims\": [\"view\", \"create\"],\n        \"work_orders\": [\"view\", \"edit\"]\n    }\n}",
@@ -1210,8 +1627,20 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/permissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "permissions"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Remove Personal Permissions",
@@ -1223,8 +1652,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/permissions"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/permissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "permissions"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "List Trashed Users",
@@ -1236,8 +1676,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/trashed"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/trashed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "trashed"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Restore User",
@@ -1249,8 +1699,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/users/1/restore"
-          }
+            "url": {
+              "raw": "{{base_url}}/users/1/restore",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "restore"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1267,8 +1728,17 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/roles"
-          }
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Create Role",
@@ -1280,7 +1750,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/roles",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"title\": \"Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\"],\n        \"claims\": [\"view\", \"create\", \"edit\"]\n    }\n}",
@@ -1289,8 +1758,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Role",
@@ -1302,8 +1781,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/roles/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/roles/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Role",
@@ -1315,7 +1804,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/roles/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"title\": \"Senior Manager\",\n    \"permissions\": {\n        \"warranties\": [\"view\", \"create\", \"edit\", \"delete\"],\n        \"claims\": [\"view\", \"create\", \"edit\", \"delete\"]\n    }\n}",
@@ -1324,8 +1812,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/roles/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Role",
@@ -1337,8 +1836,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/roles/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/roles/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Permissions List",
@@ -1350,8 +1859,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/roles/permissions/list"
-          }
+            "url": {
+              "raw": "{{base_url}}/roles/permissions/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles",
+                "permissions",
+                "list"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1368,8 +1888,17 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Create Brand",
@@ -1381,7 +1910,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Apple\",\n    \"short_name\": \"APL\",\n    \"description\": \"Apple Inc. products\",\n    \"logo\": \"\",\n    \"status\": \"active\"\n}",
@@ -1390,8 +1918,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/brands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Brand",
@@ -1403,8 +1941,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Brand",
@@ -1416,7 +1964,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Samsung Electronics\",\n    \"short_name\": \"SMG\"\n}",
@@ -1425,8 +1972,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/brands/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Brand",
@@ -1438,8 +1996,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Brand Products",
@@ -1451,8 +2019,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1/products"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands/1/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1",
+                "products"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Brand Stats",
@@ -1464,8 +2043,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1/stats"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands/1/stats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1",
+                "stats"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle Brand Status",
@@ -1477,8 +2067,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Service Centers by Brand",
@@ -1490,8 +2091,24 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers/by-brand?brand_id=1"
-          }
+            "url": {
+              "raw": "{{base_url}}/service-centers/by-brand?brand_id=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers",
+                "by-brand"
+              ],
+              "query": [
+                {
+                  "key": "brand_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Products by Brand",
@@ -1503,8 +2120,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/brands/1/products"
-          }
+            "url": {
+              "raw": "{{base_url}}/brands/1/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "brands",
+                "1",
+                "products"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1522,7 +2150,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/categories?parent_id=null&status=active",
+              "raw": "{{base_url}}/categories",
               "host": [
                 "{{base_url}}"
               ],
@@ -1542,7 +2170,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Category",
@@ -1554,7 +2183,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Electronics\",\n    \"short_name\": \"ELE\",\n    \"parent_id\": null,\n    \"status\": \"active\"\n}",
@@ -1563,8 +2191,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Category",
@@ -1576,8 +2214,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/categories/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Category",
@@ -1589,7 +2237,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Smartphones\"\n}",
@@ -1598,8 +2245,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Category",
@@ -1611,8 +2269,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/categories/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle Category Status",
@@ -1624,8 +2292,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/categories/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Parent Categories",
@@ -1637,8 +2316,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories/parents"
-          }
+            "url": {
+              "raw": "{{base_url}}/categories/parents",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "parents"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Subcategories",
@@ -1650,8 +2339,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/categories/1/subcategories"
-          }
+            "url": {
+              "raw": "{{base_url}}/categories/1/subcategories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "1",
+                "subcategories"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1669,7 +2369,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/cities?search=&status=",
+              "raw": "{{base_url}}/cities",
               "host": [
                 "{{base_url}}"
               ],
@@ -1689,7 +2389,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create City",
@@ -1701,7 +2402,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/cities",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Dhaka\",\n    \"code\": \"DHK\",\n    \"status\": \"active\"\n}",
@@ -1710,8 +2410,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/cities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get City",
@@ -1723,8 +2433,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/cities/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/cities/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update City",
@@ -1736,7 +2456,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/cities/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Dhaka Metropolitan\",\n    \"code\": \"DHK\"\n}",
@@ -1745,8 +2464,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/cities/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete City",
@@ -1758,8 +2488,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/cities/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/cities/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle City Status",
@@ -1771,8 +2511,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/cities/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/cities/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cities",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1790,7 +2541,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/customers?search=&city_id=&city=",
+              "raw": "{{base_url}}/customers",
               "host": [
                 "{{base_url}}"
               ],
@@ -1806,18 +2557,19 @@
                 {
                   "key": "city_id",
                   "value": "",
-                  "disabled": true,
-                  "description": "Filter by city ID"
+                  "description": "Filter by city ID",
+                  "disabled": true
                 },
                 {
                   "key": "city",
                   "value": "",
-                  "disabled": true,
-                  "description": "Filter by city name"
+                  "description": "Filter by city name",
+                  "disabled": true
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Customer",
@@ -1829,17 +2581,26 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customers",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"customer_name\": \"ABC Corporation\",\n    \"contact_person\": \"John Doe\",\n    \"email\": \"contact@abccorp.com\",\n    \"phone\": \"+8801234567890\",\n    \"landline\": \"02-12345678\",\n    \"address\": \"123 Business Street, Dhaka\",\n    \"city_id\": 1,\n    \"password\": \"Password@123\"\n}",
+              "raw": "{\n    \"customer_name\": \"ABC Corporation\",\n    \"contact_person\": \"John Doe\",\n    \"email\": \"softnayem169@gmail.com\",\n    \"phone\": \"+8801234567890\",\n    \"landline\": \"02-12345678\",\n    \"address\": \"123 Business Street, Dhaka\",\n    \"city_id\": 1,\n    \"password\": \"Password@123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Customer",
@@ -1851,8 +2612,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customers/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/customers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Customer",
@@ -1864,7 +2635,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customers/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"customer_name\": \"ABC Corporation Ltd\",\n    \"contact_person\": \"Jane Doe\"\n}",
@@ -1873,8 +2643,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Customer",
@@ -1886,8 +2667,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/customers/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/customers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "customers",
+                "1"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1905,7 +2696,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/products?brand_id=1&category_id=1&status=active&search=",
+              "raw": "{{base_url}}/products",
               "host": [
                 "{{base_url}}"
               ],
@@ -1935,7 +2726,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Product",
@@ -1947,7 +2739,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/products",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"model_no\": \"SMG-S24-ULTRA\",\n    \"item_description\": \"Samsung Galaxy S24 Ultra 256GB\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"is_countable\": true,\n    \"start_date\": \"2026-01-01\",\n    \"end_date\": \"2027-01-01\"\n}",
@@ -1956,8 +2747,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Product",
@@ -1969,8 +2770,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/products/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Product",
@@ -1982,7 +2793,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/products/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"item_description\": \"Samsung Galaxy S24 Ultra 512GB\",\n    \"end_date\": \"2027-06-01\"\n}",
@@ -1991,8 +2801,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Product",
@@ -2004,8 +2825,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/products/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Check Serial",
@@ -2018,7 +2849,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/products/check/SN123456789?model_no=SMG-S24-ULTRA",
+              "raw": "{{base_url}}/products/check/SN123456789",
               "host": [
                 "{{base_url}}"
               ],
@@ -2035,7 +2866,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Import Products",
@@ -2047,18 +2879,28 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/products/import",
             "body": {
               "mode": "formdata",
               "formdata": [
                 {
                   "key": "file",
                   "type": "file",
-                  "src": ""
+                  "value": ""
                 }
               ]
+            },
+            "url": {
+              "raw": "{{base_url}}/products/import",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "import"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Download Import Sample",
@@ -2070,8 +2912,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/products/import/sample"
-          }
+            "url": {
+              "raw": "{{base_url}}/products/import/sample",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "import",
+                "sample"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2089,7 +2942,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/claims?status=Open&brand_id=1&service_center_id=1&date_from=2024-01-01&date_to=2024-12-31&search=&service_type=In Warranty&job_type=Carry In&customer_name=&customer_phone=&engineer_id=&doa=&invoice_no=&ref=&part_id=&part_description=&customer_email=",
+              "raw": "{{base_url}}/claims?is_delivered=true",
               "host": [
                 "{{base_url}}"
               ],
@@ -2100,156 +2953,192 @@
                 {
                   "key": "status",
                   "value": "Delivered",
-                  "description": "Open, Converted, Closed, Not Assigned, In Progress, Delivered"
+                  "description": "Open, Converted, Closed, Not Assigned, In Progress, Delivered",
+                  "disabled": true
                 },
                 {
                   "key": "brand_id",
                   "value": "1",
-                  "description": "Filter by brand"
+                  "description": "Filter by brand",
+                  "disabled": true
                 },
                 {
                   "key": "category_id",
                   "value": "",
-                  "description": "Filter by product category"
+                  "description": "Filter by product category",
+                  "disabled": true
                 },
                 {
                   "key": "sub_category_id",
                   "value": "",
-                  "description": "Filter by product sub category"
+                  "description": "Filter by product sub category",
+                  "disabled": true
                 },
                 {
                   "key": "service_center_id",
                   "value": "1",
-                  "description": "Filter by service center"
+                  "description": "Filter by service center",
+                  "disabled": true
                 },
                 {
                   "key": "date_from",
                   "value": "2024-01-01",
-                  "description": "Claim date from"
+                  "description": "Claim date from",
+                  "disabled": true
                 },
                 {
                   "key": "date_to",
                   "value": "2024-12-31",
-                  "description": "Claim date to"
+                  "description": "Claim date to",
+                  "disabled": true
                 },
                 {
                   "key": "search",
                   "value": "",
-                  "description": "Search claim number or problem"
+                  "description": "Search claim number or problem",
+                  "disabled": true
                 },
                 {
                   "key": "service_type",
                   "value": "In Warranty",
-                  "description": "In Warranty, Out of Warranty"
+                  "description": "In Warranty, Out of Warranty",
+                  "disabled": true
                 },
                 {
                   "key": "job_type",
                   "value": "Carry In",
-                  "description": "Carry In, On Site, Replace"
+                  "description": "Carry In, On Site, Replace",
+                  "disabled": true
                 },
                 {
                   "key": "customer_name",
                   "value": "",
-                  "description": "Search by customer name"
+                  "description": "Search by customer name",
+                  "disabled": true
                 },
                 {
                   "key": "customer_email",
                   "value": "",
-                  "description": "Search by customer email"
+                  "description": "Search by customer email",
+                  "disabled": true
                 },
                 {
                   "key": "customer_phone",
                   "value": "",
-                  "description": "Search by customer phone"
+                  "description": "Search by customer phone",
+                  "disabled": true
                 },
                 {
                   "key": "engineer_id",
                   "value": "",
-                  "description": "Filter by assigned engineer"
+                  "description": "Filter by assigned engineer",
+                  "disabled": true
                 },
                 {
                   "key": "doa",
                   "value": "",
-                  "description": "Dead on arrival (0 or 1)"
+                  "description": "Dead on arrival (0 or 1)",
+                  "disabled": true
                 },
                 {
                   "key": "invoice_no",
                   "value": "",
-                  "description": "Search by invoice number"
+                  "description": "Search by invoice number",
+                  "disabled": true
                 },
                 {
                   "key": "ref",
                   "value": "",
-                  "description": "Search by reference"
+                  "description": "Search by reference",
+                  "disabled": true
                 },
                 {
                   "key": "part_id",
                   "value": "",
-                  "description": "Filter by part ID"
+                  "description": "Filter by part ID",
+                  "disabled": true
                 },
                 {
                   "key": "part_description",
                   "value": "",
-                  "description": "Filter by part description"
+                  "description": "Filter by part description",
+                  "disabled": true
                 },
                 {
                   "key": "part_status",
                   "value": "",
-                  "description": "Part status"
+                  "description": "Part status",
+                  "disabled": true
                 },
                 {
                   "key": "customer_id",
                   "value": "",
-                  "description": "Filter by customer ID"
+                  "description": "Filter by customer ID",
+                  "disabled": true
                 },
                 {
                   "key": "wo_assigned_date",
                   "value": "",
-                  "description": "WO assigned date"
+                  "description": "WO assigned date",
+                  "disabled": true
                 },
                 {
                   "key": "wo_closed_date",
                   "value": "",
-                  "description": "WO closed date"
+                  "description": "WO closed date",
+                  "disabled": true
                 },
                 {
                   "key": "wo_delivery_date",
                   "value": "",
-                  "description": "WO delivery date"
+                  "description": "WO delivery date",
+                  "disabled": true
                 },
                 {
                   "key": "invoice_date",
                   "value": "",
-                  "description": "Invoice date"
+                  "description": "Invoice date",
+                  "disabled": true
                 },
                 {
                   "key": "replace_serial",
                   "value": "",
-                  "description": "Search by replace serial"
+                  "description": "Search by replace serial",
+                  "disabled": true
                 },
                 {
                   "key": "replace_product_id",
                   "value": "",
-                  "description": "Filter by replace product ID"
+                  "description": "Filter by replace product ID",
+                  "disabled": true
                 },
                 {
                   "key": "work_done_comment",
                   "value": "",
-                  "description": "Search by work done comment"
+                  "description": "Search by work done comment",
+                  "disabled": true
                 },
                 {
                   "key": "case_id",
                   "value": "",
-                  "description": "Filter by case ID"
+                  "description": "Filter by case ID",
+                  "disabled": true
                 },
                 {
                   "key": "order_id",
                   "value": "",
-                  "description": "Filter by order ID"
+                  "description": "Filter by order ID",
+                  "disabled": true
+                },
+                {
+                  "key": "is_delivered",
+                  "value": "true",
+                  "type": "text"
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Claim",
@@ -2261,17 +3150,26 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"product_id\": 1,\n    \"serial_number\": \"SN123456789\",\n    \"customer_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"service_center_id\": 1,\n    \"claim_date\": \"2024-06-01\",\n\n    \"status\": \"Not Assigned\",\n    \"engineer_id\": 2,\n\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"IN123456\",\n\n    \"received_date_time\": \"2024-06-01 10:30:00\",\n    \"delivery_id\": 1,\n    \"is_delivered\": true,\n\n    \"wo_assigned_date\": \"2024-06-02\",\n    \"wo_closed_date\": \"2024-06-04\",\n    \"wo_delivery_date\": \"2024-06-05\",\n\n    \"tat\": 3,\n    \"doa\": false,\n\n    \"replace_serial\": \"RS-12345\",\n    \"replace_product_id\": 2,\n    \"replace_ref\": \"REF-98765\",\n\n    \"invoice_no\": \"INV-2024-001\",\n    \"invoice_date\": \"2024-05-20\",\n    \"purchase_price\": 15000,\n\n    \"ref\": \"Internal Note\",\n    \"web_wty_date\": \"2025-05-20\",\n\n    \"additional_comment\": \"Handle with care\",\n    \"work_done_comment\": \"Display replaced successfully\",\n    \"status_comment\": \"Work completed\",\n\n    \"is_feedback_taken\": 1,\n    \"service_type\": \"In Warranty\",\n    \"job_remarks\": \"no remarks\",\n    \"accessories\": \"not given\",\n    \"job_type\": \"Carry In\",\n\n    \"assigned_by\": 1\n}",
+              "raw": "{\n    \"product_id\": 1,\n    \"serial_number\": \"SN1234567189\",\n    \"customer_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"service_center_id\": 1,\n    \"claim_date\": \"2024-06-01 10:30:00\",\n\n    \"status\": \"Not Assigned\",\n    \"engineer_id\": 2,\n\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"IN123456\",\n    \"courier_out_id\": 2,\n    \"courier_slip_outward\": \"OUT654321\",\n\n    \"received_date_time\": \"2024-06-01 10:30:00\",\n    \"delivered_date_time\": \"2024-06-05 15:45:00\",\n    \"delivered_remarks\": \"Customer received in good condition\",\n\n    \"wo_assigned_date\": \"2024-06-05 15:45:00\",\n    \"wo_closed_date\": \"2024-06-05 15:45:00\",\n    \"wo_delivery_date\": \"2024-06-05 15:45:00\",\n\n    \"tat\": 3,\n    \"doa\": false,\n\n    \"replace_serial\": \"RS-12345\",\n    \"replace_product_id\": 2,\n    \"replace_ref\": \"REF-98765\",\n\n    \"invoice_no\": \"INV-2024-001\",\n    \"invoice_date\": \"2024-05-20\",\n    \"purchase_price\": 15000,\n\n    \"ref\": \"Internal Note\",\n    \"web_wty_date\": \"2025-05-20\",\n\n    \"additional_comment\": \"Handle with care\",\n    \"work_done_comment\": \"Display replaced successfully\",\n    \"status_comment\": \"Work completed\",\n\n    \"is_feedback_taken\": 1,\n    \"service_type\": \"In Warranty\",\n    \"job_remarks\": \"no remarks\",\n    \"accessories\": \"not given\",\n    \"job_type\": \"Carry In\",\n\n    \"assigned_by\": 1\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/claims",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Claim",
@@ -2283,8 +3181,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/claims/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Claim",
@@ -2296,7 +3204,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"product_id\": 1,\n    \"serial_number\": \"SN123456789\",\n    \"customer_id\": 1,\n    \"problem_description\": \"Screen not responding\",\n    \"service_center_id\": 1,\n    \"claim_date\": \"2024-06-01\",\n\n    \"status\": \"Not Assigned\",\n    \"engineer_id\": 2,\n\n    \"courier_in_id\": 1,\n    \"courier_slip_inward\": \"IN123456\",\n    \"courier_out_id\": 2,\n    \"courier_slip_outward\": \"OUT654321\",\n\n    \"received_date_time\": \"2024-06-01 10:30:00\",\n    \"delivered_date_time\": \"2024-06-05 15:45:00\",\n    \"delivered_remarks\": \"Customer received in good condition\",\n\n    \"counter\": 1,\n    \"wo_assigned_date\": \"2024-06-02\",\n    \"wo_closed_date\": \"2024-06-04\",\n    \"wo_delivery_date\": \"2024-06-05\",\n\n    \"tat\": 3,\n    \"doa\": false,\n\n    \"replace_serial\": \"RS-12345\",\n    \"replace_product_id\": 2,\n    \"replace_ref\": \"REF-98765\",\n\n    \"invoice_no\": \"INV-2024-001\",\n    \"invoice_date\": \"2024-05-20\",\n    \"purchase_price\": 15000,\n\n    \"ref\": \"Internal Note\",\n    \"web_wty_date\": \"2025-05-20\",\n\n    \"additional_comment\": \"Handle with care\",\n    \"work_done_comment\": \"Display replaced successfully\",\n    \"status_comment\": \"Work completed\",\n\n    \"is_feedback_taken\": 1,\n    \"service_type\": \"In Warranty\",\n    \"job_remarks\": \"no remarks\",\n    \"accessories\": \"not given\",\n    \"job_type\": \"Carry In\",\n\n    \"assigned_by\": 1,\n\n    \"parts\": [\n        {\n            \"part_id\": 1,\n            \"claim_id\": \"CASE-001\",\n            \"claim_date_time\": \"2024-06-01 10:00:00\",\n            \"case_id\": \"CASE-001\",\n            \"case_date_time\": \"2024-06-01 11:00:00\",\n            \"order_id\": \"ORD-001\",\n            \"order_date_time\": \"2024-06-01 12:00:00\",\n            \"received_date_time\": \"2024-06-02 09:30:00\",\n            \"install_date_time\": \"2024-06-02 11:00:00\",\n            \"good_part_serial\": \"GPS-12345\",\n            \"faulty_part_serial\": \"FPS-54321\",\n            \"return_date_time\": \"2024-06-03 15:00:00\",\n            \"part_returned\": \"No\",\n            \"part_status\": \"DOA Part\",\n            \"part_return_comment\": \"Returned to vendor\"\n        },\n        {\n            \"part_id\": 2,\n            \"claim_id\": \"CASE-002\",\n            \"claim_date_time\": \"2024-06-01 10:15:00\",\n            \"case_id\": \"CASE-002\",\n            \"case_date_time\": \"2024-06-01 11:30:00\",\n            \"order_id\": \"ORD-002\",\n            \"order_date_time\": \"2024-06-01 13:00:00\",\n            \"received_date_time\": \"2024-06-02 10:00:00\",\n            \"install_date_time\": \"2024-06-02 12:30:00\",\n            \"good_part_serial\": \"GPS-67890\",\n            \"faulty_part_serial\": \"FPS-09876\",\n            \"return_date_time\": null,\n            \"part_returned\": \"Yes\",\n            \"part_status\": \"DOA Part\",\n            \"part_return_comment\": null\n        }\n    ]\n}",
@@ -2305,8 +3212,51 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/claims/13",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "13"
+              ]
             }
-          }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Claim transfer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"service_center_id\": 1,\n    \"transferred_at\": \"2026-06-01 14:30:45\",\n    \"transfer_reason\": \"N/A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/transfer/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "transfer",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Delete Claim",
@@ -2318,8 +3268,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/claims/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Close Claim",
@@ -2331,8 +3291,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1/close"
-          }
+            "url": {
+              "raw": "{{base_url}}/claims/1/close",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "1",
+                "close"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Delete Claim Attachment",
@@ -2344,8 +3315,28 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1/attachment"
-          }
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"file_name\":\"storage/uploads/claims/757dc9eb-dd0b-4f8c-9fac-3fa4b15b24c2.jpg\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/claims/9/attachment",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "9",
+                "attachment"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2362,8 +3353,17 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers"
-          }
+            "url": {
+              "raw": "{{base_url}}/service-centers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Create Service Center",
@@ -2375,7 +3375,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"title\": \"Karachi Service Center\",\n    \"brand_ids\": [1, 2, 3],\n    \"address\": \"Karachi, Dhaka\",\n    \"uan\": \"09612345678\",\n    \"email\": \"karachi@snpdist.com\",\n    \"working_hours\": \"9AM - 6PM\",\n    \"is_active\": true\n}",
@@ -2384,8 +3383,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/service-centers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Service Center",
@@ -2397,8 +3406,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/service-centers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Service Center",
@@ -2410,7 +3429,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"title\": \"Karachi Service Center - Updated\",\n    \"brand_ids\": [1]\n}",
@@ -2419,8 +3437,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/service-centers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Service Center",
@@ -2432,8 +3461,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/service-centers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle Status",
@@ -2445,8 +3484,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/service-centers/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/service-centers/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service-centers",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2464,7 +3514,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/couriers?is_active=true",
+              "raw": "{{base_url}}/couriers",
               "host": [
                 "{{base_url}}"
               ],
@@ -2479,7 +3529,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Courier",
@@ -2491,7 +3542,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/couriers",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Pathao\",\n    \"phone\": \"+8801234567890\",\n    \"address\": \"Dhaka, Bangladesh\",\n    \"is_active\": true\n}",
@@ -2500,8 +3550,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/couriers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "couriers"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Courier",
@@ -2513,8 +3573,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/couriers/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/couriers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "couriers",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Courier",
@@ -2526,7 +3596,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/couriers/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"phone\": \"+8809876543210\"\n}",
@@ -2535,8 +3604,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/couriers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "couriers",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Courier",
@@ -2548,8 +3628,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/couriers/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/couriers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "couriers",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle Courier Status",
@@ -2561,8 +3651,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/couriers/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/couriers/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "couriers",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2580,7 +3681,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/delivery-challans?search=&customer_id=",
+              "raw": "{{base_url}}/delivery-challans",
               "host": [
                 "{{base_url}}"
               ],
@@ -2591,18 +3692,19 @@
                 {
                   "key": "search",
                   "value": "",
-                  "disabled": true,
-                  "description": "Search by delivery number or courier slip"
+                  "description": "Search by delivery number or courier slip",
+                  "disabled": true
                 },
                 {
                   "key": "customer_id",
                   "value": "",
-                  "disabled": true,
-                  "description": "Filter by customer ID"
+                  "description": "Filter by customer ID",
+                  "disabled": true
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Delivery Challan",
@@ -2614,7 +3716,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/delivery-challans",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"claim_ids\": [1, 2, 3],\n    \"courier_out_id\": 1,\n    \"courier_slip_outward\": \"DC-SLIP-001\",\n    \"delivered_date_time\": \"2026-05-18 16:30:00\",\n    \"delivered_remarks\": \"All items delivered in good condition\"\n}",
@@ -2623,6 +3724,15 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/delivery-challans",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery-challans"
+              ]
             }
           },
           "response": [
@@ -2644,10 +3754,16 @@
                       "language": "json"
                     }
                   }
+                },
+                "url": {
+                  "raw": ""
                 }
               },
               "status": "OK",
               "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Delivery challan created successfully.\",\n    \"data\": {\n        \"id\": 1,\n        \"delivery_number\": \"DC-2026-00001\",\n        \"customer\": {},\n        \"courier_out\": {},\n        \"courier_slip_outward\": \"DC-SLIP-001\",\n        \"delivered_date_time\": \"2026-05-18T16:30:00+00:00\",\n        \"delivered_remarks\": \"All items delivered in good condition\",\n        \"claim_ids\": [1, 2, 3],\n        \"claims\": [],\n        \"created_at\": \"2026-05-18T16:30:00+00:00\"\n    }\n}"
             }
           ]
@@ -2662,25 +3778,50 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/delivery-challans/1",
-            "response": [
+            "url": {
+              "raw": "{{base_url}}/delivery-challans/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery-challans",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delivery Challan Update",
+          "request": {
+            "method": "PUT",
+            "header": [
               {
-                "name": "Success",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [
-                    {
-                      "key": "Accept",
-                      "value": "application/json"
-                    }
-                  ]
-                },
-                "status": "OK",
-                "code": 200,
-                "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1,\n        \"delivery_number\": \"DC-2026-00001\",\n        \"customer\": {\n            \"id\": 1,\n            \"customer_name\": \"ABC Corporation\",\n            \"email\": \"contact@abccorp.com\",\n            \"phone\": \"+8801234567890\"\n        },\n        \"courier_out\": {\n            \"id\": 1,\n            \"name\": \"Pathao\",\n            \"phone\": \"+8801234567890\"\n        },\n        \"courier_slip_outward\": \"DC-SLIP-001\",\n        \"delivered_date_time\": \"2026-05-18T16:30:00+00:00\",\n        \"delivered_remarks\": \"All items delivered in good condition\",\n        \"claim_ids\": [1, 2, 3],\n        \"claims\": [\n            {\n                \"id\": 1,\n                \"claim_number\": \"CLM-2026-00001\",\n                \"status\": \"Delivered\",\n                \"product\": {\n                    \"id\": 1,\n                    \"model_no\": \"SMG-S24-ULTRA\",\n                    \"item_description\": \"Samsung Galaxy S24 Ultra\"\n                }\n            }\n        ],\n        \"created_at\": \"2026-05-18T16:30:00+00:00\"\n    }\n}"
+                "key": "Accept",
+                "value": "application/json"
               }
-            ]
-          }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"courier_out_id\": 1,\r\n    \"courier_slip_outward\": \"DC-SLIP-005\",\r\n    \"delivered_date_time\": \"2026-05-18 16:30:00\",\r\n    \"delivered_remarks\": \"All items delivered in good condition\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/delivery-challans/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery-challans",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Claim Delivery List",
@@ -2692,8 +3833,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/claims/1/delivery"
-          }
+            "url": {
+              "raw": "{{base_url}}/claims/1/delivery",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "claims",
+                "1",
+                "delivery"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2711,7 +3863,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/parts?brand_id=1&category_id=1&sub_category_id=2",
+              "raw": "{{base_url}}/parts",
               "host": [
                 "{{base_url}}"
               ],
@@ -2741,7 +3893,8 @@
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Part",
@@ -2753,7 +3906,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/parts",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"part_id\": \"LCD Display\",\n    \"part_description\": \"LCD-SMG-001\",\n    \"brand_id\": 1,\n    \"category_id\": 1,\n    \"sub_category_id\": 2,\n    \"is_active\": true\n}",
@@ -2762,8 +3914,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/parts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "parts"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Part",
@@ -2775,8 +3937,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/parts/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/parts/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "parts",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Part",
@@ -2788,7 +3960,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/parts/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"price\": 5500\n}",
@@ -2797,8 +3968,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/parts/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "parts",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Part",
@@ -2810,8 +3992,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/parts/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/parts/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "parts",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle Part Status",
@@ -2823,8 +4015,19 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/parts/1/toggle-status"
-          }
+            "url": {
+              "raw": "{{base_url}}/parts/1/toggle-status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "parts",
+                "1",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Part Usage History",
@@ -2837,7 +4040,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/parts/1/usage-history?limit=15",
+              "raw": "{{base_url}}/parts/1/usage-history",
               "host": [
                 "{{base_url}}"
               ],
@@ -2850,8 +4053,8 @@
                 {
                   "key": "limit",
                   "value": "15",
-                  "disabled": true,
-                  "description": "Items per page"
+                  "description": "Items per page",
+                  "disabled": true
                 }
               ]
             }
@@ -2866,10 +4069,16 @@
                     "key": "Accept",
                     "value": "application/json"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"data\": [\n            {\n                \"id\": 1,\n                \"work_order_id\": 1,\n                \"claim_id\": \"CLM-2024-00001\",\n                \"claim_date_time\": \"2024-06-01T10:00:00+00:00\",\n                \"part_id\": 1,\n                \"case_id\": \"CASE-001\",\n                \"case_date_time\": \"2024-06-02T10:00:00+00:00\",\n                \"order_id\": \"ORD-001\",\n                \"order_date_time\": \"2024-06-03T10:00:00+00:00\",\n                \"received_date_time\": \"2024-06-04T10:00:00+00:00\",\n                \"install_date_time\": \"2024-06-05T10:00:00+00:00\",\n                \"good_part_serial\": \"GPSN-12345\",\n                \"faulty_part_serial\": \"FPSN-67890\",\n                \"return_date_time\": \"2024-06-10T10:00:00+00:00\",\n                \"part_returned\": true,\n                \"part_status\": \"Returned\",\n                \"part_return_comment\": \"Part in good condition\",\n                \"labour_claim_id\": \"LC-2024-001\",\n                \"labour_claim_date\": \"2024-06-15\",\n                \"faulty_part_id\": 2,\n                \"faulty_description\": \"Screen display not working\"\n            }\n        ]\n    }\n}"
             }
           ]
@@ -2889,8 +4098,17 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/memorize-reports"
-          }
+            "url": {
+              "raw": "{{base_url}}/memorize-reports",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memorize-reports"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Create Memorize Report",
@@ -2902,7 +4120,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/memorize-reports",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"title\": \"Monthly Warranty Summary\",\n    \"type\": \"warranty_summary\",\n    \"filter\": {\"brand_id\": 1, \"date_from\": \"2026-01-01\", \"date_to\": \"2026-12-31\"}\n}",
@@ -2911,8 +4128,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/memorize-reports",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memorize-reports"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Memorize Report",
@@ -2924,8 +4151,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/memorize-reports/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/memorize-reports/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memorize-reports",
+                "1"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Memorize Report",
@@ -2937,7 +4174,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/memorize-reports/1",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"title\": \"Monthly Warranty Summary - Updated\",\n    \"filter\": {\"brand_id\": 1, \"date_from\": \"2026-01-01\", \"date_to\": \"2026-06-30\"}\n}",
@@ -2946,8 +4182,19 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/memorize-reports/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memorize-reports",
+                "1"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Delete Memorize Report",
@@ -2959,8 +4206,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/memorize-reports/1"
-          }
+            "url": {
+              "raw": "{{base_url}}/memorize-reports/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memorize-reports",
+                "1"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2977,8 +4234,17 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/settings"
-          }
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Create/Update Setting",
@@ -2990,7 +4256,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/settings",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"key\": \"company_name\",\n    \"value\": \"SNP Distribution Ltd.\",\n    \"type\": \"app\"\n}",
@@ -2999,8 +4264,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Update All Settings",
@@ -3012,7 +4287,6 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/settings",
             "body": {
               "mode": "raw",
               "raw": "{\n    \"settings\": [\n        {\"key\": \"company_name\", \"value\": \"SNP Distribution Ltd.\", \"type\": \"app\"},\n        {\"key\": \"company_email\", \"value\": \"info@snpdist.com\", \"type\": \"app\"},\n        {\"key\": \"company_phone\", \"value\": \"+8802\", \"type\": \"app\"},\n        {\"key\": \"warranty_default_days\", \"value\": \"365\", \"type\": \"app\"}\n    ]\n}",
@@ -3021,8 +4295,18 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings"
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Get Setting",
@@ -3034,8 +4318,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/settings/company_name"
-          }
+            "url": {
+              "raw": "{{base_url}}/settings/company_name",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings",
+                "company_name"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Delete Setting",
@@ -3047,8 +4341,18 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/settings/company_name"
-          }
+            "url": {
+              "raw": "{{base_url}}/settings/company_name",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "settings",
+                "company_name"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -3066,7 +4370,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/dashboard?brand_id=1&service_center_id=1&year=2026",
+              "raw": "{{base_url}}/dashboard",
               "host": [
                 "{{base_url}}"
               ],
@@ -3077,20 +4381,20 @@
                 {
                   "key": "brand_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by brand"
+                  "description": "Filter by brand",
+                  "disabled": true
                 },
                 {
                   "key": "service_center_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by service center"
+                  "description": "Filter by service center",
+                  "disabled": true
                 },
                 {
                   "key": "year",
                   "value": "2026",
-                  "disabled": true,
-                  "description": "Year for monthly claims"
+                  "description": "Year for monthly claims",
+                  "disabled": true
                 }
               ]
             }
@@ -3105,10 +4409,16 @@
                     "key": "Accept",
                     "value": "application/json"
                   }
-                ]
+                ],
+                "url": {
+                  "raw": ""
+                }
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": {\n        \"stats\": {\n            \"total_warranties\": 100,\n            \"active_warranties\": 80,\n            \"expired_warranties\": 20,\n            \"total_claims\": 50,\n            \"open_claims\": 10,\n            \"converted_claims\": 30,\n            \"closed_claims\": 10,\n            \"total_work_orders\": 45,\n            \"pending_work_orders\": 5,\n            \"in_progress_work_orders\": 10,\n            \"completed_work_orders\": 20,\n            \"delivered_work_orders\": 10,\n            \"total_service_centers\": 5,\n            \"total_brands\": 3,\n            \"avg_customer_rating\": 4.5,\n            \"avg_tat_days\": 3.2\n        },\n        \"warranty\": {\n            \"total\": 100,\n            \"active\": 80,\n            \"expired\": 20,\n            \"expiring_soon\": []\n        },\n        \"claim\": {\n            \"total\": 50,\n            \"open\": 10,\n            \"converted\": 30,\n            \"closed\": 10,\n            \"recent\": [],\n            \"monthly\": []\n        },\n        \"work_order\": {\n            \"total\": 45,\n            \"pending\": 5,\n            \"in_progress\": 10,\n            \"completed\": 20,\n            \"delivered\": 10,\n            \"recent\": []\n        },\n        \"service_center\": {\n            \"total\": 5\n        },\n        \"brand\": {\n            \"total\": 3\n        },\n        \"metrics\": {\n            \"avg_customer_rating\": 4.5,\n            \"avg_tat_days\": 3.2\n        }\n    }\n}"
             }
           ]
@@ -3129,7 +4439,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/exports/claims?status=Open&brand_id=1&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/exports/claims?format=excel",
               "host": [
                 "{{base_url}}"
               ],
@@ -3146,42 +4456,43 @@
                 {
                   "key": "status",
                   "value": "Open",
-                  "disabled": true,
-                  "description": "Filter by status"
+                  "description": "Filter by status",
+                  "disabled": true
                 },
                 {
                   "key": "product_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by product ID"
+                  "description": "Filter by product ID",
+                  "disabled": true
                 },
                 {
                   "key": "service_center_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by service center"
+                  "description": "Filter by service center",
+                  "disabled": true
                 },
                 {
                   "key": "brand_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by brand"
+                  "description": "Filter by brand",
+                  "disabled": true
                 },
                 {
                   "key": "date_from",
                   "value": "2024-01-01",
-                  "disabled": true,
-                  "description": "From date"
+                  "description": "From date",
+                  "disabled": true
                 },
                 {
                   "key": "date_to",
                   "value": "2024-12-31",
-                  "disabled": true,
-                  "description": "To date"
+                  "description": "To date",
+                  "disabled": true
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Download Claims PDF",
@@ -3194,7 +4505,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/exports/claims?format=pdf&status=Open&brand_id=1&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/exports/claims?format=pdf",
               "host": [
                 "{{base_url}}"
               ],
@@ -3211,42 +4522,43 @@
                 {
                   "key": "status",
                   "value": "Open",
-                  "disabled": true,
-                  "description": "Filter by status"
+                  "description": "Filter by status",
+                  "disabled": true
                 },
                 {
                   "key": "product_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by product ID"
+                  "description": "Filter by product ID",
+                  "disabled": true
                 },
                 {
                   "key": "service_center_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by service center"
+                  "description": "Filter by service center",
+                  "disabled": true
                 },
                 {
                   "key": "brand_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by brand"
+                  "description": "Filter by brand",
+                  "disabled": true
                 },
                 {
                   "key": "date_from",
                   "value": "2024-01-01",
-                  "disabled": true,
-                  "description": "From date"
+                  "description": "From date",
+                  "disabled": true
                 },
                 {
                   "key": "date_to",
                   "value": "2024-12-31",
-                  "disabled": true,
-                  "description": "To date"
+                  "description": "To date",
+                  "disabled": true
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Download Products Excel",
@@ -3259,7 +4571,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/exports/products?brand_id=1&status=active&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/exports/products?format=excel",
               "host": [
                 "{{base_url}}"
               ],
@@ -3276,42 +4588,43 @@
                 {
                   "key": "brand_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by brand"
+                  "description": "Filter by brand",
+                  "disabled": true
                 },
                 {
                   "key": "category_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by category"
+                  "description": "Filter by category",
+                  "disabled": true
                 },
                 {
                   "key": "status",
                   "value": "active",
-                  "disabled": true,
-                  "description": "Filter by status (active/expired)"
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
                 },
                 {
                   "key": "date_from",
                   "value": "2024-01-01",
-                  "disabled": true,
-                  "description": "From date"
+                  "description": "From date",
+                  "disabled": true
                 },
                 {
                   "key": "date_to",
                   "value": "2024-12-31",
-                  "disabled": true,
-                  "description": "To date"
+                  "description": "To date",
+                  "disabled": true
                 },
                 {
                   "key": "search",
                   "value": "",
-                  "disabled": true,
-                  "description": "Search by model or serial"
+                  "description": "Search by model or serial",
+                  "disabled": true
                 }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Download Products PDF",
@@ -3324,7 +4637,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/exports/products?format=pdf&brand_id=1&status=active&date_from=2024-01-01&date_to=2024-12-31",
+              "raw": "{{base_url}}/exports/products?format=pdf",
               "host": [
                 "{{base_url}}"
               ],
@@ -3341,44 +4654,662 @@
                 {
                   "key": "brand_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by brand"
+                  "description": "Filter by brand",
+                  "disabled": true
                 },
                 {
                   "key": "category_id",
                   "value": "1",
-                  "disabled": true,
-                  "description": "Filter by category"
+                  "description": "Filter by category",
+                  "disabled": true
                 },
                 {
                   "key": "status",
                   "value": "active",
-                  "disabled": true,
-                  "description": "Filter by status (active/expired)"
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
                 },
                 {
                   "key": "date_from",
                   "value": "2024-01-01",
-                  "disabled": true,
-                  "description": "From date"
+                  "description": "From date",
+                  "disabled": true
                 },
                 {
                   "key": "date_to",
                   "value": "2024-12-31",
-                  "disabled": true,
-                  "description": "To date"
+                  "description": "To date",
+                  "disabled": true
                 },
                 {
                   "key": "search",
                   "value": "",
-                  "disabled": true,
-                  "description": "Search by model or serial"
+                  "description": "Search by model or serial",
+                  "disabled": true
                 }
               ]
             }
-          }
+          },
+          "response": []
+        },
+        {
+          "name": "Download customers Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/customers?format=excel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "excel"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download customers PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/customers?format=pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf",
+                  "description": "Download format: excel or pdf"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download categories Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?format=excel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "excel",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download categories PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?format=pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download brands Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?format=excel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "excel",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download brands PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?format=pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download cities Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?format=excel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "excel",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download cities PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/products?format=pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "description": "Filter by brand",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "description": "Filter by category",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status (active/expired)",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by model or serial",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Delivery Challans Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/delivery-challans?format=excel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "delivery-challans"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "excel",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by delivery number or courier slip",
+                  "disabled": true
+                },
+                {
+                  "key": "customer_id",
+                  "value": "",
+                  "description": "Filter by customer ID",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Delivery Challans PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exports/delivery-challans?format=pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exports",
+                "delivery-challans"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf",
+                  "description": "Download format: excel or pdf"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by delivery number or courier slip",
+                  "disabled": true
+                },
+                {
+                  "key": "customer_id",
+                  "value": "",
+                  "description": "Filter by customer ID",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "description": "From date",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "description": "To date",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://localhost/warranty_management_system/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "customer_token",
+      "value": ""
     }
   ]
 }

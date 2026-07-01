@@ -7,6 +7,7 @@ use App\Exports\CategoriesExport;
 use App\Exports\CitiesExport;
 use App\Exports\ClaimsExport;
 use App\Exports\CustomersExport;
+use App\Exports\DeliveryChallansExport;
 use App\Exports\ProductsExport;
 use App\Exports\WorkOrdersExport;
 use App\Http\Controllers\Controller;
@@ -14,6 +15,7 @@ use App\Models\Brand;
 use App\Models\City;
 use App\Models\Claim;
 use App\Models\Customer;
+use App\Models\DeliveryChallan;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -595,5 +597,47 @@ class ExportController extends Controller
         $filename = 'cities-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
 
         return Excel::download(new CitiesExport($filters), $filename);
+    }
+
+    public function downloadDeliveryChallans(Request $request)
+    {
+        $filters = $request->only([
+            'search',
+            'customer_id',
+            'date_from',
+            'date_to',
+        ]);
+
+        if ($request->input('format') === 'pdf') {
+            $query = DeliveryChallan::with(['customer', 'serviceCenter', 'courierOut']);
+
+            if (!empty($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('delivery_number', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('courier_slip_outward', 'like', '%' . $filters['search'] . '%');
+                });
+            }
+
+            if (!empty($filters['customer_id'])) {
+                $query->where('customer_id', $filters['customer_id']);
+            }
+
+            if (!empty($filters['date_from'])) {
+                $query->where('created_at', '>=', $filters['date_from']);
+            }
+
+            if (!empty($filters['date_to'])) {
+                $query->where('created_at', '<=', $filters['date_to']);
+            }
+
+            $deliveryChallans = $query->orderBy('id', 'desc')->get();
+            $filename = 'delivery-challans-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+
+            return Pdf::loadView('exports.delivery-challans-pdf', compact('deliveryChallans'))->download($filename);
+        }
+
+        $filename = 'delivery-challans-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
+
+        return Excel::download(new DeliveryChallansExport($filters), $filename);
     }
 }

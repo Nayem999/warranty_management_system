@@ -16,6 +16,8 @@ class MemorizeReportController extends Controller
     {
         $query = MemorizeReport::query();
 
+        $query->where('created_by', $request->user()->id);
+
         if ($request->has('type')) {
             $query->where('type', $request->type);
         }
@@ -36,6 +38,8 @@ class MemorizeReportController extends Controller
             'type' => 'required|string|max:100',
             'filter' => 'nullable|string',
         ]);
+
+        $data['created_by'] = $request->user()->id;
 
         $report = MemorizeReport::create($data);
 

@@ -348,6 +348,7 @@ Route::prefix('')->group(function () {
         Route::get('/exports/categories', [ExportController::class, 'downloadCategories']);
         Route::get('/exports/brands', [ExportController::class, 'downloadBrands']);
         Route::get('/exports/cities', [ExportController::class, 'downloadCities']);
+        Route::get('/exports/delivery-challans', [ExportController::class, 'downloadDeliveryChallans']);
 
         // });
 
