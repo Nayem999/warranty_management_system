@@ -116,10 +116,19 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Brand::class, 'wms_user_brand_access')
             ->withPivot('created_by')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->wherePivotNull('deleted_at');
     }
 
     public function serviceCenters(): BelongsToMany
+    {
+        return $this->belongsToMany(ServiceCenter::class, 'wms_user_service_center_access')
+            ->withPivot('created_by')
+            ->withTimestamps()
+            ->wherePivotNull('deleted_at');
+    }
+
+    public function serviceCentersWithTrashed(): BelongsToMany
     {
         return $this->belongsToMany(ServiceCenter::class, 'wms_user_service_center_access')
             ->withPivot('created_by')

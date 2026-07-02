@@ -39,6 +39,7 @@ class DashboardController extends Controller
 
         if ($user->isServiceCenterRestricted()) {
             $serviceCenterIds = $user->accessibleServiceCenterIds();
+            dd($serviceCenterIds);
             $claimQuery->whereIn('service_center_id', $serviceCenterIds);
         }
 
